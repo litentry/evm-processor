@@ -1,0 +1,7 @@
+node_modules
+dist
+.env
+yarn-error.log
+.idea
+.DS_Store
+google-credentials.json

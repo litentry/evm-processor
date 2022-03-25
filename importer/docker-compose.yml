@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=ethereum
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '8000:5432'
+      # command: ["postgres", "-c", "log_statement=all"]
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/create_tables.sql

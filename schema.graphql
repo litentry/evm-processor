@@ -1,0 +1,28 @@
+type UniswapLPSwap @entity {
+  # block-index
+  id: ID!
+  account: String! @index
+  "tokenAddress:tokenAddress"
+  pair: String! @index
+  # pairSymbol: String! @index
+  intermediatePath: String
+  deadline: BigInt!
+
+  token0: UniswapLPToken! @index
+  token1: UniswapLPToken! @index
+  token0Amount: BigInt!
+  token1Amount: BigInt!
+
+  gas: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transactionHash: String!
+}
+
+type UniswapLPToken @entity {
+  # address
+  id: ID!
+  # symbol: String!
+  # decimals: BigInt!
+  # name: String!
+}

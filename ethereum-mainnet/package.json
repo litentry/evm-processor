@@ -1,0 +1,16 @@
+{
+  "name": "ethereum-mainnet",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "build": "rm -rf dist && tsc",
+    "start": "node dist/index.js",
+    "prettier": "node_modules/.bin/prettier --write '**/*.ts'",
+    "typecheck": "yarn tsc --noEmit",
+    "postinstall": "yarn run build"
+  },
+  "dependencies": {
+    "dotenv": "^10.0.0"
+  }
+}
