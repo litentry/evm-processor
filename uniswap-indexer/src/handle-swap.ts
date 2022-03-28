@@ -1,9 +1,10 @@
-import { BigNumber, Transaction } from 'ethers';
+import { BigNumber } from 'ethers';
 import _ from 'lodash';
-import { UNISWAP } from './constants';
+import { Log } from 'processor';
+import { UNISWAP, TRANSFER_CALL } from './constants';
 import getIntermediatePath from './get-intermediate-path';
 import getOrCreateToken from './get-or-create-token';
-import { Log, UniswapLPSwap } from './types';
+import { UniswapLPSwap } from './types';
 
 export function handleSwap(
   transactionIndex: BigInt,
@@ -28,7 +29,7 @@ export function handleSwap(
   const transferLogs = logs.filter(
     (log) =>
       log.address === tokenAddressOfMissingAmount.toLowerCase() &&
-      log.topic0.startsWith(`0x${UNISWAP.TRANSFER_CALL.ID}`)
+      log.topic0.startsWith(`0x${TRANSFER_CALL.ID}`)
   );
 
   // todo - delete when confident in the above logic
@@ -46,6 +47,7 @@ export function handleSwap(
 
   // SWAP
   const swapId = `${blockNumber.toString()}:${transactionIndex.toString()}`;
+  // todo revert when we have generated models
   // const swap = new UniswapLPSwap(swapId);
   // swap.account = address;
   // swap.pair = `${token0.id}:${token1.id}`;

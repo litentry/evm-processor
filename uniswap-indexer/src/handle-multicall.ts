@@ -2,23 +2,12 @@ import { BigNumber } from 'ethers';
 import _ from 'lodash';
 import { UNISWAP } from './constants';
 import { handleSwap } from './handle-swap';
-import { Log, Transaction, TransactionWithLogs } from './types';
-import * as utils from './utils';
+import { Log, Transaction, TransactionWithLogs, utils } from 'processor';
 
 const swapMethodIds = UNISWAP.V3_MULTICALL_SWAP_METHODS.map(
   (method) => method.ID
 );
 
-/*
-    "1. transactions where to_address === 0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45 (uniswap v3)",
-    "2. check input starts with 0x5ae401dc multicall(uint256 deadline, bytes[] data)",
-    "3. Break down input into individual calls",
-    "4. Check calls for relevant method ids e.g. 472b43f3 swapExactTokensForTokens(uint256,uint256,address[],address)",
-    "5. Pass matching call inputs into parsers",
-    "6. Check we have all the data we need - log to JSON",
-
-    "FORGOT - output is possibly: logs where address is non-exact token and topic0 starts with Withdrawal(address,uint256) 7fcf532c - use data"
-    */
 export default async function handleMulticall(tx: TransactionWithLogs) {
   const swapMethodsCalled = utils.findMethodsInInput(tx.input, swapMethodIds);
   if (!swapMethodsCalled.length) {

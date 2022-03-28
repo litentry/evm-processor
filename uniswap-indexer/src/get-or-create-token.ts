@@ -1,3 +1,4 @@
+// todo - revert when we have models generated
 import { UniswapLPToken } from './types';
 // import { UniswapLPToken } from '../../../generated/schema';
 // import { fetchTokenDecimals } from './fetchTokenDecimals';
