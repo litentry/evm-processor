@@ -6,7 +6,7 @@
     "prettier": "node_modules/.bin/prettier --write '**/*.ts'",
     "build": "rm -rf dist && tsc",
     "typecheck": "yarn tsc --noEmit",
-    "postinstall": "yarn run build",
+    "_postinstall": "yarn run build",
     "watch": "tsc --watch"
   },
   "dependencies": {
