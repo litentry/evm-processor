@@ -69,5 +69,5 @@ export interface TransactionConfig {
   startBlock: number;
   contractAddress: string;
   method: string;
-  handler: (tx: TransactionWithLogs, dataSource: DataSource) => Promise<void>;
+  handler: (tx: TransactionWithLogs) => Promise<void>;
 }

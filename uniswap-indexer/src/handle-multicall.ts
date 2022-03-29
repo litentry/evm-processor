@@ -9,10 +9,7 @@ const swapMethodIds = UNISWAP.V3_MULTICALL_SWAP_METHODS.map(
   (method) => method.ID
 );
 
-export default async function handleMulticall(
-  tx: TransactionWithLogs,
-  dataSource: DataSource
-) {
+export default async function handleMulticall(tx: TransactionWithLogs) {
   const swapMethodsCalled = utils.findMethodsInInput(tx.input, swapMethodIds);
   if (!swapMethodsCalled.length) {
     return;
@@ -47,7 +44,6 @@ export default async function handleMulticall(
       case 'swapExactTokensForTokens': {
         await swapExactTokensForTokens(
           tx,
-          dataSource,
           deadline.toBigInt()
         )(decodedCalls[i].decoded as [BigNumber, BigNumber, string[], string]);
         break;
@@ -85,21 +81,14 @@ const swapTokensForExactTokens = async ([amountOut, amountInMax, path, to]: [
 ]) => {};
 
 const swapExactTokensForTokens =
-  (tx: TransactionWithLogs, dataSource: DataSource, deadline: BigInt) =>
+  (tx: TransactionWithLogs, deadline: BigInt) =>
   async ([amountIn, amountOutMin, path, to]: [
     BigNumber,
     BigNumber,
     string[],
     string
   ]) => {
-    await handleSwap(
-      dataSource,
-      tx,
-      deadline,
-      path,
-      amountIn.toBigInt(),
-      'unknown'
-    );
+    await handleSwap(tx, deadline, path, amountIn.toBigInt(), 'unknown');
   };
 
 const swapExactTokensForETH = async ([amountIn, amountOutMin, path, to]: [

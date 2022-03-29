@@ -1,13 +1,12 @@
 import _ from 'lodash';
 import { BigNumber } from 'ethers';
-import { DataSource } from 'typeorm';
 import { TransactionWithLogs } from 'processor';
 import { TRANSFER_CALL } from './constants';
 import getIntermediatePath from './get-intermediate-path';
 import { UniswapLPSwap, UniswapLPToken } from './model';
+import dataSource from './data-source';
 
 export async function handleSwap(
-  dataSource: DataSource,
   tx: TransactionWithLogs,
   deadline: BigInt,
   path: string[],

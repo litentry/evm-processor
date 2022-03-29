@@ -17,6 +17,7 @@
     "@subsquid/cli": "^0.2.1",
     "dotenv": "^10.0.0",
     "processor": "0.0.1",
+    "reflect-metadata": "^0.1.13",
     "typeorm": "^0.3.4"
   },
   "devDependencies": {
