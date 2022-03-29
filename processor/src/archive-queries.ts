@@ -4,9 +4,9 @@ import { Block, Transaction, Log, TransactionWithLogs } from './types';
 
 const pool = new Pool({
   host: process.env.ARCHIVE_DB_HOST,
-  user: process.env.ARCHIVE_DB_USER,
+  user: 'postgres',
+  password: 'postgres',
   database: process.env.ARCHIVE_DB_DATABASE,
-  password: process.env.ARCHIVE_DB_PASSWORD,
   port: parseInt(process.env.ARCHIVE_DB_PORT!),
 });
 

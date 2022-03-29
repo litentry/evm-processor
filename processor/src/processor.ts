@@ -7,8 +7,8 @@ import { TransactionConfig } from './types';
 //   type: 'postgres',
 //   host: process.env.PROCESSOR_DB_HOST,
 //   port: parseInt(process.env.PROCESSOR_DB_PORT!),
-//   username: process.env.PROCESSOR_DB_USER,
-//   password: process.env.PROCESSOR_DB_PASSWORD,
+// user: 'postgres',
+// password: 'postgres',
 //   database: process.env.PROCESSOR_DB_DATABASE,
 //   // migrations: [],
 // });
