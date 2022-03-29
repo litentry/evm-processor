@@ -15,7 +15,7 @@ type UniswapLPSwap @entity {
 
   gas: BigInt!
   blockNumber: BigInt!
-  timestamp: BigInt!
+  timestamp: DateTime!
   transactionHash: String!
 }
 

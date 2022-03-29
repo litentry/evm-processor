@@ -1,3 +1,5 @@
+import { DataSource } from 'typeorm';
+
 export interface Block {
   timestamp: Date;
   number: BigInt;
@@ -63,8 +65,9 @@ export interface TransactionWithLogs extends Transaction {
   logs: Log[];
 }
 
-export interface Status {
-  id: 'fixed';
-  last_indexed_block: number;
-  chain_height: number;
+export interface TransactionConfig {
+  startBlock: number;
+  contractAddress: string;
+  method: string;
+  handler: (tx: TransactionWithLogs, dataSource: DataSource) => Promise<void>;
 }

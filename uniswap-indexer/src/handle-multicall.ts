@@ -1,14 +1,18 @@
-import { BigNumber } from 'ethers';
 import _ from 'lodash';
+import { BigNumber } from 'ethers';
+import { TransactionWithLogs, utils } from 'processor';
+import { DataSource } from 'typeorm';
 import { UNISWAP } from './constants';
 import { handleSwap } from './handle-swap';
-import { Log, Transaction, TransactionWithLogs, utils } from 'processor';
 
 const swapMethodIds = UNISWAP.V3_MULTICALL_SWAP_METHODS.map(
   (method) => method.ID
 );
 
-export default async function handleMulticall(tx: TransactionWithLogs) {
+export default async function handleMulticall(
+  tx: TransactionWithLogs,
+  dataSource: DataSource
+) {
   const swapMethodsCalled = utils.findMethodsInInput(tx.input, swapMethodIds);
   if (!swapMethodsCalled.length) {
     return;
@@ -43,6 +47,7 @@ export default async function handleMulticall(tx: TransactionWithLogs) {
       case 'swapExactTokensForTokens': {
         await swapExactTokensForTokens(
           tx,
+          dataSource,
           deadline.toBigInt()
         )(decodedCalls[i].decoded as [BigNumber, BigNumber, string[], string]);
         break;
@@ -54,7 +59,7 @@ export default async function handleMulticall(tx: TransactionWithLogs) {
     }
   }
 
-  return { decodedCalls };
+  // return { decodedCalls };
 }
 
 const swapTokensForExactETH = async ([amountOut, amountInMax, path, to]: [
@@ -80,7 +85,7 @@ const swapTokensForExactTokens = async ([amountOut, amountInMax, path, to]: [
 ]) => {};
 
 const swapExactTokensForTokens =
-  (tx: TransactionWithLogs, deadline: BigInt) =>
+  (tx: TransactionWithLogs, dataSource: DataSource, deadline: BigInt) =>
   async ([amountIn, amountOutMin, path, to]: [
     BigNumber,
     BigNumber,
@@ -88,17 +93,12 @@ const swapExactTokensForTokens =
     string
   ]) => {
     await handleSwap(
-      tx.transaction_index,
-      tx.hash,
-      tx.block_timestamp,
-      tx.block_number,
-      tx.gas,
-      tx.from_address,
+      dataSource,
+      tx,
       deadline,
       path,
       amountIn.toBigInt(),
-      'unknown',
-      tx.logs
+      'unknown'
     );
   };
 

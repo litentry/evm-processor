@@ -1,32 +1,38 @@
-import { BigNumber } from 'ethers';
 import _ from 'lodash';
-import { Log } from 'processor';
-import { UNISWAP, TRANSFER_CALL } from './constants';
+import { BigNumber } from 'ethers';
+import { DataSource } from 'typeorm';
+import { TransactionWithLogs } from 'processor';
+import { TRANSFER_CALL } from './constants';
 import getIntermediatePath from './get-intermediate-path';
-import getOrCreateToken from './get-or-create-token';
-import { UniswapLPSwap } from './types';
+import { UniswapLPSwap, UniswapLPToken } from './model';
 
-export function handleSwap(
-  transactionIndex: BigInt,
-  transactionHash: string,
-  timestamp: Date,
-  blockNumber: BigInt,
-  gas: BigInt,
-  address: string,
+export async function handleSwap(
+  dataSource: DataSource,
+  tx: TransactionWithLogs,
   deadline: BigInt,
   path: string[],
   token0Amount: BigInt | 'unknown',
-  token1Amount: BigInt | 'unknown',
-  logs: Log[]
-): void {
-  const token0 = getOrCreateToken(path[0]);
-  const token1 = getOrCreateToken(path[path.length - 1]);
+  token1Amount: BigInt | 'unknown'
+): Promise<void> {
+  const tokenRepository = dataSource.getRepository(UniswapLPToken);
+
+  let token0 = await tokenRepository.findOneBy({ id: path[0] });
+  if (!token0) {
+    token0 = new UniswapLPToken({ id: path[0] });
+    await dataSource.manager.save(token0);
+  }
+
+  let token1 = await tokenRepository.findOneBy({ id: path[path.length - 1] });
+  if (!token1) {
+    token1 = new UniswapLPToken({ id: path[path.length - 1] });
+    await dataSource.manager.save(token1);
+  }
 
   // We need to find the actual amount of the non-fixed side of the swap, to do this we looks for the transfer events on the relevant token contract
   const tokenAddressOfMissingAmount =
     token0Amount === 'unknown' ? token0.id : token1.id;
 
-  const transferLogs = logs.filter(
+  const transferLogs = tx.logs.filter(
     (log) =>
       log.address === tokenAddressOfMissingAmount.toLowerCase() &&
       log.topic0.startsWith(`0x${TRANSFER_CALL.ID}`)
@@ -34,7 +40,7 @@ export function handleSwap(
 
   // todo - delete when confident in the above logic
   if (!transferLogs.length) {
-    throw new Error(`Transfer log missing from tx: ${transactionHash}`);
+    throw new Error(`Transfer log missing from tx: ${tx.hash}`);
   }
 
   // sum the transfer events for the missing token - it's not always a single transfer as some token contracts have special cases
@@ -45,38 +51,28 @@ export function handleSwap(
     )
     .toBigInt();
 
-  // SWAP
-  const swapId = `${blockNumber.toString()}:${transactionIndex.toString()}`;
-  // todo revert when we have generated models
-  // const swap = new UniswapLPSwap(swapId);
-  // swap.account = address;
-  // swap.pair = `${token0.id}:${token1.id}`;
-  // swap.pairSymbol = `${token0.symbol}:${token1.symbol}`;
-  // swap.intermediatePath = getIntermediatePath(path);
-  // swap.deadline = deadline;
-  // swap.token0 = token0.id;
-  // swap.token1 = token1.id;
-  // swap.token0Amount = token0Amount;
-  // swap.token1Amount = token1Amount;
-  // swap.gas = gas;
-  // swap.blockNumber = blockNumber;
-  // swap.timestamp = timestamp;
-  // swap.transactionHash = transactionHash;
-  // swap.save();
-  const swap: UniswapLPSwap = {
-    id: swapId,
-    account: address,
+  const swap = new UniswapLPSwap({
+    id: `${tx.block_number.toString()}:${tx.transaction_index.toString()}`,
+    account: tx.from_address,
     pair: `${token0.id}:${token1.id}`,
+    // pairSymbol: `${token0.symbol}:${token1.symbol}`,
     intermediatePath: getIntermediatePath(path),
-    deadline,
-    token0,
-    token1,
-    token0Amount: token0Amount === 'unknown' ? missingAmount : token0Amount,
-    token1Amount: token1Amount === 'unknown' ? missingAmount : token1Amount,
-    gas,
-    blockNumber,
-    timestamp,
-    transactionHash,
-  };
-  console.log(swap);
+    deadline: deadline.valueOf(),
+    token0: token0,
+    token1: token1,
+    token0Amount: (token0Amount === 'unknown'
+      ? missingAmount
+      : token0Amount
+    ).valueOf(),
+    token1Amount: (token1Amount === 'unknown'
+      ? missingAmount
+      : token1Amount
+    ).valueOf(),
+    gas: tx.gas.valueOf(),
+    blockNumber: tx.block_number.valueOf(),
+    timestamp: tx.block_timestamp,
+    transactionHash: tx.hash,
+  });
+
+  await dataSource.manager.save(swap);
 }

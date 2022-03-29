@@ -5,3 +5,5 @@ yarn-error.log
 .idea
 .DS_Store
 google-credentials.json
+last-indexed-block
+*/src/model
