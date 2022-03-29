@@ -1,55 +1,94 @@
 import { writeFileSync, readFileSync, existsSync } from 'fs';
-import { queryTransactionsAndLogs } from './archive-queries';
-import { TransactionConfig } from './types';
+import { queryChainHeight, queryTransactionsAndLogs } from './archive-queries';
+import { ProcessorConfig, ContractSpec } from './types';
+import { getMethodIdFromSignature } from './utils';
 
-export async function processor(txConfigs: TransactionConfig[]) {
-  const startBlock = getStartBlock();
-  const batchSize = parseInt(process.env.BATCH_SIZE || '10');
-  const endBlock = parseInt(process.env.END_BLOCK!);
+export async function processor(config: ProcessorConfig) {
+  const startBlock = getStartBlock(config.startBlock);
+  const { batchSize, endBlock, contracts: _contracts } = config;
+  const contracts = contractsWithMethodIds(_contracts);
+  const initialChainHeight = await queryChainHeight();
+  const combinations = getCombinations(config.contracts);
 
   let currentBlock = startBlock;
 
-  const [tx] = await queryTransactionsAndLogs({
-    startBlock: currentBlock,
-    endBlock: currentBlock + 1,
-    method: '5ae401dc',
-    contract: '0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45',
-  });
+  // todo - don't go past end block
+  while (currentBlock <= initialChainHeight) {
+    let batchEndBlock = currentBlock + batchSize - 1;
+    if (batchEndBlock > initialChainHeight) {
+      batchEndBlock = initialChainHeight;
+    }
 
-  await txConfigs[0].handler(tx);
+    const allTxs = await Promise.all(
+      combinations.map(({ contract, methodId }) =>
+        queryTransactionsAndLogs({
+          startBlock: currentBlock,
+          endBlock: batchEndBlock,
+          methodId,
+          contract,
+        })
+      )
+    );
 
-  // // todo batches
-  // while (currentBlock <= endBlock) {
-  //   /*
-  //   move logic to uniswap:
-  //   contract = 'UNISWAP.V3_CONTRACT_ADDRESS'
-  //   additionalClause `AND input LIKE '0x5ae401dc%'`
-  //   */
-  //   const txs = await queryTransactionsAndLogs({
-  //     startBlock: currentBlock,
-  //     endBlock: currentBlock + batchSize,
-  //     method: '5ae401dc',
-  //     contract: '0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45',
-  //   });
-  //   console.log(txs);
-  //   // todo - handle txs
+    const txs = allTxs.flat();
+    txs.sort((a, b) => {
+      if (b.block_number < a.block_number) return 1;
+      if (a.block_number < b.block_number) return -1;
+      if (b.transaction_index < a.transaction_index) return 1;
+      if (a.transaction_index < b.transaction_index) return -1;
+      return 0;
+    });
 
-  //   writeFileSync('last-indexed-block', currentBlock.toString());
-  //   currentBlock += batchSize;
-  // }
-}
+    for (let i = 0; i < txs.length; i++) {
+      await contracts[txs[i].to_address][txs[i].input.substring(2, 10)](txs[i]);
 
-function getStartBlock() {
-  let startBlock = 0;
+      console.log(
+        `Processed block ${txs[i].block_number}: Transaction ${txs[i].transaction_index}`
+      );
+    }
 
-  if (existsSync('last-indexed-block')) {
-    const file = readFileSync('last-indexed-block');
-    startBlock = parseInt(file.toString());
-    return startBlock + 1;
+    writeFileSync('last-indexed-block', batchEndBlock.toString());
+    currentBlock = batchEndBlock + 1;
   }
 
-  if (process.env.START_BLOCK) {
-    startBlock = parseInt(process.env.START_BLOCK);
+  // todo -> carry on block by block
+}
+
+function contractsWithMethodIds(contracts: ContractSpec): ContractSpec {
+  const formatted: ContractSpec = {};
+
+  Object.entries(contracts).forEach(([address, methods]) => {
+    formatted[address] = {};
+    Object.entries(methods).forEach(([sig, fn]) => {
+      formatted[address][getMethodIdFromSignature(sig)] = fn;
+    }, {});
+  });
+
+  return formatted;
+}
+
+function getCombinations(contracts: ContractSpec) {
+  const combinations: {
+    contract: string;
+    methodId: string;
+  }[] = [];
+
+  Object.entries(contracts).forEach(([address, methods]) => {
+    combinations.push(
+      ...Object.keys(methods).map((method) => ({
+        contract: address,
+        methodId: getMethodIdFromSignature(method),
+      }))
+    );
+  });
+
+  return combinations;
+}
+
+function getStartBlock(startBlock: number) {
+  if (existsSync('last-indexed-block')) {
+    const file = readFileSync('last-indexed-block');
+    return parseInt(file.toString()) + 1;
   }
 
   return startBlock;

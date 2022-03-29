@@ -31,3 +31,7 @@ export function getMethodIdFromCall(input: string) {
 export function get32ByteChunks(input: string) {
   return input.match(/.{1,64}/g) as string[];
 }
+
+export function getMethodIdFromSignature(signature: string) {
+  return ethers.utils.keccak256(Buffer.from(signature)).substring(2, 10);
+}

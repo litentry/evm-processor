@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import { BigNumber } from 'ethers';
 import { TransactionWithLogs, utils } from 'processor';
-import { DataSource } from 'typeorm';
 import { UNISWAP } from './constants';
 import { handleSwap } from './handle-swap';
 

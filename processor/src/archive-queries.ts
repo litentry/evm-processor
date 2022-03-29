@@ -1,6 +1,8 @@
 import _ from 'lodash';
-import { Pool } from 'pg';
-import { Block, Transaction, Log, TransactionWithLogs } from './types';
+import pg, { Pool } from 'pg';
+import { Transaction, Log, TransactionWithLogs } from './types';
+
+pg.types.setTypeParser(20, BigInt);
 
 const pool = new Pool({
   host: process.env.ARCHIVE_DB_HOST,
@@ -10,41 +12,56 @@ const pool = new Pool({
   port: parseInt(process.env.ARCHIVE_DB_PORT!),
 });
 
+export async function queryChainHeight() {
+  const { rows: blocks } = await pool.query<{ height: number }>(
+    'SELECT MAX(number) as height FROM blocks'
+  );
+  return blocks[0].height;
+}
+
 export async function queryTransactionsAndLogs({
   startBlock,
   endBlock,
   contract,
-  method,
+  methodId,
 }: {
   startBlock: number;
   endBlock: number;
   contract: string;
-  method: string;
+  methodId: string;
 }): Promise<TransactionWithLogs[]> {
-  const { rows: blocks } = await pool.query<Block>(
-    `SELECT timestamp FROM blocks WHERE number >= ${startBlock} AND number < ${endBlock}`
+  const { rows: blocks } = await pool.query<{
+    start: Date;
+    end: Date;
+  }>(
+    `SELECT MIN(timestamp) as start, MAX(timestamp) as end FROM blocks WHERE number >= ${startBlock} AND number <= ${endBlock}`
   );
 
-  const blockTimestamps = blocks
-    .map((block) => `'${block.timestamp.toISOString()}'`)
-    .join(',');
-
-  const { rows: txs } =
-    await pool.query<Transaction>(`SELECT * FROM transactions
-  WHERE
-    block_timestamp IN (${blockTimestamps})
-  AND
-    receipt_status = 1
-  AND
-    to_address = '${contract}'
-  AND
-    input LIKE '0x${method}%'
-  ORDER BY block_number ASC`);
+  const { rows: txs } = await pool.query<Transaction>(
+    `SELECT * FROM transactions
+    WHERE
+      block_timestamp >= '${blocks[0].start.toISOString()}'
+    AND
+      block_timestamp <= '${blocks[0].end.toISOString()}'
+    AND
+      receipt_status = 1
+    AND
+      to_address = '${contract}'
+    AND
+      input LIKE '0x${methodId}%'
+    ORDER BY block_number ASC`
+  );
 
   const { rows: logs } = await pool.query<Log>(
-    `SELECT * FROM logs WHERE transaction_hash IN (${txs
-      .map((tx) => `'${tx.hash}'`)
-      .join(',')}) ORDER BY log_index ASC`
+    `SELECT * FROM logs
+    WHERE
+      block_timestamp >= '${blocks[0].start.toISOString()}'
+    AND
+      block_timestamp <= '${blocks[0].end.toISOString()}'
+    AND
+      transaction_hash IN (${txs
+        .map((tx) => `'${tx.hash}'`)
+        .join(',')}) ORDER BY log_index ASC`
   );
 
   const logsByTx = _.groupBy(logs, 'transaction_hash');

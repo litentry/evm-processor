@@ -65,9 +65,15 @@ export interface TransactionWithLogs extends Transaction {
   logs: Log[];
 }
 
-export interface TransactionConfig {
+export interface ProcessorConfig {
   startBlock: number;
-  contractAddress: string;
-  method: string;
-  handler: (tx: TransactionWithLogs) => Promise<void>;
+  endBlock?: number;
+  batchSize: number;
+  contracts: ContractSpec;
+}
+
+export interface ContractSpec {
+  [address: string]: {
+    [method: string]: (tx: TransactionWithLogs) => Promise<void>;
+  };
 }

@@ -6,5 +6,5 @@ export {
   Block,
   Log,
   TransactionWithLogs,
-  TransactionConfig,
+  ProcessorConfig,
 } from './types';
