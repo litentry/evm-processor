@@ -1025,7 +1025,24 @@
   resolved "https://registry.yarnpkg.com/@subsquid/graphiql-console/-/graphiql-console-0.2.0.tgz#53edcc562342735e800361bb3892c54388b2e717"
   integrity sha512-Wh2Oxi9JkK79Y728yDEeY7JelcY1cGiQTbzVIRMFLT2tjkkoQ69goAGXdh9QmM/ANAVrHQkBUNJOLd5oAg//oQ==
 
-"@subsquid/openreader@^0.5.1":
+"@subsquid/graphql-server@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@subsquid/graphql-server/-/graphql-server-0.1.5.tgz#18f6cd6bc3ce0b9d165793f369e5f60cc2bbf113"
+  integrity sha512-LpHv1Q6vEFMtWJ7oRvrtBWLFuI53EXyk90UVnnp+s0pcEPNIk6apNCrw5igh8ABGz6kIFbqe37JA+r1HFnZiWw==
+  dependencies:
+    "@graphql-tools/merge" "^8"
+    "@graphql-tools/utils" "^8"
+    "@subsquid/openreader" "^0.5.0"
+    "@subsquid/typeorm-config" "^0.0.4"
+    "@subsquid/util" "^0.0.4"
+    apollo-server-core "^3.6.2"
+    apollo-server-express "^3.6.2"
+    dotenv "^10.0.0"
+    express "^4.17.2"
+    graphql "^15.8.0"
+    pg "^8.7.1"
+
+"@subsquid/openreader@^0.5.0", "@subsquid/openreader@^0.5.1":
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/@subsquid/openreader/-/openreader-0.5.1.tgz#2559f0d24a957e764209aabc9381376a35a431f4"
   integrity sha512-qe61sWse9ME9UeZnLSIs8gCi1k1MYU0YZ5gERuLKFRr/KtSIMz+LI9AJNUeddQigFzn6RxR+J8Wa5k5FNDg2uQ==
