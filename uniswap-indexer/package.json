@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "main": "lib/index.js",
   "scripts": {
+    "db:build": "docker-compose down && docker-compose up -d && yarn codegen && yarn build && rm -rf db/migrations/* && yarn migration && yarn migrate",
     "dev": "nodemon src/index.ts",
     "build": "rm -rf lib && tsc",
     "start": "node lib/index.js",
@@ -15,6 +16,7 @@
     "migration": "sqd db:create-migration Data"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^4.5.0",
     "@subsquid/cli": "^0.2.1",
     "@subsquid/graphql-server": "^0.1.5",
     "dotenv": "^10.0.0",

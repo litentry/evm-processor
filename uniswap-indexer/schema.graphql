@@ -14,7 +14,7 @@ type UniswapLPSwap @entity {
   contract: String!
   "tokenAddress:tokenAddress"
   pair: String! @index
-  # pairSymbol: String! @index
+  pairSymbol: String! @index
   intermediatePath: String
   deadline: BigInt!
 
@@ -33,7 +33,7 @@ type UniswapLPSwap @entity {
 type UniswapLPToken @entity {
   # address
   id: ID!
-  # symbol: String!
-  # decimals: BigInt!
-  # name: String!
+  symbol: String
+  decimals: BigInt
+  name: String
 }

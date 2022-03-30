@@ -1,21 +1,18 @@
-// todo - revert when we have models generated
-import { UniswapLPToken } from './types';
-// import { UniswapLPToken } from '../../../generated/schema';
-// import { fetchTokenDecimals } from './fetchTokenDecimals';
-// import { fetchTokenSymbol } from './fetchTokenSymbol';
-// import { fetchTokenName } from './fetchTokenName';
+import dataSource from './data-source';
+import { UniswapLPToken } from './model';
+import fetchTokenData from './fetchTokenData';
 
-// (from identity-subgraph) need contract types
-export default function getOrCreateToken(
+export default async function getOrCreateToken(
   address: string
-): Partial<UniswapLPToken> & { id: string } {
-  // let token = UniswapLPToken.load(address);
-  // if (!token) {
-  //   token = new UniswapLPToken(address);
-  //   // token.decimals = fetchTokenDecimals(address);
-  //   // token.symbol = fetchTokenSymbol(address);
-  //   // token.name = fetchTokenName(address);
-  //   token.save();
-  // }
-  return { id: address };
+): Promise<UniswapLPToken> {
+  const tokenRepository = dataSource.getRepository(UniswapLPToken);
+  let token = await tokenRepository.findOneBy({ id: address });
+  if (!token) {
+    // todo replace with archive call when ready
+    const data = await fetchTokenData(address);
+    token = new UniswapLPToken({ id: address, ...data });
+    await dataSource.manager.save(token);
+  }
+
+  return token;
 }

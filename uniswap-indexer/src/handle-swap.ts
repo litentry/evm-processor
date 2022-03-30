@@ -5,6 +5,7 @@ import { TRANSFER_CALL } from './constants';
 import getIntermediatePath from './get-intermediate-path';
 import { UniswapLPSwap, UniswapLPToken, UniswapLPSwapMethod } from './model';
 import dataSource from './data-source';
+import getOrCreateToken from './get-or-create-token';
 
 export async function handleSwap(
   method: UniswapLPSwapMethod,
@@ -14,19 +15,8 @@ export async function handleSwap(
   token0Amount: BigInt | 'unknown',
   token1Amount: BigInt | 'unknown'
 ): Promise<void> {
-  const tokenRepository = dataSource.getRepository(UniswapLPToken);
-
-  let token0 = await tokenRepository.findOneBy({ id: path[0] });
-  if (!token0) {
-    token0 = new UniswapLPToken({ id: path[0] });
-    await dataSource.manager.save(token0);
-  }
-
-  let token1 = await tokenRepository.findOneBy({ id: path[path.length - 1] });
-  if (!token1) {
-    token1 = new UniswapLPToken({ id: path[path.length - 1] });
-    await dataSource.manager.save(token1);
-  }
+  const token0 = await getOrCreateToken(path[0]);
+  const token1 = await getOrCreateToken(path[path.length - 1]);
 
   // We need to find the actual amount of the non-fixed side of the swap, to do this we looks for the transfer events on the relevant token contract
   const tokenAddressOfMissingAmount =
@@ -57,7 +47,7 @@ export async function handleSwap(
     account: tx.from_address,
     method,
     pair: `${token0.id}:${token1.id}`,
-    // pairSymbol: `${token0.symbol}:${token1.symbol}`,
+    pairSymbol: `${token0.symbol || 'unknown'}:${token1.symbol || 'unknown'}`,
     intermediatePath: getIntermediatePath(path),
     deadline: deadline.valueOf(),
     token0: token0,
