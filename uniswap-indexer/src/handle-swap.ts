@@ -52,7 +52,8 @@ export async function handleSwap(
     .toBigInt();
 
   const swap = new UniswapLPSwap({
-    id: `${tx.block_number.toString()}:${tx.transaction_index.toString()}`,
+    id: tx.hash,
+    contract: tx.to_address,
     account: tx.from_address,
     method,
     pair: `${token0.id}:${token1.id}`,
@@ -72,7 +73,6 @@ export async function handleSwap(
     gas: tx.gas.valueOf(),
     blockNumber: tx.block_number.valueOf(),
     timestamp: tx.block_timestamp,
-    transactionHash: tx.hash,
   });
 
   await dataSource.manager.save(swap);

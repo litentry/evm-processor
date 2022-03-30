@@ -8,9 +8,10 @@ enum UniswapLPSwapMethod {
 }
 
 type UniswapLPSwap @entity {
-  # block-index
+  # tx hash
   id: ID!
   account: String! @index
+  contract: String!
   "tokenAddress:tokenAddress"
   pair: String! @index
   # pairSymbol: String! @index
@@ -27,7 +28,6 @@ type UniswapLPSwap @entity {
   gas: BigInt!
   blockNumber: BigInt!
   timestamp: DateTime!
-  transactionHash: String!
 }
 
 type UniswapLPToken @entity {
