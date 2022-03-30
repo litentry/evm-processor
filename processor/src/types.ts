@@ -12,8 +12,8 @@ export interface Block {
   state_root: string;
   receipts_root: string;
   miner: string;
-  difficulty: number;
-  total_difficulty: number;
+  difficulty: BigInt;
+  total_difficulty: BigInt;
   size: BigInt;
   extra_data: string;
   gas_limit: BigInt;
@@ -28,7 +28,7 @@ export interface Transaction {
   transaction_index: BigInt;
   from_address: string;
   to_address: string;
-  value: number;
+  value: BigInt;
   gas: BigInt;
   gas_price: BigInt;
   input: string;

@@ -3,6 +3,7 @@ import pg, { Pool } from 'pg';
 import { Transaction, Log, TransactionWithLogs } from './types';
 
 pg.types.setTypeParser(20, BigInt);
+pg.types.setTypeParser(1700, BigInt);
 
 const pool = new Pool({
   host: process.env.ARCHIVE_DB_HOST,
