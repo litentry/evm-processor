@@ -12,11 +12,11 @@ const pool = new Pool({
   port: parseInt(process.env.ARCHIVE_DB_PORT!),
 });
 
-export async function queryChainHeight() {
-  const { rows: blocks } = await pool.query<{ height: number }>(
+export async function queryChainHeight(): Promise<number> {
+  const { rows: blocks } = await pool.query<{ height: BigInt }>(
     'SELECT MAX(number) as height FROM blocks'
   );
-  return blocks[0].height;
+  return Number(blocks[0].height);
 }
 
 export async function queryTransactionsAndLogs({
