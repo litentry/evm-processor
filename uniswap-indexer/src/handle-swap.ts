@@ -3,10 +3,11 @@ import { BigNumber } from 'ethers';
 import { TransactionWithLogs } from 'processor';
 import { TRANSFER_CALL } from './constants';
 import getIntermediatePath from './get-intermediate-path';
-import { UniswapLPSwap, UniswapLPToken } from './model';
+import { UniswapLPSwap, UniswapLPToken, UniswapLPSwapMethod } from './model';
 import dataSource from './data-source';
 
 export async function handleSwap(
+  method: UniswapLPSwapMethod,
   tx: TransactionWithLogs,
   deadline: BigInt,
   path: string[],
@@ -53,6 +54,7 @@ export async function handleSwap(
   const swap = new UniswapLPSwap({
     id: `${tx.block_number.toString()}:${tx.transaction_index.toString()}`,
     account: tx.from_address,
+    method,
     pair: `${token0.id}:${token1.id}`,
     // pairSymbol: `${token0.symbol}:${token1.symbol}`,
     intermediatePath: getIntermediatePath(path),
