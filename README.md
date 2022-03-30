@@ -8,7 +8,9 @@ An application to process and index EVM data
 
 ## TODO - Uniswap
 
-- get token data from archive not web3 when ready
+- pair account to track aggregate volumes
+- fix dodgy name call error
+- BLOCKED: get token data from archive not web3 when ready
 
 ## TODO - Processor
 
