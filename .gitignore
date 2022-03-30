@@ -8,3 +8,4 @@ yarn-error.log
 google-credentials.json
 last-indexed-block
 */src/model
+*/db/migrations/*.js
