@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import pg, { Pool } from 'pg';
+import pg, { Pool, QueryResult, QueryResultRow } from 'pg';
 import { Transaction, Log, TransactionWithLogs } from './types';
 
 pg.types.setTypeParser(20, BigInt);
@@ -13,8 +13,21 @@ const pool = new Pool({
   port: parseInt(process.env.ARCHIVE_DB_PORT!),
 });
 
+const query = async <R extends QueryResultRow = any, I extends any[] = any[]>(
+  config: any
+): Promise<QueryResult<R>> => {
+  let result;
+  try {
+    result = await pool.query(config);
+  } catch (e) {
+    console.error('Failing query/config:', config);
+    throw e;
+  }
+  return result;
+};
+
 export async function queryChainHeight(): Promise<number> {
-  const { rows: blocks } = await pool.query<{ height: BigInt }>(
+  const { rows: blocks } = await query<{ height: BigInt }>(
     'SELECT MAX(number) as height FROM blocks'
   );
   return Number(blocks[0].height);
@@ -31,14 +44,14 @@ export async function queryTransactionsAndLogs({
   contract: string;
   methodId: string;
 }): Promise<TransactionWithLogs[]> {
-  const { rows: blocks } = await pool.query<{
+  const { rows: blocks } = await query<{
     start: Date;
     end: Date;
   }>(
     `SELECT MIN(timestamp) as start, MAX(timestamp) as end FROM blocks WHERE number >= ${startBlock} AND number <= ${endBlock}`
   );
 
-  const { rows: txs } = await pool.query<Transaction>(
+  const { rows: txs } = await query<Transaction>(
     `SELECT * FROM transactions
     WHERE
       block_timestamp >= '${blocks[0].start.toISOString()}'
@@ -53,22 +66,25 @@ export async function queryTransactionsAndLogs({
     ORDER BY block_number ASC`
   );
 
-  const { rows: logs } = await pool.query<Log>(
-    `SELECT * FROM logs
+  const txHashes = txs.map((tx) => `'${tx.hash}'`).join(',');
+
+  if (txHashes.length) {
+    const { rows: logs } = await query<Log>(
+      `SELECT * FROM logs
     WHERE
       block_timestamp >= '${blocks[0].start.toISOString()}'
     AND
       block_timestamp <= '${blocks[0].end.toISOString()}'
     AND
-      transaction_hash IN (${txs
-        .map((tx) => `'${tx.hash}'`)
-        .join(',')}) ORDER BY log_index ASC`
-  );
+      transaction_hash IN (${txHashes}) ORDER BY log_index ASC`
+    );
 
-  const logsByTx = _.groupBy(logs, 'transaction_hash');
+    const logsByTx = _.groupBy(logs, 'transaction_hash');
 
-  return txs.map((tx) => ({
-    ...tx,
-    logs: logsByTx[tx.hash],
-  }));
+    return txs.map((tx) => ({
+      ...tx,
+      logs: logsByTx[tx.hash],
+    }));
+  }
+  return [];
 }
