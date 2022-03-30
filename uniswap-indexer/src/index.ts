@@ -14,9 +14,9 @@ async function run() {
     startBlock: 14389625,
     batchSize: 10,
     contracts: {
-      // [UNISWAP.V3_CONTRACT_ADDRESS]: {
-      //   [UNISWAP.V3_MULTICALL.SIGNATURE]: handleMulticall,
-      // },
+      [UNISWAP.V3_CONTRACT_ADDRESS]: {
+        [UNISWAP.V3_MULTICALL.SIGNATURE]: handleMulticall,
+      },
       [UNISWAP.V2_CONTRACT_ADDRESS]: UNISWAP.V2_SWAP_METHODS.reduce(
         (prev, curr) => ({
           ...prev,
