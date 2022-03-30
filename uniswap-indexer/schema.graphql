@@ -1,3 +1,12 @@
+enum UniswapLPSwapMethod {
+  swapTokensForExactETH
+  swapExactETHForTokens
+  swapTokensForExactTokens
+  swapExactTokensForTokens
+  swapExactTokensForETH
+  swapETHForExactTokens
+}
+
 type UniswapLPSwap @entity {
   # block-index
   id: ID!
@@ -12,6 +21,8 @@ type UniswapLPSwap @entity {
   token1: UniswapLPToken! @index
   token0Amount: BigInt!
   token1Amount: BigInt!
+
+  method: UniswapLPSwapMethod!
 
   gas: BigInt!
   blockNumber: BigInt!
