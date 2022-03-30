@@ -6,6 +6,7 @@ export const TRANSFER_CALL = {
 };
 
 export const UNISWAP = {
+  V2_CONTRACT_ADDRESS: '0x7a250d5630b4cf539739df2c5dacb4c659f2488d',
   V3_CONTRACT_ADDRESS: '0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45',
   V3_MULTICALL: {
     SIGNATURE: 'multicall(uint256,bytes[])',
@@ -13,46 +14,46 @@ export const UNISWAP = {
     ID: '5ae401dc',
     PARAMS: ['uint256', 'bytes[]'],
   },
-  V2_MULTICALL_SWAP_METHODS: [
+  V2_SWAP_METHODS: [
     {
       SIGNATURE:
         'swapTokensForExactETH(uint256,uint256,address[],address,uint256)',
       NAME: 'swapTokensForExactETH',
       ID: '4a25d94a',
-      PARAMS: ['uint256', 'uint256', 'address[]', 'address', 'unit256'],
+      PARAMS: ['uint256', 'uint256', 'address[]', 'address', 'uint256'],
     },
     {
       SIGNATURE: 'swapExactETHForTokens(uint256,address[],address,uint256)',
       NAME: 'swapExactETHForTokens',
       ID: '7ff36ab5',
-      PARAMS: ['uint256', 'address[]', 'address', 'unit256'],
+      PARAMS: ['uint256', 'address[]', 'address', 'uint256'],
     },
     {
       SIGNATURE:
         'swapTokensForExactTokens(uint256,uint256,address[],address,uint256)',
       NAME: 'swapTokensForExactTokens',
       ID: '8803dbee',
-      PARAMS: ['uint256', 'uint256', 'address[]', 'address', 'unit256'],
+      PARAMS: ['uint256', 'uint256', 'address[]', 'address', 'uint256'],
     },
     {
       SIGNATURE:
         'swapExactTokensForTokens(uint256,uint256,address[],address,uint256)',
       NAME: 'swapExactTokensForTokens',
       ID: '38ed1739',
-      PARAMS: ['uint256', 'uint256', 'address[]', 'address', 'unit256'],
+      PARAMS: ['uint256', 'uint256', 'address[]', 'address', 'uint256'],
     },
     {
       SIGNATURE:
         'swapExactTokensForETH(uint256,uint256,address[],address,uint256)',
       NAME: 'swapExactTokensForETH',
       ID: '18cbafe5',
-      PARAMS: ['uint256', 'uint256', 'address[]', 'address', 'unit256'],
+      PARAMS: ['uint256', 'uint256', 'address[]', 'address', 'uint256'],
     },
     {
       SIGNATURE: 'swapETHForExactTokens(uint256,address[],address,uint256)',
-      NAME: 'swapTokensForExactETH',
+      NAME: 'swapETHForExactTokens',
       ID: 'fb3bdb41',
-      PARAMS: ['uint256', 'address[]', 'address', 'unit256'],
+      PARAMS: ['uint256', 'address[]', 'address', 'uint256'],
     },
   ],
 
@@ -90,7 +91,7 @@ export const UNISWAP = {
     },
     {
       SIGNATURE: 'swapETHForExactTokens(uint256,address[],address)',
-      NAME: 'swapTokensForExactETH',
+      NAME: 'swapETHForExactTokens',
       ID: '10086982',
       PARAMS: ['uint256', 'address[]', 'address'],
     },
