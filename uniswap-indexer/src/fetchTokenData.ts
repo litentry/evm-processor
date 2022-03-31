@@ -60,7 +60,7 @@ async function getTokenProperty(
         value = ethers.utils.parseBytes32String(bytesValue);
       }
     } catch (e) {
-      // use default 'unknown
+      // use default 'unknown'
     }
   }
 
@@ -71,7 +71,7 @@ const abiBytesMethod = (name: string) => [
   {
     constant: true,
     inputs: [],
-    name: name,
+    name,
     outputs: [
       {
         internalType: 'bytes32',
