@@ -33,7 +33,8 @@ type UniswapLPSwap @entity {
 type UniswapLPToken @entity {
   # address
   id: ID!
-  symbol: String
+  symbol: String!
+  # decimals should never be null, but we need to run on a full dataset first
   decimals: BigInt
-  name: String
+  name: String!
 }
