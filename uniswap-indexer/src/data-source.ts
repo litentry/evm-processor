@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
-import { UniswapLPSwap, UniswapLPToken } from './model';
 import { SnakeNamingStrategy } from '@subsquid/typeorm-config/lib/namingStrategy';
+import { UniswapLPSwap, UniswapLPToken } from './model';
 
 const dataSource = new DataSource({
   type: 'postgres',
