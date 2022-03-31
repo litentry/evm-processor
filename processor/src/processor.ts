@@ -13,8 +13,8 @@ export async function processor(config: ProcessorConfig) {
   let currentBlock = startBlock;
 
   // todo - don't go past end block
-  while (currentBlock <= initialChainHeight) {
-    let batchEndBlock = currentBlock + batchSize - 1;
+  while (currentBlock < initialChainHeight) {
+    let batchEndBlock = currentBlock + batchSize;
     if (batchEndBlock > initialChainHeight) {
       batchEndBlock = initialChainHeight;
     }
@@ -48,7 +48,7 @@ export async function processor(config: ProcessorConfig) {
     }
 
     writeFileSync('last-indexed-block', batchEndBlock.toString());
-    currentBlock = batchEndBlock + 1;
+    currentBlock = batchEndBlock;
   }
 
   // todo -> carry on block by block
@@ -86,10 +86,14 @@ function getCombinations(contracts: ContractSpec) {
 }
 
 function getStartBlock(startBlock: number) {
+  const lastIndexedBlock = getLastIndexedBlock();
+  return lastIndexedBlock > startBlock ? lastIndexedBlock : startBlock;
+}
+
+function getLastIndexedBlock() {
   if (existsSync('last-indexed-block')) {
     const file = readFileSync('last-indexed-block');
-    return parseInt(file.toString()) + 1;
+    return parseInt(file.toString());
   }
-
-  return startBlock;
+  return 0;
 }

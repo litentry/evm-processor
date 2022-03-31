@@ -30,7 +30,10 @@ export async function queryChainHeight(): Promise<number> {
   const { rows: blocks } = await query<{ height: BigInt }>(
     'SELECT MAX(number) as height FROM blocks'
   );
-  return Number(blocks[0].height);
+  // Reduce this number by 5 as ethereum-ETL may have not committed all data relating to a set of blocks at
+  // any given moment
+  // @todo Remove this if/when the archive guarantees consistency between blocks/logs/transactions tables
+  return Number(blocks[0].height) - 5;
 }
 
 export async function queryTransactionsAndLogs({
@@ -44,12 +47,14 @@ export async function queryTransactionsAndLogs({
   contract: string;
   methodId: string;
 }): Promise<TransactionWithLogs[]> {
-  const { rows: blocks } = await query<{
-    start: Date;
-    end: Date;
-  }>(
-    `SELECT MIN(timestamp) as start, MAX(timestamp) as end FROM blocks WHERE number >= ${startBlock} AND number <= ${endBlock}`
-  );
+  let sql: string;
+  if (startBlock === endBlock) {
+    sql = `SELECT MIN(timestamp) as start, MAX(timestamp) as end FROM blocks WHERE number = ${startBlock}`
+  } else {
+    sql = `SELECT MIN(timestamp) as start, MAX(timestamp) as end FROM blocks WHERE number >= ${startBlock} AND number < ${endBlock}`
+  }
+
+  const { rows: blocks } = await query<{ start: Date; end: Date; }>(sql);
 
   const { rows: txs } = await query<Transaction>(
     `SELECT * FROM transactions

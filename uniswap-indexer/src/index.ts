@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { processor, TransactionWithLogs } from 'processor';
+import { TransactionWithLogs,processorDaemon } from 'processor';
 import handleMulticall from './handle-multicall';
 import dataSource from './data-source';
 import { UNISWAP } from './constants';
@@ -8,10 +8,8 @@ import { UniswapLPSwapMethod } from './model';
 
 async function run() {
   await dataSource.initialize();
-
-  // v2 deployment 10207858
-  processor({
-    startBlock: 14389625,
+  const config = {
+    startBlock: parseInt(process.env.START_BLOCK!, 10),
     batchSize: 10,
     contracts: {
       [UNISWAP.V3_CONTRACT_ADDRESS]: {
@@ -25,7 +23,11 @@ async function run() {
         {} as { [method: string]: (tx: TransactionWithLogs) => Promise<void> }
       ),
     },
-  });
+  };
+  console.log('Processor config:', {...config, contracts: {}});
+
+  // v2 deployment 10207858
+  await processorDaemon(config);
 }
 
 run();

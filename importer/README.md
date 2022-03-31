@@ -4,7 +4,7 @@ This is just a temporary helper to spin up a local postgres database with the et
 
 ## Getting Started
 
-One time only: `pip3 install ethereum-etl[streaming]`
+One time only: `pip3 install 'ethereum-etl[streaming]'`
 
 Bring database up: `docker-compose up -d`
 

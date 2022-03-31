@@ -1,5 +1,5 @@
 {
-  "name": "ethereum-mainnet",
+  "name": "uniswap-indexer",
   "version": "0.0.1",
   "main": "lib/index.js",
   "scripts": {

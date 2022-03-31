@@ -35,3 +35,9 @@ export function get32ByteChunks(input: string) {
 export function getMethodIdFromSignature(signature: string) {
   return ethers.utils.keccak256(Buffer.from(signature)).substring(2, 10);
 }
+
+export async function waitSeconds(seconds: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, seconds * 1000);
+  });
+}
