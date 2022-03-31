@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers';
 import { TransactionWithLogs } from 'processor';
 import { TRANSFER_CALL } from './constants';
 import getIntermediatePath from './get-intermediate-path';
-import { UniswapLPSwap, UniswapLPToken, UniswapLPSwapMethod } from './model';
+import { UniswapLPSwap, UniswapLPSwapMethod } from './model';
 import dataSource from './data-source';
 import getOrCreateToken from './get-or-create-token';
 
@@ -15,8 +15,11 @@ export async function handleSwap(
   token0Amount: BigInt | 'unknown',
   token1Amount: BigInt | 'unknown'
 ): Promise<void> {
-  const token0 = await getOrCreateToken(path[0]);
-  const token1 = await getOrCreateToken(path[path.length - 1]);
+  // the token addresses come through checksummed, which is purely for helping identify invalid addresses during transactions
+  // it's much easier for indexing/querying to just enfore lowercase everywhere
+  const lowerCasePath = path.map((address) => address.toLowerCase());
+  const token0 = await getOrCreateToken(lowerCasePath[0]);
+  const token1 = await getOrCreateToken(lowerCasePath[path.length - 1]);
 
   // We need to find the actual amount of the non-fixed side of the swap, to do this we looks for the transfer events on the relevant token contract
   const tokenAddressOfMissingAmount =
@@ -24,7 +27,7 @@ export async function handleSwap(
 
   const transferLogs = tx.logs.filter(
     (log) =>
-      log.address === tokenAddressOfMissingAmount.toLowerCase() &&
+      log.address === tokenAddressOfMissingAmount &&
       log.topic0.startsWith(`0x${TRANSFER_CALL.ID}`)
   );
 
@@ -48,7 +51,7 @@ export async function handleSwap(
     method,
     pair: `${token0.id}:${token1.id}`,
     pairSymbol: `${token0.symbol || 'unknown'}:${token1.symbol || 'unknown'}`,
-    intermediatePath: getIntermediatePath(path),
+    intermediatePath: getIntermediatePath(lowerCasePath),
     deadline: deadline.valueOf(),
     token0: token0,
     token1: token1,

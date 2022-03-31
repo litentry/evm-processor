@@ -2,10 +2,6 @@
 
 An application to process and index EVM data
 
-## TODO - General
-
-- lowercase all addresses - or use version with some uppercase letters - not sure which?
-
 ## TODO - Uniswap
 
 - pair account to track aggregate volumes
