@@ -22,7 +22,7 @@ export const logSchema = new parquetjs.ParquetSchema({
 export const transactionSchema = new parquetjs.ParquetSchema({
   blockNumber: { type: 'INT64' },
   methodId: { type: 'UTF8' },
-  to: { type: 'UTF8' },
+  to: { type: 'UTF8', optional: true },
   hash: { type: 'UTF8' },
   blockHash: { type: 'UTF8' },
   data: { type: 'UTF8' },
