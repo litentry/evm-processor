@@ -3,11 +3,11 @@ import { TransactionModel } from './models';
 
 export default async function getStartBlock() {
   if (config.startBlock) {
-    // TODO? maybe add a scan to check for existing blocks and suggest a delete
+    // TODO we need to scan existing blocks in the range to avoid duplication
     return config.startBlock;
   }
 
-  // TODO? replace with parquet query
+  // TODO add parquet query option
   const res = await TransactionModel.find({})
     .sort('-blockNumber')
     .limit(1)
