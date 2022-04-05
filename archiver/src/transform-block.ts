@@ -1,20 +1,35 @@
 import * as ethers from 'ethers';
 import { getContractSignatures } from './get-contract-signatures';
-import { Log, ContractSignatures, Transaction } from './types';
+import { Log, ContractSignature, Transaction } from './types';
 
-export function mapTransactionsAndLogs(
-  blockNumber: number,
-  blockHash: string,
-  blockTransactions: ethers.providers.TransactionResponse[],
-  receipts: ethers.providers.TransactionReceipt[]
-) {
+export default function transformBlock({
+  blockHash,
+  blockNumber,
+  transactions: blockTransactions,
+  receipts,
+}: {
+  blockNumber: number;
+  blockHash: string;
+  transactions: ethers.providers.TransactionResponse[];
+  receipts: ethers.providers.TransactionReceipt[];
+}): {
+  transactions: Transaction[];
+  logs: Log[];
+  contractSignatures: ContractSignature[];
+} {
   const transactions: Transaction[] = [];
   const logs: Log[] = [];
-  const contractSignatures: ContractSignatures[] = [];
+  const contractSignatures: ContractSignature[] = [];
 
   blockTransactions.forEach(
     ({ hash, data, value, from, to, type, accessList, nonce }, i) => {
-      const receipt = receipts[i];
+      const receipt = receipts.find(
+        (receipt) => receipt.transactionHash === hash
+      );
+
+      if (!receipt) {
+        throw Error(`Receipt not found for transaction: ${hash}`);
+      }
 
       // store separately should we need failed transactions
       if (receipt.status !== 1) return;
@@ -37,14 +52,14 @@ export function mapTransactionsAndLogs(
         blockHash,
         hash,
         data,
-        value,
+        value: value.toString(),
         from,
         to,
         methodId,
         transactionIndex: receipt.transactionIndex,
-        gasUsed: receipt.gasUsed,
-        effectiveGasPrice: receipt.effectiveGasPrice,
-        cumulativeGasUsed: receipt.cumulativeGasUsed,
+        gasUsed: receipt.gasUsed.toString(),
+        effectiveGasPrice: receipt.effectiveGasPrice.toString(),
+        cumulativeGasUsed: receipt.cumulativeGasUsed.toString(),
         contractCreated: receipt.contractAddress,
         type: type ?? undefined,
         accessList: accessList ? accessList.join(',') : undefined,
