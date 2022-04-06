@@ -3,6 +3,7 @@ import type { ContractSignature } from '../types';
 
 const contractSignatureSchema = new Schema<ContractSignature>({
   blockNumber: { type: Number, required: true },
+  blockTimestamp: { type: Number, required: true },
   contractAddress: { type: String, required: true },
   signature: { type: String, required: true },
 });

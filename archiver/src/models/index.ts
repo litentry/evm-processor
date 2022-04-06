@@ -1,5 +1,6 @@
+import BlockModel from './block';
 import ContractSignatureModel from './contract-signature';
-import TransactionModel from './transaction';
 import LogModel from './log';
+import TransactionModel from './transaction';
 
-export { ContractSignatureModel, TransactionModel, LogModel };
+export { BlockModel, ContractSignatureModel, LogModel, TransactionModel };

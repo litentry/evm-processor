@@ -1,23 +1,27 @@
 import mongoose from 'mongoose';
 import config from './config';
 import getStartBlock from './get-start-block';
-import extract from './extract-block';
+import extractBlock from './extract-block';
 import load from './load-block';
-import { LoadBlock, ExtractBlock } from './types';
+import { LoadBlock } from './types';
 import processBatch from './process-batch';
 
 (async () => {
-  const { extractBlock, loadBlock } = await tempConfigGetter();
+  const loadBlock = await getLoadType();
 
   let batchStartBlock = await getStartBlock();
 
   while (batchStartBlock <= config.endBlock) {
     let batchEndBlock = batchStartBlock + config.batchSize - 1;
+
     if (batchEndBlock > config.endBlock) {
       batchEndBlock = config.endBlock;
     }
+
+    console.time('Batch time');
     await processBatch(batchStartBlock, batchEndBlock, extractBlock, loadBlock);
     console.log(`Processed batch ${batchStartBlock} to ${batchEndBlock}`);
+    console.timeEnd('Batch time');
 
     batchStartBlock = batchEndBlock + 1;
   }
@@ -25,17 +29,17 @@ import processBatch from './process-batch';
   process.exit(0);
 })();
 
-async function tempConfigGetter() {
-  let extractBlock: ExtractBlock;
-  let loadBlock: LoadBlock;
+async function getLoadType() {
+  //  let extractBlock: ExtractBlock;
 
-  if (config.extractType === 'bv') {
-    extractBlock = extract.blockVision;
-  } else if (config.extractType === 'rpc') {
-    extractBlock = extract.rpc;
-  } else {
-    throw new Error('EXTRACT_TYPE must be "rpc" or "bv"');
-  }
+  // if (config.extractType === 'bv') {
+  //   extractBlock = extract.blockVision;
+  // } else if (config.extractType === 'rpc') {
+  //   extractBlock = extract.rpc;
+  // } else {
+  //   throw new Error('EXTRACT_TYPE must be "rpc" or "bv"');
+  // }
+  let loadBlock: LoadBlock;
 
   if (config.loadType === 'mongo') {
     if (!config.mongoUri) {
@@ -49,8 +53,5 @@ async function tempConfigGetter() {
     throw new Error('LOAD_TYPE must be "mongo" or "parquet"');
   }
 
-  return {
-    extractBlock,
-    loadBlock,
-  };
+  return loadBlock;
 }

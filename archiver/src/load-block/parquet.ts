@@ -4,6 +4,7 @@ const parquet: LoadBlock = async ({
   transactions,
   logs,
   contractSignatures,
+  block,
 }) => {
   // TODO
 };

@@ -1,4 +1,9 @@
-import { ContractSignatureModel, LogModel, TransactionModel } from '../models';
+import {
+  ContractSignatureModel,
+  LogModel,
+  TransactionModel,
+  BlockModel,
+} from '../models';
 import { LoadBlock } from '../types';
 
 /**
@@ -8,36 +13,34 @@ import { LoadBlock } from '../types';
  * @param logs
  * @param contractSignatures
  */
-const mongo: LoadBlock = async ({ transactions, logs, contractSignatures }) => {
+const mongo: LoadBlock = async ({
+  transactions,
+  logs,
+  contractSignatures,
+  block,
+}) => {
   try {
     await Promise.all([
+      BlockModel.create(block),
       TransactionModel.insertMany(transactions),
       LogModel.insertMany(logs),
       ContractSignatureModel.insertMany(contractSignatures),
     ]);
   } catch (e) {
     console.error(e);
-
-    const blocks = transactions.map((tx) => tx.blockNumber).sort();
-    const filter = {
-      blockNumber: { $lte: blocks[0], $gte: blocks[blocks.length - 1] },
-    };
-
-    console.log(
-      `Cleaning up blocks between ${blocks[0]} and ${blocks[blocks.length - 1]}`
-    );
+    console.log(`Cleaning up block ${block.number}`);
 
     try {
+      const filter = {
+        blockNumber: block.number,
+      };
+      await BlockModel.deleteOne({ block: block.number });
       await TransactionModel.deleteMany(filter);
       await LogModel.deleteMany(filter);
       await ContractSignatureModel.deleteMany(filter);
     } catch (e) {
       console.error(e);
-      console.error(
-        `Clean up failed for blocks between ${blocks[0]} and ${
-          blocks[blocks.length - 1]
-        }`
-      );
+      console.error(`Clean up failed for block ${block.number}`);
     }
   }
 };

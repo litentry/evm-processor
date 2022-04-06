@@ -2,23 +2,26 @@ import { Schema, model } from 'mongoose';
 import type { Transaction } from '../types';
 
 const transactionSchema = new Schema<Transaction>({
-  blockNumber: { type: Number, required: true },
-  transactionIndex: { type: Number, required: true },
+  hash: { type: String, required: true, unique: true },
   nonce: { type: Number, required: true },
   blockHash: { type: String, required: true },
-  data: { type: String, required: true },
-  hash: { type: String, required: true },
+  blockNumber: { type: Number, required: true },
+  blockTimestamp: { type: Number, required: true },
+  transactionIndex: { type: Number, required: true },
   from: { type: String, required: true },
-  // bignumbers
-  value: { type: String, required: true },
-  gasUsed: { type: String, required: true },
-  cumulativeGasUsed: { type: String, required: true },
-  effectiveGasPrice: { type: String, required: true },
-  methodId: String,
   to: String,
-  contractCreated: String,
-  accessList: String,
-  type: Number,
+  value: { type: String, required: true },
+  gasPrice: { type: String, required: true },
+  gas: { type: Number, required: true },
+  maxPriorityFeePerGas: String,
+  maxFeePerGas: String,
+  input: { type: String, required: true },
+  methodId: String,
+  receiptStatus: Boolean,
+  receiptGasUsed: { type: Number, required: true },
+  receiptEffectiveGasPrice: { type: Number, required: true },
+  receiptCumulativeGasUsed: { type: Number, required: true },
+  receiptContractAddress: String,
 });
 
 transactionSchema.index({ blockNumber: 1 });

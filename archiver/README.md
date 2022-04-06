@@ -12,22 +12,10 @@ END_BLOCK=14001999
 BATCH_SIZE=5 # if this is too big the endpoints we get data from fail
 ```
 
-If you want to use a standard RPC endpoint set:
-
-```
-EXTRACT_TYPE=rpc
-```
-
-If you want to use BlockVision to enable querying all transaction receipt for a block in 1 request (rather than per transaction) set:
-
-```
-EXTRACT_TYPE=bv
-```
-
 Set endpoint:
 
 ```
-EXTRACT_ENDPOINT=your_rpc_or_blockvision_endpoint
+EXTRACT_ENDPOINT=your_rpc_endpoint
 ```
 
 If you want to use mongodb for archive storage set:
@@ -83,21 +71,3 @@ GETH or an alternative would allow us to request the data a lot faster, but it w
 Parquet is more complex, but it could offer improved query speed & storage savings.
 
 MongoDB is a lot simpler, and as we only read/write (no updates), it may be a good choice, depending on query performance.
-
-### Consider Ignored Fields
-
-The following fields have been ignored to save on data. Seeing as processing history is such a heavy task this might be a bad idea.
-
-- gasPrice (better gas data in receipt)
-- maxPriorityFeePerGas (better gas data in receipt)
-- maxFeePerGas (better gas data in receipt)
-- gasLimit (better gas data in receipt)
-- r
-- s
-- v
-- chainId
-- confirmations (blocks since it was mined, incorrect a few seconds after fetching!)
-
-### Consider storing failed transactions
-
-We are only storing sucessful transactions (I assume this is over 90% of the total). The saving is small, and the main bulk of building history is requesting all the data (which we would need to do fully again). So whilst we can fetch these at a later date, it may be worth doing it from the start.

@@ -3,6 +3,7 @@ import type { Log } from '../types';
 
 const logSchema = new Schema<Log>({
   blockNumber: { type: Number, required: true },
+  blockTimestamp: { type: Number, required: true },
   transactionHash: { type: String, required: true },
   address: { type: String, required: true },
   topic0: { type: String, required: true },
@@ -10,7 +11,7 @@ const logSchema = new Schema<Log>({
   topic2: String,
   topic3: String,
   topic4: String,
-  data: String,
+  data: { type: String, required: true },
   logIndex: { type: Number, required: true },
 });
 

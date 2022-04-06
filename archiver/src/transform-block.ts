@@ -1,28 +1,56 @@
-import * as ethers from 'ethers';
 import { getContractSignatures } from './get-contract-signatures';
-import { Log, ContractSignature, Transaction } from './types';
+import {
+  Log,
+  ContractSignature,
+  Transaction,
+  TransformBlock,
+  Block,
+} from './types';
 
-export default function transformBlock({
-  blockHash,
-  blockNumber,
-  transactions: blockTransactions,
+const transformBlock: TransformBlock = ({
+  blockWithTransactions,
   receipts,
-}: {
-  blockNumber: number;
-  blockHash: string;
-  transactions: ethers.providers.TransactionResponse[];
-  receipts: ethers.providers.TransactionReceipt[];
-}): {
-  transactions: Transaction[];
-  logs: Log[];
-  contractSignatures: ContractSignature[];
-} {
+}) => {
+  const block: Block = {
+    number: blockWithTransactions.number,
+    hash: blockWithTransactions.hash,
+    parentHash: blockWithTransactions.parentHash,
+    nonce: blockWithTransactions.nonce,
+    sha3Uncles: blockWithTransactions.sha3Uncles,
+    transactionRoot: blockWithTransactions.transactionRoot,
+    stateRoot: blockWithTransactions.stateRoot,
+    receiptsRoot: blockWithTransactions.receiptsRoot,
+    miner: blockWithTransactions.miner.toLowerCase(),
+    extraData: blockWithTransactions.extraData,
+    gasLimit: blockWithTransactions.gasLimit,
+    gasUsed: blockWithTransactions.gasUsed,
+    timestamp: blockWithTransactions.timestamp as number,
+    baseFeePerGas: blockWithTransactions.baseFeePerGas,
+    size: blockWithTransactions.size,
+    difficulty: blockWithTransactions.difficulty as unknown as string,
+    totalDifficulty: blockWithTransactions.totalDifficulty as unknown as string,
+    uncles: blockWithTransactions.uncles.length
+      ? blockWithTransactions.uncles.join(',')
+      : undefined,
+  };
   const transactions: Transaction[] = [];
   const logs: Log[] = [];
   const contractSignatures: ContractSignature[] = [];
 
-  blockTransactions.forEach(
-    ({ hash, data, value, from, to, type, accessList, nonce }, i) => {
+  blockWithTransactions.transactions.forEach(
+    ({
+      hash,
+      nonce,
+      transactionIndex,
+      from,
+      to,
+      value,
+      gasPrice,
+      gas,
+      maxPriorityFeePerGas,
+      maxFeePerGas,
+      input,
+    }) => {
       const receipt = receipts.find(
         (receipt) => receipt.transactionHash === hash
       );
@@ -31,45 +59,33 @@ export default function transformBlock({
         throw Error(`Receipt not found for transaction: ${hash}`);
       }
 
-      // store separately should we need failed transactions
-      if (receipt.status !== 1) return;
-
-      const methodId = data.substring(2, 10);
-
-      if (receipt.contractAddress) {
-        const signatures = getContractSignatures(data);
-        contractSignatures.push(
-          ...signatures.map((signature) => ({
-            signature,
-            contractAddress: receipt.contractAddress,
-            blockNumber,
-          }))
-        );
-      }
-
       transactions.push({
-        blockNumber,
-        blockHash,
         hash,
-        data,
-        value: value.toString(),
-        from,
-        to,
-        methodId,
-        transactionIndex: receipt.transactionIndex,
-        gasUsed: receipt.gasUsed.toString(),
-        effectiveGasPrice: receipt.effectiveGasPrice.toString(),
-        cumulativeGasUsed: receipt.cumulativeGasUsed.toString(),
-        contractCreated: receipt.contractAddress,
-        type: type ?? undefined,
-        accessList: accessList ? accessList.join(',') : undefined,
         nonce,
+        blockHash: block.hash,
+        blockNumber: block.number,
+        blockTimestamp: block.timestamp,
+        transactionIndex: transactionIndex!,
+        from: from.toLowerCase(),
+        to: to?.toLowerCase(),
+        value,
+        gasPrice,
+        gas,
+        maxPriorityFeePerGas: maxPriorityFeePerGas?.toString(),
+        maxFeePerGas: maxFeePerGas?.toString(),
+        input,
+        methodId: input.substring(2, 10),
+        receiptStatus: receipt.status,
+        receiptGasUsed: receipt.gasUsed,
+        receiptEffectiveGasPrice: receipt.effectiveGasPrice,
+        receiptCumulativeGasUsed: receipt.cumulativeGasUsed,
+        receiptContractAddress: receipt.contractAddress?.toLowerCase(),
       });
 
       receipt.logs.forEach(({ address, topics, data, logIndex }) => {
         logs.push({
           transactionHash: hash,
-          address,
+          address: address?.toLowerCase(),
           topic0: topics[0],
           topic1: topics[1],
           topic2: topics[2],
@@ -77,15 +93,31 @@ export default function transformBlock({
           topic4: topics[4],
           data,
           logIndex,
-          blockNumber,
+          blockNumber: block.number,
+          blockTimestamp: block.timestamp,
         });
       });
+
+      if (receipt.contractAddress) {
+        const signatures = getContractSignatures(input);
+        contractSignatures.push(
+          ...signatures.map((signature) => ({
+            signature,
+            contractAddress: receipt.contractAddress as string, // we shouldn't need this, TS is being very odd
+            blockNumber: block.number,
+            blockTimestamp: block.timestamp,
+          }))
+        );
+      }
     }
   );
 
   return {
+    block,
     transactions,
     logs,
     contractSignatures,
   };
-}
+};
+
+export default transformBlock;

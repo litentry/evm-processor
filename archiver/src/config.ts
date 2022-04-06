@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { Config } from './types';
 
 const config: Config = {
-  extractType: process.env.EXTRACT_TYPE! as 'rpc' | 'bv',
+  // extractType: process.env.EXTRACT_TYPE! as 'rpc' | 'bv',
   extractEndpoint: process.env.EXTRACT_ENDPOINT!,
   loadType: process.env.LOAD_TYPE! as 'mongo' | 'parquet',
   mongoUri: process.env.MONGO_URI,

@@ -8,18 +8,17 @@ export default async function processBatch(
   loadBlock: LoadBlock
 ) {
   const blocks: number[] = [];
+  for (let block = start; block <= end; block++) blocks.push(block);
 
-  for (let block = start; block <= end; block++) {
-    blocks.push(block);
-  }
-
-  console.time('Batch time');
   await Promise.all(
     blocks.map(async (block) => {
-      const blockData = await extractBlock(block);
-      const transformedData = transformBlock(blockData);
+      const data = await extractBlock(block);
+      const transformedData = transformBlock(data);
+      console.log(
+        `${transformedData.transactions.length} transactions in block ${block}`
+      );
+      console.log(`${transformedData.logs.length} logs in block ${block}`);
       await loadBlock(transformedData);
     })
   );
-  console.timeEnd('Batch time');
 }
