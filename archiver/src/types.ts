@@ -8,6 +8,9 @@ export type Config = {
   batchSize: number;
   startBlock?: number;
   endBlock?: number;
+  parquet: {
+    blocksPerFile: number;
+  }
 };
 
 export type ExtractedBlock = {
@@ -29,6 +32,8 @@ export type TransformBlock = (
 ) => TransformedBlock;
 
 export type LoadBlock = (transformedBlock: TransformedBlock) => Promise<void>;
+
+export type Cleanup = () => Promise<void>;
 
 export type ContractSignature = {
   blockNumber: number; // partition

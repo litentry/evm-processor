@@ -24,6 +24,9 @@ const config: Config = {
     : undefined,
   endBlock: process.env.END_BLOCK ? parseInt(process.env.END_BLOCK) : undefined,
   batchSize: parseInt(process.env.BATCH_SIZE || '1'),
+  parquet: {
+    blocksPerFile: parseInt(process.env.PARQUET_BLOCKS_PER_FILE || '100'),
+  }
 };
 
 export default config;
