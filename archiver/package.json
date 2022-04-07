@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "mongo:reset": "yarn mongo:down && rm -rf ./data && yarn mongo:up",
     "mongo:up": "docker-compose -f docker-compose.mongo.yml up -d",
     "mongo:down": "docker-compose -f docker-compose.mongo.yml down",
     "mongo:stop": "docker-compose -f docker-compose.mongo.yml stop",
