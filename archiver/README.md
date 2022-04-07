@@ -54,10 +54,6 @@ The plan is to run multiple instances of these in parallel to speed up the rebui
 
 ### TODO
 
-- Add streaming mode to update when new blocks are published.
-
-- Sometimes data request fail and need to be re-run, we need to ensure this restarts from the last block indexed in the range + 1 and keeps restarting when required until the range is complete.
-
 - Create a deployment process that handles the creation of multiple instances of the application. Good logging is essential to prevent errors being ignored, creating gaps in the data.
 
 ## Decisions

@@ -1,13 +1,13 @@
+import Web3 from 'web3';
 import { BlockTransactionObject, TransactionReceipt } from 'web3-eth';
 
 export type Config = {
-  // extractType: 'rpc' | 'bv';
-  extractEndpoint: string;
+  web3: Web3;
   loadType: 'mongo' | 'parquet';
   mongoUri?: string;
   batchSize: number;
   startBlock?: number;
-  endBlock: number;
+  endBlock?: number;
 };
 
 export type ExtractedBlock = {

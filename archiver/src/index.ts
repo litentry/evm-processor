@@ -1,44 +1,53 @@
+import fs from 'fs';
 import mongoose from 'mongoose';
 import config from './config';
 import getStartBlock from './get-start-block';
-import extractBlock from './extract-block';
 import load from './load-block';
 import { LoadBlock } from './types';
-import processBatch from './process-batch';
+import processBlockRange from './process-block-range';
+import processBlock from './process-block';
 
 (async () => {
   const loadBlock = await getLoadType();
+  let chainHeight = await config.web3.eth.getBlockNumber();
+  let startBlock = await getStartBlock();
 
-  let batchStartBlock = await getStartBlock();
+  console.log(`Initial chain height: ${chainHeight}`);
+  let lastBlockArchived = await processBlockRange(
+    startBlock,
+    config.endBlock || chainHeight,
+    loadBlock
+  );
+  console.log(`Caught up to block: ${chainHeight}`);
 
-  while (batchStartBlock <= config.endBlock) {
-    let batchEndBlock = batchStartBlock + config.batchSize - 1;
-
-    if (batchEndBlock > config.endBlock) {
-      batchEndBlock = config.endBlock;
-    }
-
-    console.time('Batch time');
-    await processBatch(batchStartBlock, batchEndBlock, extractBlock, loadBlock);
-    console.log(`Processed batch ${batchStartBlock} to ${batchEndBlock}`);
-    console.timeEnd('Batch time');
-
-    batchStartBlock = batchEndBlock + 1;
+  if (config.endBlock) {
+    process.exit(0);
   }
 
-  process.exit(0);
+  // update chain height
+  chainHeight = await config.web3.eth.getBlockNumber();
+  console.log(`New chain height: ${chainHeight}`);
+
+  // catch up with chain height then re-check chain height
+  while (chainHeight - lastBlockArchived) {
+    lastBlockArchived = await processBlockRange(
+      lastBlockArchived + 1,
+      chainHeight,
+      loadBlock
+    );
+    chainHeight = await config.web3.eth.getBlockNumber();
+  }
+  console.log(`In sync with with chain height: ${chainHeight}`);
+
+  // todo get new blocks
+  config.web3.eth.subscribe('newBlockHeaders', (err, { number }) => {
+    processBlock(number, loadBlock);
+    console.log(`Processed new block: ${number}`);
+    fs.writeFileSync('last-indexed-block', number.toString());
+  });
 })();
 
 async function getLoadType() {
-  //  let extractBlock: ExtractBlock;
-
-  // if (config.extractType === 'bv') {
-  //   extractBlock = extract.blockVision;
-  // } else if (config.extractType === 'rpc') {
-  //   extractBlock = extract.rpc;
-  // } else {
-  //   throw new Error('EXTRACT_TYPE must be "rpc" or "bv"');
-  // }
   let loadBlock: LoadBlock;
 
   if (config.loadType === 'mongo') {
