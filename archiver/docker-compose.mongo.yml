@@ -2,10 +2,10 @@ services:
   mongodb:
     image: mongo:latest
     container_name: mongodb
-    # volumes:
+    volumes:
+      - ./data/:/data/db/
     #   - ./.docker/mongodb/mongod.conf:/etc/mongod.conf
     #   - ./.docker/mongodb/initdb.d/:/docker-entrypoint-initdb.d/
-    #   - ./.docker/mongodb/data/db/:/data/db/
     #   - ./.docker/mongodb/data/log/:/var/log/mongodb/
     # environment:
     #   MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
