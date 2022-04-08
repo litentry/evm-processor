@@ -45,13 +45,11 @@ export type Block = {
   sha3Uncles: string;
   transactionRoot?: string;
   stateRoot: string;
-  receiptsRoot: string;
   miner: string;
   extraData: string;
   gasLimit: number;
   gasUsed: number;
   timestamp: number;
-  baseFeePerGas?: number;
   size: number;
   difficulty: string;
   totalDifficulty: string;
@@ -85,8 +83,6 @@ export type Transaction = {
   value: string;
   gasPrice: string; // 2930 & Legacy (why is this required in Web3 type?)
   gas: number;
-  maxPriorityFeePerGas?: string; // 1159
-  maxFeePerGas?: string; // 1159
   input: string;
 
   // first 4 bytes of input
@@ -95,7 +91,6 @@ export type Transaction = {
   // from receipt
   receiptStatus?: boolean; // not available before byzantium upgrade
   receiptGasUsed: number;
-  receiptEffectiveGasPrice: number;
   receiptCumulativeGasUsed: number;
   receiptContractAddress?: string;
 };

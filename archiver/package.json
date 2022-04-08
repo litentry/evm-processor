@@ -15,7 +15,7 @@
     "dotenv": "^16.0.0",
     "evm": "^0.2.0",
     "mongoose": "^6.2.10",
-    "web3": "^1.7.1"
+    "web3": "^v3.0.0-rc.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.15",

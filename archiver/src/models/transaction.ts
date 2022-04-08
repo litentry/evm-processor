@@ -13,13 +13,10 @@ const transactionSchema = new Schema<Transaction>({
   value: { type: String, required: true },
   gasPrice: { type: String, required: true },
   gas: { type: Number, required: true },
-  maxPriorityFeePerGas: String,
-  maxFeePerGas: String,
   input: { type: String, required: true },
   methodId: String,
   receiptStatus: Boolean,
   receiptGasUsed: { type: Number, required: true },
-  receiptEffectiveGasPrice: { type: Number, required: true },
   receiptCumulativeGasUsed: { type: Number, required: true },
   receiptContractAddress: String,
 });

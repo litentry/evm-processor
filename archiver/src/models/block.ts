@@ -9,7 +9,6 @@ const blockSchema = new Schema<Block>({
   sha3Uncles: { type: String, required: true },
   transactionRoot: String,
   stateRoot: { type: String, required: true },
-  receiptsRoot: { type: String, required: true },
   miner: { type: String, required: true },
   extraData: { type: String, required: true },
   gasLimit: { type: Number, required: true },
@@ -18,7 +17,6 @@ const blockSchema = new Schema<Block>({
   size: { type: Number, required: true },
   difficulty: { type: String, required: true },
   totalDifficulty: { type: String, required: true },
-  baseFeePerGas: String,
   uncles: String,
 });
 
