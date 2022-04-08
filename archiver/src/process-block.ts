@@ -9,7 +9,14 @@ export default async function processBlock(
   const data = await extractBlock(number);
   const transformedData = transformBlock(data);
   await loadBlock(transformedData);
+  console.log(`Processed block ${number}`);
   console.log(
-    `Processed block ${number}, ${transformedData.transactions.length} transactions, ${transformedData.logs.length} logs`
+    `Contract creations: ${transformedData.contractCreationTransactions.length}`
+  );
+  console.log(
+    `Contract interactions: ${transformedData.contractTransactions.length}`
+  );
+  console.log(
+    `Native token transfers: ${transformedData.nativeTokenTransactions.length}`
   );
 }

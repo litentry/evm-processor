@@ -1,4 +1,5 @@
 import fs from 'fs';
+import colors from 'colors';
 import { LoadBlock } from './types';
 import processBlock from './process-block';
 
@@ -17,6 +18,7 @@ export default async function processBatch(
     })
   );
   fs.writeFileSync('last-indexed-block', end.toString());
-  console.log(`Processed batch ${start} to ${end}`);
+  console.log(colors.blue(`Processed batch ${start} to ${end}`));
   console.timeEnd('Batch time');
+  console.log('\n');
 }

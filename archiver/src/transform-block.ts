@@ -1,10 +1,15 @@
+import { Transaction as RpcTx, TransactionReceipt } from 'web3-eth';
 import { getContractSignatures } from './get-contract-signatures';
 import {
   Log,
   ContractSignature,
-  Transaction,
+  NativeTokenTransaction,
+  ContractCreationTransaction,
+  ContractTransaction,
   TransformBlock,
   Block,
+  TransactionType,
+  TransactionBase,
 } from './types';
 
 const transformBlock: TransformBlock = ({
@@ -31,88 +36,129 @@ const transformBlock: TransformBlock = ({
       ? blockWithTransactions.uncles.join(',')
       : undefined,
   };
-  const transactions: Transaction[] = [];
+  const nativeTokenTransactions: NativeTokenTransaction[] = [];
+  const contractCreationTransactions: ContractCreationTransaction[] = [];
+  const contractTransactions: ContractTransaction[] = [];
   const logs: Log[] = [];
   const contractSignatures: ContractSignature[] = [];
 
-  blockWithTransactions.transactions.forEach(
-    ({
-      hash,
-      nonce,
-      transactionIndex,
-      from,
-      to,
-      value,
-      gasPrice,
-      gas,
-      input,
-    }) => {
-      const receipt = receipts.find(
-        (receipt) => receipt.transactionHash === hash
-      );
+  blockWithTransactions.transactions.forEach((tx) => {
+    const receipt = receipts.find(
+      (receipt) => receipt.transactionHash === tx.hash
+    );
 
-      if (!receipt) {
-        throw Error(`Receipt not found for transaction: ${hash}`);
-      }
+    // check the node we're using isn't missing data
+    if (!receipt) {
+      throw Error(`Receipt not found for transaction: ${tx.hash}`);
+    }
 
-      const contractCreated = receipt.contractAddress?.toLowerCase();
+    // define the transaction type
+    let txType: TransactionType;
 
-      transactions.push({
-        hash,
-        nonce,
-        blockHash: block.hash,
-        blockNumber: block.number,
-        blockTimestamp: block.timestamp,
-        transactionIndex: transactionIndex!,
-        from: from.toLowerCase(),
-        to: to?.toLowerCase(),
-        value,
-        gasPrice,
-        gas,
-        input,
-        methodId: input.substring(2, 10),
-        receiptStatus: receipt.status,
-        receiptGasUsed: receipt.gasUsed,
-        receiptCumulativeGasUsed: receipt.cumulativeGasUsed,
-        receiptContractAddress: contractCreated,
-      });
+    if (receipt.contractAddress) {
+      txType = TransactionType.ContractCreationTransaction;
+    } else if (tx.input === '0x') {
+      txType = TransactionType.NativeTokenTransaction;
+    } else {
+      txType = TransactionType.ContractTransaction;
+    }
 
-      receipt.logs.forEach(({ address, topics, data, logIndex }) => {
-        logs.push({
-          transactionHash: hash,
-          address: address?.toLowerCase(),
-          topic0: topics[0],
-          topic1: topics[1],
-          topic2: topics[2],
-          topic3: topics[3],
-          topic4: topics[4],
-          data,
-          logIndex,
-          blockNumber: block.number,
-          blockTimestamp: block.timestamp,
+    const txBase = mapTransactionBase(
+      block.hash,
+      block.number,
+      block.timestamp,
+      tx,
+      receipt
+    );
+
+    switch (txType) {
+      case TransactionType.ContractCreationTransaction: {
+        const contractAddress = receipt.contractAddress!.toLowerCase();
+        contractCreationTransactions.push({
+          ...txBase,
+          input: tx.input,
+          methodId: tx.input.substring(2, 10),
+          receiptContractAddress: contractAddress,
         });
-      });
 
-      if (contractCreated) {
-        const signatures = getContractSignatures(input);
+        const signatures = getContractSignatures(tx.input);
         contractSignatures.push(
           ...signatures.map((signature) => ({
             signature,
-            contractAddress: contractCreated,
+            contractAddress,
             blockNumber: block.number,
             blockTimestamp: block.timestamp,
           }))
         );
+        break;
+      }
+
+      case TransactionType.ContractTransaction: {
+        contractTransactions.push({
+          ...txBase,
+          input: tx.input,
+          methodId: tx.input.substring(2, 10),
+          to: tx.to!.toLowerCase(),
+        });
+        break;
+      }
+
+      case TransactionType.NativeTokenTransaction: {
+        nativeTokenTransactions.push({
+          ...txBase,
+          to: tx.to!.toLowerCase(),
+        });
+        break;
       }
     }
-  );
+
+    receipt.logs.forEach(({ address, topics, data, logIndex }) => {
+      logs.push({
+        transactionHash: tx.hash,
+        address: address?.toLowerCase(),
+        topic0: topics[0],
+        topic1: topics[1],
+        topic2: topics[2],
+        topic3: topics[3],
+        topic4: topics[4],
+        data,
+        logIndex,
+        blockNumber: block.number,
+        blockTimestamp: block.timestamp,
+      });
+    });
+  });
 
   return {
     block,
-    transactions,
+    nativeTokenTransactions,
+    contractCreationTransactions,
+    contractTransactions,
     logs,
     contractSignatures,
   };
 };
 
 export default transformBlock;
+
+const mapTransactionBase = (
+  blockHash: string,
+  blockNumber: number,
+  blockTimestamp: number,
+  tx: RpcTx,
+  receipt: TransactionReceipt
+): TransactionBase => ({
+  hash: tx.hash,
+  nonce: tx.nonce,
+  blockHash,
+  blockNumber,
+  blockTimestamp,
+  transactionIndex: tx.transactionIndex!,
+  from: tx.from.toLowerCase(),
+  value: tx.value,
+  gasPrice: tx.gasPrice,
+  gas: tx.gas,
+  receiptStatus: receipt.status,
+  receiptGasUsed: receipt.gasUsed,
+  receiptCumulativeGasUsed: receipt.cumulativeGasUsed,
+});
