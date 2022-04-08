@@ -3,9 +3,9 @@ import mongoose from 'mongoose';
 import config from './config';
 import getStartBlock from './get-start-block';
 import load from './load-block';
-import { LoadBlock } from './types';
-import processBlockRange from './process-block-range';
 import processBlock from './process-block';
+import processBlockRange from './process-block-range';
+import { LoadBlock } from './types';
 
 (async () => {
   const loadBlock = await getLoadType();
@@ -58,8 +58,10 @@ async function getLoadType() {
     loadBlock = load.mongo;
   } else if (config.loadType === 'parquet') {
     loadBlock = load.parquet;
+  } else if (config.loadType === 'postgres') {
+    loadBlock = load.postgres;
   } else {
-    throw new Error('LOAD_TYPE must be "mongo" or "parquet"');
+    throw new Error('LOAD_TYPE must be "mongo", "parquet" or "postgres"');
   }
 
   return loadBlock;
