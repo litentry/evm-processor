@@ -1,14 +1,14 @@
 import parquetjs from "parquetjs";
 import path from "path";
-import { contractSignatureSchema, logSchema, transactionSchema } from "./schema";
+import { contractSignatureSchema, logSchema, transactionSchema, blockSchema } from "./schema";
 import { promisify } from "util";
 import fs from "fs";
-import throat from "throat";
 
 export interface ParquetBlockSet {
   logs: parquetjs.ParquetWriter;
   transactions: parquetjs.ParquetWriter;
   contractSignatures: parquetjs.ParquetWriter;
+  blocks: parquetjs.ParquetWriter;
 }
 
 export interface OpenFiles {
@@ -20,7 +20,7 @@ export interface ParquetInstance {
   getParquetPath: (p: {
     type: string;
     blockNum: number;
-  }) => string;
+  }) => Promise<string>;
   ensureOpen: (n: number) => Promise<ParquetBlockSet>,
   closeAll: () => Promise<void>
 }
@@ -34,20 +34,23 @@ export function getParquet(blocksPerFile: number): ParquetInstance {
     return blockNum - (blockNum % blocksPerFile);
   }
 
-  function getParquetPath(params: {
+  async function getParquetPath(params: {
     type: string;
     blockNum: number;
   }) {
-    return `./output/blocks-${blocksPerFile}/${params.type.toLowerCase()}/blockstart=${params.blockNum}/data.parquet`;
+    const filePath = `./output/blocks-${blocksPerFile}/${params.type.toLowerCase()}/blockstart=${params.blockNum}/data.parquet`;
+    await mkdir(path.dirname(filePath), { recursive: true});
+    return filePath;
   }
 
   async function ensureOpen(forBlock: number) {
     const blockNum = getBlockStart(forBlock);
     if (!fds[blockNum]) {
-      const [logPath, transPath, contractPath] = [
-        getParquetPath({ type: 'logs', blockNum }),
-        getParquetPath({ type: 'transactions', blockNum }),
-        getParquetPath({ type: 'contractSignatures', blockNum }),
+      const [logPath, transPath, contractPath, blockPath] = [
+        await getParquetPath({ type: 'logs', blockNum }),
+        await getParquetPath({ type: 'transactions', blockNum }),
+        await getParquetPath({ type: 'contractSignatures', blockNum }),
+        await getParquetPath({ type: 'blocks', blockNum }),
       ];
       for (const f of [logPath, transPath, contractPath]) {
         console.log(`Opening parquet file ${f}`);
@@ -57,7 +60,7 @@ export function getParquet(blocksPerFile: number): ParquetInstance {
       fds[blockNum] = {
         logs: await parquetjs.ParquetWriter.openFile(
           logSchema,
-          logPath
+          logPath,
         ),
         transactions: await parquetjs.ParquetWriter.openFile(
           transactionSchema,
@@ -66,7 +69,11 @@ export function getParquet(blocksPerFile: number): ParquetInstance {
         contractSignatures: await parquetjs.ParquetWriter.openFile(
           contractSignatureSchema,
           contractPath,
-        )
+        ),
+        blocks: await parquetjs.ParquetWriter.openFile(
+          blockSchema,
+          blockPath,
+        ),
       };
     }
     return fds[blockNum];
@@ -88,7 +95,6 @@ export function getParquet(blocksPerFile: number): ParquetInstance {
       return Promise.resolve();
     }));
     fds = {};
-
   }
   return { getBlockStart, getParquetPath, ensureOpen, closeAll };
 }

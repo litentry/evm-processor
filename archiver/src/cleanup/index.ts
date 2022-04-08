@@ -3,5 +3,5 @@ import parquet from './parquet';
 
 export default {
   mongo,
-  parquet,
+  parquet
 };

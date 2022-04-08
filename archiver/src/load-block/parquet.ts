@@ -1,5 +1,6 @@
 import { LoadBlock } from '../types';
 import { ParquetInstance } from '../parquet/instance';
+import { convert } from "../parquet/schema";
 
 export const withInstance = (instance: ParquetInstance): LoadBlock => {
   return async ({
@@ -9,35 +10,32 @@ export const withInstance = (instance: ParquetInstance): LoadBlock => {
     block,
   }) => {
 
-    const blockNumber =
-      transactions[0]?.blockNumber ||
-      logs[0]?.blockNumber ||
-      contractSignatures[0]?.blockNumber;
+    const blockNumber = block.number;
 
     if (blockNumber === undefined) {
       console.warn('No data');
       return Promise.resolve();
     }
 
-    const parquetBlockSet = await instance.ensureOpen(blockNumber);
-    console.log(`Writing batch for ${blockNumber}: logs ${JSON.stringify(logs).length}`);
+    const parquetBlockSet = await instance.ensureOpen(block.number);
+    console.log(`Writing batch for ${block.number}: logs ${JSON.stringify(logs).length}`);
 
+    await parquetBlockSet.blocks.appendRow(convert(block, parquetBlockSet.blocks.schema));
+
+    parquetBlockSet.logs.setRowGroupSize(logs.length);
     for (const i of logs) {
-     await parquetBlockSet.logs.appendRow(i);
+     await parquetBlockSet.logs.appendRow(convert(i, parquetBlockSet.logs.schema));
     }
+    parquetBlockSet.contractSignatures.setRowGroupSize(logs.length);
     for (const i of contractSignatures) {
-      await parquetBlockSet.contractSignatures.appendRow(i);
+      await parquetBlockSet.contractSignatures.appendRow(convert(i, parquetBlockSet.contractSignatures.schema));
     }
-    for (const r of transactions) {
-      const s = {
-        ...r,
-        value: r.value.toString(),
-        gasUsed: r.gasUsed.toString(),
-        cumulativeGasUsed: r.cumulativeGasUsed.toString(),
-        effectiveGasPrice: r.effectiveGasPrice.toString(),
-      }
-      await parquetBlockSet.transactions.appendRow(s);
+    parquetBlockSet.transactions.setRowGroupSize(logs.length);
+    for (const i of transactions) {
+      await parquetBlockSet.transactions.appendRow(convert(i, parquetBlockSet.transactions.schema));
     }
+    parquetBlockSet.blocks.setRowGroupSize(1);
+    await parquetBlockSet.blocks.appendRow(convert(block, parquetBlockSet.blocks.schema));
   }
 }
 

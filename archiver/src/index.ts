@@ -8,32 +8,12 @@ import { LoadBlock, ExtractBlock, Cleanup } from './types';
 import processBlockRange from './process-block-range';
 import processBlock from './process-block';
 import { getParquet } from "./parquet/instance";
+import attachHandlers from "./error-handler";
 
 (async () => {
-  const loadBlock = await getLoadType();
+  const {loadBlock, cleanup } = await getLoadType();
   let chainHeight = await config.web3.eth.getBlockNumber();
   let startBlock = await getStartBlock();
-  process.on('beforeExit', async (code) => {
-    console.log(`\nCleaning up (exit code ${code})...`);
-    try {
-      await cleanup();
-      console.log('cleanup complete');
-      process.exit(code);
-    } catch (e) {
-      console.log('failed to cleanup!');
-      console.error(e);
-      process.exit(3);
-    }
-  });
-
-  process.on('SIGINT', () => {
-    process.emit('beforeExit', 2);
-  });
-
-  process.on('unhandledRejection', async (err: any) => {
-    console.error({err});
-    process.exit(1);
-  });
 
   console.log(`Initial chain height: ${chainHeight}`);
   let lastBlockArchived = await processBlockRange(
@@ -44,7 +24,7 @@ import { getParquet } from "./parquet/instance";
   console.log(`Caught up to block: ${chainHeight}`);
 
   if (config.endBlock) {
-    process.exit(0);
+    return;
   }
 
   // update chain height
@@ -68,7 +48,6 @@ import { getParquet } from "./parquet/instance";
     console.log(`Processed new block: ${number}`);
     fs.writeFileSync('last-indexed-block', number.toString());
   });
-  await cleanup();
 })();
 
 async function getLoadType() {
@@ -89,9 +68,8 @@ async function getLoadType() {
   } else {
     throw new Error('LOAD_TYPE must be "mongo" or "parquet"');
   }
-
+  attachHandlers(cleanup);
   return {
-    extractBlock,
     loadBlock,
     cleanup
   };
