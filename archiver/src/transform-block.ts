@@ -55,6 +55,8 @@ const transformBlock: TransformBlock = ({
         throw Error(`Receipt not found for transaction: ${hash}`);
       }
 
+      const contractCreated = receipt.contractAddress?.toLowerCase();
+
       transactions.push({
         hash,
         nonce,
@@ -72,7 +74,7 @@ const transformBlock: TransformBlock = ({
         receiptStatus: receipt.status,
         receiptGasUsed: receipt.gasUsed,
         receiptCumulativeGasUsed: receipt.cumulativeGasUsed,
-        receiptContractAddress: receipt.contractAddress?.toLowerCase(),
+        receiptContractAddress: contractCreated,
       });
 
       receipt.logs.forEach(({ address, topics, data, logIndex }) => {
@@ -91,12 +93,12 @@ const transformBlock: TransformBlock = ({
         });
       });
 
-      if (receipt.contractAddress) {
+      if (contractCreated) {
         const signatures = getContractSignatures(input);
         contractSignatures.push(
           ...signatures.map((signature) => ({
             signature,
-            contractAddress: receipt.contractAddress as string, // we shouldn't need this, TS is being very odd
+            contractAddress: contractCreated,
             blockNumber: block.number,
             blockTimestamp: block.timestamp,
           }))
