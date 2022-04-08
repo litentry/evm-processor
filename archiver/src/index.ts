@@ -41,8 +41,8 @@ import processBlock from './process-block';
 
   // todo get new blocks
   config.web3.eth.subscribe('newBlockHeaders', (err, { number }) => {
+    console.log(`New block in chain: ${number}`);
     processBlock(number, loadBlock);
-    console.log(`Processed new block: ${number}`);
     fs.writeFileSync('last-indexed-block', number.toString());
   });
 })();
