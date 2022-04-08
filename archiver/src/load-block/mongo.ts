@@ -1,7 +1,9 @@
 import {
   ContractSignatureModel,
   LogModel,
-  TransactionModel,
+  NativeTokenTransactionModel,
+  ContractCreationTransactionModel,
+  ContractTransactionModel,
   BlockModel,
 } from '../models';
 import { LoadBlock } from '../types';
@@ -14,7 +16,9 @@ import { LoadBlock } from '../types';
  * @param contractSignatures
  */
 const mongo: LoadBlock = async ({
-  transactions,
+  nativeTokenTransactions,
+  contractCreationTransactions,
+  contractTransactions,
   logs,
   contractSignatures,
   block,
@@ -22,7 +26,9 @@ const mongo: LoadBlock = async ({
   try {
     await Promise.all([
       BlockModel.create(block),
-      TransactionModel.insertMany(transactions),
+      NativeTokenTransactionModel.insertMany(nativeTokenTransactions),
+      ContractCreationTransactionModel.insertMany(contractCreationTransactions),
+      ContractTransactionModel.insertMany(contractTransactions),
       LogModel.insertMany(logs),
       ContractSignatureModel.insertMany(contractSignatures),
     ]);
@@ -35,7 +41,9 @@ const mongo: LoadBlock = async ({
         blockNumber: block.number,
       };
       await BlockModel.deleteOne({ block: block.number });
-      await TransactionModel.deleteMany(filter);
+      await NativeTokenTransactionModel.deleteMany(filter);
+      await ContractCreationTransactionModel.deleteMany(filter);
+      await ContractTransactionModel.deleteMany(filter);
       await LogModel.deleteMany(filter);
       await ContractSignatureModel.deleteMany(filter);
     } catch (e) {

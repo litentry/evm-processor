@@ -1,26 +1,28 @@
 import Web3 from 'web3';
 import { BlockTransactionObject, TransactionReceipt } from 'web3-eth';
 
-export type Config = {
+export interface Config {
   web3: Web3;
   loadType: 'mongo' | 'parquet';
   mongoUri?: string;
   batchSize: number;
   startBlock?: number;
   endBlock?: number;
-};
+}
 
-export type ExtractedBlock = {
+export interface ExtractedBlock {
   blockWithTransactions: BlockTransactionObject;
   receipts: TransactionReceipt[];
-};
+}
 
-export type TransformedBlock = {
-  transactions: Transaction[];
+export interface TransformedBlock {
+  nativeTokenTransactions: NativeTokenTransaction[];
+  contractCreationTransactions: ContractCreationTransaction[];
+  contractTransactions: ContractTransaction[];
   logs: Log[];
   contractSignatures: ContractSignature[];
   block: Block;
-};
+}
 
 export type ExtractBlock = (blockNumber: number) => Promise<ExtractedBlock>;
 
@@ -30,14 +32,14 @@ export type TransformBlock = (
 
 export type LoadBlock = (transformedBlock: TransformedBlock) => Promise<void>;
 
-export type ContractSignature = {
+export interface ContractSignature {
   blockNumber: number; // partition
   blockTimestamp: number;
   contractAddress: string;
   signature: string; // index
-};
+}
 
-export type Block = {
+export interface Block {
   number: number;
   hash: string;
   parentHash: string;
@@ -54,9 +56,9 @@ export type Block = {
   difficulty: string;
   totalDifficulty: string;
   uncles?: string;
-};
+}
 
-export type Log = {
+export interface Log {
   blockNumber: number; // index
   blockTimestamp: number;
   transactionHash: string; // index
@@ -68,9 +70,20 @@ export type Log = {
   topic4?: string;
   data: string;
   logIndex: number;
-};
+}
 
-export type Transaction = {
+export enum TransactionType {
+  NativeTokenTransaction = 'NativeTokenTransaction',
+  ContractCreationTransaction = 'ContractCreationTransaction',
+  ContractTransaction = 'ContractTransaction',
+}
+
+export type Transaction =
+  | NativeTokenTransaction
+  | ContractCreationTransaction
+  | ContractTransaction;
+/*
+{
   // from BlockTransactionObject
   hash: string;
   nonce: number;
@@ -93,4 +106,38 @@ export type Transaction = {
   receiptGasUsed: number;
   receiptCumulativeGasUsed: number;
   receiptContractAddress?: string;
-};
+}
+*/
+
+export interface TransactionBase {
+  // from BlockTransactionObject
+  hash: string;
+  nonce: number;
+  blockHash: string;
+  blockNumber: number; // index
+  blockTimestamp: number;
+  transactionIndex: number;
+  from: string;
+  value: string;
+  gasPrice: string; // 2930 & Legacy (why is this required in Web3 type?)
+  gas: number;
+  receiptStatus?: boolean; // not available before byzantium upgrade
+  receiptCumulativeGasUsed: number;
+  receiptGasUsed: number;
+}
+
+export interface NativeTokenTransaction extends TransactionBase {
+  to: string;
+}
+
+export interface ContractTransaction extends TransactionBase {
+  to: string;
+  input: string;
+  methodId: string;
+}
+
+export interface ContractCreationTransaction extends TransactionBase {
+  input: string;
+  methodId: string;
+  receiptContractAddress: string;
+}
