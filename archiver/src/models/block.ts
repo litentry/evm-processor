@@ -13,7 +13,7 @@ const blockSchema = new Schema<Block>({
   extraData: { type: String, required: true },
   gasLimit: { type: Number, required: true },
   gasUsed: { type: Number, required: true },
-  timestamp: { type: Number, required: true, unique: true },
+  timestamp: { type: Number, required: true },
   size: { type: Number, required: true },
   difficulty: { type: String, required: true },
   totalDifficulty: { type: String, required: true },
