@@ -1,7 +1,8 @@
 import {
-  BlockModel, ContractSignatureModel,
+  BlockModel,
+  ContractSignatureModel,
   LogModel,
-  TransactionModel
+  TransactionModel,
 } from '../postgres-models';
 import { LoadBlock } from '../types';
 
@@ -19,12 +20,12 @@ const postgres: LoadBlock = async ({
   block,
 }) => {
   try {
-    await Promise.all([
-      BlockModel.create(block as any),
-      TransactionModel.bulkCreate(contractTransactions as any),
-      LogModel.bulkCreate(logs as any),
-      ContractSignatureModel.bulkCreate(contractSignatures as any),
-    ]);
+    // await Promise.all([
+    //   BlockModel.create(block as any),
+    //   TransactionModel.bulkCreate(contractTransactions as any),
+    //   LogModel.bulkCreate(logs as any),
+    //   ContractSignatureModel.bulkCreate(contractSignatures as any),
+    // ]);
   } catch (e) {
     console.error(e);
     console.log(`Cleaning up block ${block.number}`);
@@ -33,10 +34,10 @@ const postgres: LoadBlock = async ({
       const filter = {
         blockNumber: block.number,
       };
-      await BlockModel.destroy({ where: { block: block.number } });
-      await TransactionModel.destroy({ where: filter });
-      await LogModel.destroy({ where: filter });
-      await ContractSignatureModel.destroy({ where: filter });
+      // await BlockModel.destroy({ where: { block: block.number } });
+      // await TransactionModel.destroy({ where: filter });
+      // await LogModel.destroy({ where: filter });
+      // await ContractSignatureModel.destroy({ where: filter });
     } catch (e) {
       console.error(e);
       console.error(`Clean up failed for block ${block.number}`);
