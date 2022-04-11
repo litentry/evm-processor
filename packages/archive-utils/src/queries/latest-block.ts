@@ -1,9 +1,17 @@
-// import { BlockModel } from '../models';
+import axios from 'axios';
+import endpoint from './endpoint';
 
 export default async function latestBlock() {
-  // const result = await BlockModel.find({})
-  //   .select({ number: 1 })
-  //   .sort('-number')
-  //   .limit(1);
-  // return result[0].number;
+  const response = await axios({
+    url: endpoint,
+    method: 'post',
+    data: {
+      query: `
+        query LatestBlock {
+          latestBlock
+        }
+      `,
+    },
+  });
+  return response.data.data.latestBlock as number;
 }

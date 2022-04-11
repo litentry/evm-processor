@@ -1,6 +1,6 @@
 import { FilterQuery } from 'mongoose';
 import { ContractTransaction } from 'archive-utils';
-import { ContractTransactionModel, LogModel } from '../../../models';
+import { ContractTransactionModel } from '../../../models';
 import maxRange from '../../max-range';
 
 export default async function contractTransactions(
@@ -10,13 +10,11 @@ export default async function contractTransactions(
     endBlock,
     methodId,
     contractAddress,
-    withLogs,
   }: {
     startBlock: number;
     endBlock: number;
     methodId?: string;
     contractAddress?: string;
-    withLogs?: boolean;
   }
 ) {
   maxRange('contractTransactions', startBlock, endBlock);
@@ -41,20 +39,5 @@ export default async function contractTransactions(
     transactionIndex: 1,
   });
 
-  if (!withLogs) {
-    return results;
-  }
-
-  const logs = await LogModel.find({
-    blockNumber: {
-      $gte: startBlock,
-      $lte: endBlock,
-    },
-    transactionHash: {
-      $in: results.map((tx) => tx.hash),
-    },
-  }).sort({
-    blockNumber: 1,
-    logIndex: 1,
-  });
+  return results;
 }

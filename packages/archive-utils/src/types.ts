@@ -75,6 +75,10 @@ export interface ContractTransaction extends TransactionBase {
   methodId: string;
 }
 
+export interface ContractTransactionWithLogs extends ContractTransaction {
+  logs: Log[];
+}
+
 export interface ContractCreationTransaction extends TransactionBase {
   input: string;
   methodId: string;

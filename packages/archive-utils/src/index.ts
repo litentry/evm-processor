@@ -9,3 +9,4 @@ export {
   TransactionType,
   Transaction,
 } from './types';
+export { default as query } from './queries';

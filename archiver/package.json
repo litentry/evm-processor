@@ -11,7 +11,7 @@
     "mongo:down": "docker-compose -f docker-compose.mongo.yml down",
     "mongo:stop": "docker-compose -f docker-compose.mongo.yml stop",
     "start": "ts-node src/index.ts",
-    "query-node": "ts-node src/graphql/server.ts"
+    "query-node": "ts-node src/query-node/server.ts"
   },
   "dependencies": {
     "@graphql-tools/schema": "^8.3.7",
