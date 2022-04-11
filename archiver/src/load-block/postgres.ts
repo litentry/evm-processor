@@ -13,17 +13,17 @@ import { LoadBlock } from '../types';
  * @param contractSignatures
  */
 const postgres: LoadBlock = async ({
-  transactions,
+  contractTransactions,
   logs,
   contractSignatures,
   block,
 }) => {
   try {
     await Promise.all([
-      BlockModel.create(block),
-      TransactionModel.bulkCreate(transactions),
-      LogModel.bulkCreate(logs),
-      ContractSignatureModel.bulkCreate(contractSignatures),
+      BlockModel.create(block as any),
+      TransactionModel.bulkCreate(contractTransactions as any),
+      LogModel.bulkCreate(logs as any),
+      ContractSignatureModel.bulkCreate(contractSignatures as any),
     ]);
   } catch (e) {
     console.error(e);
