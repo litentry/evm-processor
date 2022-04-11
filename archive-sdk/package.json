@@ -1,0 +1,15 @@
+{
+  "name": "archive-sdk",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "scripts": {
+    "prettier": "node_modules/.bin/prettier --write '**/*.ts'",
+    "build": "rm -rf dist && tsc",
+    "typecheck": "yarn tsc --noEmit",
+    "postinstall": "yarn run build",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "mongoose": "^6.2.10"
+  }
+}

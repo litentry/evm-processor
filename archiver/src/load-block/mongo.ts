@@ -5,7 +5,7 @@ import {
   ContractCreationTransactionModel,
   ContractTransactionModel,
   BlockModel,
-} from '../models';
+} from 'archive-sdk';
 import { LoadBlock } from '../types';
 
 /**

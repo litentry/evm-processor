@@ -1,16 +1,16 @@
 import { Transaction as RpcTx, TransactionReceipt } from 'web3-eth';
-import { getContractSignatures } from './get-contract-signatures';
 import {
   Log,
+  Block,
   ContractSignature,
   NativeTokenTransaction,
   ContractCreationTransaction,
   ContractTransaction,
-  TransformBlock,
-  Block,
   TransactionType,
   TransactionBase,
-} from './types';
+} from 'archive-sdk';
+import { getContractSignatures } from './get-contract-signatures';
+import { TransformBlock } from './types';
 
 const transformBlock: TransformBlock = ({
   blockWithTransactions,
