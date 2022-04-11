@@ -9,7 +9,7 @@ if (!config.mongoUri) {
 }
 
 (async () => {
-  await mongoose.connect(config.mongoUri!);
+  await mongoose.connect(config.mongoUri);
 
   const app = express();
   app.use(
