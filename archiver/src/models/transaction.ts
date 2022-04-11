@@ -3,7 +3,7 @@ import type {
   NativeTokenTransaction,
   ContractCreationTransaction,
   ContractTransaction,
-} from '../types';
+} from 'archive-utils';
 
 const sharedSchema = {
   hash: { type: String, required: true, unique: true },

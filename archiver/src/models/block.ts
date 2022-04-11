@@ -1,4 +1,4 @@
-import type { Block } from '../types';
+import type { Block } from 'archive-utils';
 import { Schema, model } from 'mongoose';
 
 const blockSchema = new Schema<Block>({

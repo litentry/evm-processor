@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import type { ContractSignature } from '../types';
+import type { ContractSignature } from 'archive-utils';
 
 const contractSignatureSchema = new Schema<ContractSignature>({
   blockNumber: { type: Number, required: true },

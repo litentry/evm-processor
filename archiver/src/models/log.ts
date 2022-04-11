@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import type { Log } from '../types';
+import type { Log } from 'archive-utils';
 
 const logSchema = new Schema<Log>({
   blockNumber: { type: Number, required: true },

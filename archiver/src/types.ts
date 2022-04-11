@@ -5,7 +5,7 @@ import {
   ContractTransaction,
   Log,
   NativeTokenTransaction,
-} from 'archive-sdk';
+} from 'archive-utils';
 import Web3 from 'web3';
 import { BlockTransactionObject, TransactionReceipt } from 'web3-eth';
 

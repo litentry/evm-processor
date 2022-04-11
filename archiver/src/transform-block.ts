@@ -8,7 +8,7 @@ import {
   ContractTransaction,
   TransactionType,
   TransactionBase,
-} from 'archive-sdk';
+} from 'archive-utils';
 import { getContractSignatures } from './get-contract-signatures';
 import { TransformBlock } from './types';
 

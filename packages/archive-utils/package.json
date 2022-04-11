@@ -1,5 +1,5 @@
 {
-  "name": "archive-sdk",
+  "name": "archive-utils",
   "version": "0.0.1",
   "main": "dist/index.js",
   "scripts": {
@@ -9,7 +9,5 @@
     "postinstall": "yarn run build",
     "watch": "tsc --watch"
   },
-  "dependencies": {
-    "mongoose": "^6.2.10"
-  }
+  "dependencies": {}
 }

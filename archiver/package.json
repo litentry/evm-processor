@@ -11,7 +11,7 @@
     "start": "ts-node src/index.ts"
   },
   "dependencies": {
-    "archive-sdk": "0.0.1",
+    "archive-utils": "0.0.1",
     "axios": "^0.26.1",
     "colors": "^1.4.0",
     "dotenv": "^16.0.0",
