@@ -5,9 +5,7 @@ import { ParquetInstance } from "../parquet/instance";
  * Close open files
  */
 export const withInstance = (instance: ParquetInstance): Cleanup => {
-  return async () => {
-    return instance.closeAll();
-  }
+  return () => instance.writeRemainingBuffer()
 };
 
 export default withInstance;

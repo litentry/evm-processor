@@ -33,7 +33,7 @@ export type TransformBlock = (
 
 export type LoadBlock = (transformedBlock: TransformedBlock) => Promise<void>;
 
-export type Cleanup = () => Promise<void>;
+export type Cleanup = () => Promise<any>;
 
 export type ContractSignature = {
   blockNumber: number; // partition

@@ -1,34 +1,108 @@
-import parquetjs from "parquetjs";
+import parquetjs, { ParquetSchema } from "parquetjs";
 import path from "path";
-import { contractSignatureSchema, logSchema, transactionSchema, blockSchema } from "./schema";
-import { promisify } from "util";
-import fs from "fs";
+import { contractSignatureSchema, logSchema, transactionSchema, blockSchema, convert } from "./schema";
+import { mkdir } from "fs/promises";
 
-export interface ParquetBlockSet {
-  logs: parquetjs.ParquetWriter;
-  transactions: parquetjs.ParquetWriter;
-  contractSignatures: parquetjs.ParquetWriter;
-  blocks: parquetjs.ParquetWriter;
+interface ParquetBlockSet {
+  logs: ParquetWriter;
+  transactions: ParquetWriter;
+  contractSignatures: ParquetWriter;
+  blocks: ParquetWriter;
 }
 
-export interface OpenFiles {
-  [blockNum: number]: ParquetBlockSet
+type Rows = {
+  [type in keyof ParquetBlockSet]: {
+    [startBlock: number]: any[];
+  };
+};
+
+type Closing = {
+  [type in keyof ParquetBlockSet]: {
+    [startBlock: number]: boolean;
+  };
+};
+
+interface ParquetWriter {
+  path: string;
+  rows: any[];
+  writer: parquetjs.ParquetWriter;
 }
 
 export interface ParquetInstance {
-  getBlockStart: (n: number) => number,
-  getParquetPath: (p: {
-    type: string;
-    blockNum: number;
-  }) => Promise<string>;
-  ensureOpen: (n: number) => Promise<ParquetBlockSet>,
-  closeAll: () => Promise<void>
+  writeRemainingBuffer: () => Promise<any>,
+  appendRow: (rowData: any, blockNumber: number, type: keyof ParquetBlockSet) => void
 }
 
 export function getParquet(blocksPerFile: number): ParquetInstance {
+  let writers = Promise.resolve();
 
-  let fds: OpenFiles = {};
-  const mkdir = promisify(fs.mkdir);
+  const closing: Closing = {
+    logs: [],
+    blocks: [],
+    contractSignatures: [],
+    transactions: []
+  }
+  const bufferedRowSets: Rows = {
+    logs: [],
+    blocks: [],
+    contractSignatures: [],
+    transactions: []
+  }
+
+  const schemaMap: { [k: string]: ParquetSchema } = {
+    logs: logSchema,
+    blocks: blockSchema,
+    contractSignatures: contractSignatureSchema,
+    transactions: transactionSchema
+  };
+
+  /**
+   * Main synchronous data buffering function. Calls write when a new block range has been entered but doesn't care
+   * about the result - this needs to be taken care of by closeAll.
+   * @param rowData
+   * @param blockNumber
+   * @param type
+   */
+  function appendRow(rowData: any, blockNumber: number, type: keyof ParquetBlockSet) {
+    const currentStartBlock = getBlockStart(blockNumber);
+    const previousStartBlock = currentStartBlock - blocksPerFile;
+
+    if (!bufferedRowSets[type][currentStartBlock]) {
+      bufferedRowSets[type][currentStartBlock] = [];
+    }
+    bufferedRowSets[type][currentStartBlock].push(
+      convert(rowData, schemaMap[type])
+    );
+    if (bufferedRowSets[type][previousStartBlock]) {
+      writers.then(() => write(previousStartBlock, type));
+    }
+  }
+
+  /**
+   * Writes data to a Parquet file designated by its block number and type
+   * @param startBlock
+   * @param type
+   */
+  async function write(startBlock: number, type: keyof ParquetBlockSet) {
+    if (closing[type][startBlock]) {
+      return;
+    }
+    closing[type][startBlock] = true;
+    const rowData = bufferedRowSets[type][startBlock];
+    if (rowData) {
+      const filePath = await getParquetPath({ type, blockNum: startBlock });
+      console.log(`Opening parquet file ${filePath}`);
+
+      await mkdir(path.dirname(filePath), { recursive: true });
+      const parquetFile = await parquetjs.ParquetWriter.openFile(schemaMap[type], filePath);
+
+      for (const row of rowData) {
+        await parquetFile.appendRow(row);
+      }
+      await parquetFile.close();
+      delete bufferedRowSets[type][startBlock];
+    }
+  }
 
   function getBlockStart(blockNum: number) {
     return blockNum - (blockNum % blocksPerFile);
@@ -39,62 +113,26 @@ export function getParquet(blocksPerFile: number): ParquetInstance {
     blockNum: number;
   }) {
     const filePath = `./output/blocks-${blocksPerFile}/${params.type.toLowerCase()}/blockstart=${params.blockNum}/data.parquet`;
-    await mkdir(path.dirname(filePath), { recursive: true});
+    await mkdir(path.dirname(filePath), { recursive: true });
     return filePath;
   }
 
-  async function ensureOpen(forBlock: number) {
-    const blockNum = getBlockStart(forBlock);
-    if (!fds[blockNum]) {
-      const [logPath, transPath, contractPath, blockPath] = [
-        await getParquetPath({ type: 'logs', blockNum }),
-        await getParquetPath({ type: 'transactions', blockNum }),
-        await getParquetPath({ type: 'contractSignatures', blockNum }),
-        await getParquetPath({ type: 'blocks', blockNum }),
-      ];
-      for (const f of [logPath, transPath, contractPath]) {
-        console.log(`Opening parquet file ${f}`);
-        await mkdir(path.dirname(f), { recursive: true });
-      }
-
-      fds[blockNum] = {
-        logs: await parquetjs.ParquetWriter.openFile(
-          logSchema,
-          logPath,
-        ),
-        transactions: await parquetjs.ParquetWriter.openFile(
-          transactionSchema,
-          transPath,
-        ),
-        contractSignatures: await parquetjs.ParquetWriter.openFile(
-          contractSignatureSchema,
-          contractPath,
-        ),
-        blocks: await parquetjs.ParquetWriter.openFile(
-          blockSchema,
-          blockPath,
-        ),
-      };
-    }
-    return fds[blockNum];
+  async function writeRemainingBuffer() {
+    return Promise.all(
+      Object
+        .entries(bufferedRowSets)
+        .map(([type, rowSet]) =>
+          Object
+            .keys(rowSet)
+            .map((key) => write(
+              parseInt(key),
+              <keyof ParquetBlockSet>type
+            )
+          )
+        )
+        .flat()
+    );
   }
 
-  async function closeAll() {
-    const allWriters: parquetjs.ParquetWriter[] = Object.values(fds)
-      .reduce((allWriters, writers) => {
-        return [
-          ...allWriters,
-          Object.values(writers)
-        ]
-      }, [] as parquetjs.ParquetWriter[]).flat();
-
-    await Promise.all(allWriters.map(async (writer) => {
-      if (writer.rowBuffer.rowCount) {
-        return writer.close();
-      }
-      return Promise.resolve();
-    }));
-    fds = {};
-  }
-  return { getBlockStart, getParquetPath, ensureOpen, closeAll };
+  return { writeRemainingBuffer, appendRow };
 }

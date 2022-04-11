@@ -11,7 +11,7 @@ import { getParquet } from "./parquet/instance";
 import attachHandlers from "./error-handler";
 
 (async () => {
-  const {loadBlock, cleanup } = await getLoadType();
+  const {loadBlock} = await getLoadType();
   let chainHeight = await config.web3.eth.getBlockNumber();
   let startBlock = await getStartBlock();
 

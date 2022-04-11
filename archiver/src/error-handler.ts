@@ -1,4 +1,6 @@
-export function attachHandlers(cleanup: () => Promise<void>) {
+import { Cleanup } from "./types";
+
+export function attachHandlers(cleanup: Cleanup) {
   process.on('beforeExit', async (code) => {
     console.log(`\nCleaning up (exit code ${code})...`);
     try {

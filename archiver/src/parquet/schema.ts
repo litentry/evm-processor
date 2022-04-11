@@ -46,9 +46,9 @@ export const transactionSchema = new parquetjs.ParquetSchema({
   methodId: { type: ParquetTypes.UTF8, optional: true },
 
   receiptStatus: { type: ParquetTypes.BOOLEAN, optional: true },
-  receiptGasUsed: { type: ParquetTypes.INT64 },
-  receiptCumulativeGasUsed: { type: ParquetTypes.INT64 },
-  receiptEffectiveGasPrice: { type: ParquetTypes.INT64 },
+  receiptGasUsed: { type: ParquetTypes.INT64, optional: true },
+  receiptCumulativeGasUsed: { type: ParquetTypes.INT64, optional: true },
+  receiptEffectiveGasPrice: { type: ParquetTypes.INT64, optional: true },
   receiptContractAddress: { type: ParquetTypes.UTF8, optional: true },
 });
 
@@ -60,7 +60,7 @@ export const blockSchema = new parquetjs.ParquetSchema({
   sha3Uncles: { type: ParquetTypes.UTF8 },
   transactionRoot: { type: ParquetTypes.UTF8, optional: true },
   stateRoot: { type: ParquetTypes.UTF8 },
-  receiptsRoot: { type: ParquetTypes.UTF8 },
+  receiptsRoot: { type: ParquetTypes.UTF8, optional: true },
   miner: { type: ParquetTypes.UTF8 },
   extraData: { type: ParquetTypes.UTF8 },
   gasLimit: { type: ParquetTypes.INT64 },
@@ -92,6 +92,5 @@ export function convert(row: RowInterface, schema: parquetjs.ParquetSchema) {
       [key]: newValue
     }
   }, row);
-  // console.log(convertedRow);
   return convertedRow;
 }
