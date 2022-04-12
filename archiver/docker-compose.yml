@@ -9,5 +9,4 @@ services:
         - BUILD_CONTEXT=archiver
     environment:
       RPC_ENDPOINT: 'TODO' # moonbeam
-      LOAD_TYPE: mongo
       MONGO_URI: 'mongodb://0.0.0.0:27017/ethereum-archive'

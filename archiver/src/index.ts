@@ -6,10 +6,9 @@ import getStartBlock from './get-start-block';
 import load from './load-block';
 import processBlock from './process-block';
 import processBlockRange from './process-block-range';
-import { LoadBlock } from './types';
 
 (async () => {
-  const loadBlock = await getLoadType();
+  await mongoose.connect(config.mongoUri);
   let chainHeight = await config.web3.eth.getBlockNumber();
   let startBlock = await getStartBlock();
 
@@ -17,7 +16,7 @@ import { LoadBlock } from './types';
   let lastBlockArchived = await processBlockRange(
     startBlock,
     config.endBlock || chainHeight,
-    loadBlock
+    load.mongo
   );
   console.log(colors.green(`Caught up to block: ${chainHeight}`));
 
@@ -34,7 +33,7 @@ import { LoadBlock } from './types';
     lastBlockArchived = await processBlockRange(
       lastBlockArchived + 1,
       chainHeight,
-      loadBlock
+      load.mongo
     );
     chainHeight = await config.web3.eth.getBlockNumber();
   }
@@ -43,27 +42,7 @@ import { LoadBlock } from './types';
   // todo get new blocks
   config.web3.eth.subscribe('newBlockHeaders', (err, { number }) => {
     console.log(colors.green(`New block in chain: ${number}`));
-    processBlock(number, loadBlock);
+    processBlock(number, load.mongo);
     fs.writeFileSync('last-indexed-block', number.toString());
   });
 })();
-
-async function getLoadType() {
-  let loadBlock: LoadBlock;
-
-  if (config.loadType === 'mongo') {
-    if (!config.mongoUri) {
-      throw new Error('Load type set as mongo but MONGO_URI not set');
-    }
-    await mongoose.connect(config.mongoUri);
-    loadBlock = load.mongo;
-  } else if (config.loadType === 'parquet') {
-    loadBlock = load.parquet;
-  } else if (config.loadType === 'postgres') {
-    loadBlock = load.postgres;
-  } else {
-    throw new Error('LOAD_TYPE must be "mongo", "parquet" or "postgres"');
-  }
-
-  return loadBlock;
-}

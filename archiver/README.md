@@ -18,18 +18,10 @@ Set endpoint:
 RPC_ENDPOINT=your_rpc_endpoint
 ```
 
-If you want to use mongodb for archive storage set:
+Set mongo URI
 
 ```
-LOAD_TYPE=mongo
 MONGO_URI="mongodb://0.0.0.0:27017/ethereum-archive"
-```
-
-If you want to use parquet for archive storage set:
-
-```
-LOAD_TYPE=parquet
-CONNECTION_CONFIG_TODO
 ```
 
 ### Run the Application

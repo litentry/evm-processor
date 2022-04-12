@@ -11,8 +11,7 @@ import { BlockTransactionObject, TransactionReceipt } from 'web3-eth';
 
 export interface Config {
   web3: Web3;
-  loadType: 'mongo' | 'parquet';
-  mongoUri?: string;
+  mongoUri: string;
   batchSize: number;
   startBlock?: number;
   endBlock?: number;

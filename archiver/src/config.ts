@@ -2,9 +2,12 @@ import 'dotenv/config';
 import { Config } from './types';
 import { web3 } from 'archive-utils';
 
+if (!process.env.MONGO_URI) {
+  throw new Error('MONGO_URI not set');
+}
+
 const config: Config = {
   web3,
-  loadType: process.env.LOAD_TYPE! as 'mongo' | 'parquet',
   mongoUri: process.env.MONGO_URI,
   startBlock: process.env.START_BLOCK
     ? parseInt(process.env.START_BLOCK)
