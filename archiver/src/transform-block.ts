@@ -8,8 +8,8 @@ import {
   ContractTransaction,
   TransactionType,
   TransactionBase,
+  utils,
 } from 'archive-utils';
-import { getContractSignatures } from './get-contract-signatures';
 import { TransformBlock } from './types';
 
 const transformBlock: TransformBlock = ({
@@ -81,7 +81,7 @@ const transformBlock: TransformBlock = ({
           receiptContractAddress: contractAddress,
         });
 
-        const signatures = getContractSignatures(tx.input);
+        const signatures = utils.getContractSignatures(tx.input);
         contractSignatures.push(
           ...signatures.map((signature) => ({
             signature,

@@ -1,0 +1,37 @@
+enum ERCStandard {
+  ERC20
+  ERC721
+  ERC1155
+}
+
+type ERC20Contract @entity {
+  # contract address
+  id: ID!
+  creator: String! @index
+  blockNumber: Int!
+  timestamp: Int!
+
+  symbol: String
+  name: String
+  decimals: Int
+}
+
+type ERC721Contract @entity {
+  # contract address
+  id: ID!
+  creator: String! @index
+  blockNumber: Int!
+  timestamp: Int!
+
+  name: String
+}
+
+type ERC1155Contract @entity {
+  # contract address
+  id: ID!
+  creator: String! @index
+  blockNumber: Int!
+  timestamp: Int!
+
+  name: String
+}

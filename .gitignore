@@ -5,7 +5,8 @@ lib
 yarn-error.log
 .idea
 .DS_Store
-google-credentials.json
 last-indexed-block
-*/src/model
-*/db/migrations/*.js
+indexers/*/src/model
+indexers/*/db/migrations/*.js
+uniswap-indexer/src/model
+uniswap-indexer/db/migrations/*.js

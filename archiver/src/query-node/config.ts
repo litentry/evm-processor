@@ -17,7 +17,7 @@ if (!process.env.MONGO_URI) {
 
 const config: Config = {
   mongoUri: process.env.MONGO_URI,
-  port: parseInt(process.env.PORT || '4000'),
+  port: parseInt(process.env.PORT || '4050'),
   // this is a bit minging, but we do want to stop people querying a terabyte of data... and we do need it to be configurable as ethereum mainnet is quite a lot busier than some other networks
   maxBlockRange: {
     blocks: parseInt(process.env.MAX_RANGE_BLOCKS || '1000'),

@@ -15,7 +15,7 @@ BATCH_SIZE=5 # if this is too big the endpoints we get data from fail
 Set endpoint:
 
 ```
-EXTRACT_ENDPOINT=your_rpc_endpoint
+RPC_ENDPOINT=your_rpc_endpoint
 ```
 
 If you want to use mongodb for archive storage set:

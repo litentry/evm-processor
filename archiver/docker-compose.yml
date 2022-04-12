@@ -8,6 +8,6 @@ services:
       args:
         - BUILD_CONTEXT=archiver
     environment:
-      EXTRACT_ENDPOINT: "TODO" # moonbeam
+      RPC_ENDPOINT: 'TODO' # moonbeam
       LOAD_TYPE: mongo
-      MONGO_URI: "mongodb://0.0.0.0:27017/ethereum-archive"
+      MONGO_URI: 'mongodb://0.0.0.0:27017/ethereum-archive'

@@ -1,3 +1,4 @@
+// archive models
 export interface ContractSignature {
   blockNumber: number; // index
   blockTimestamp: number;
@@ -84,3 +85,9 @@ export interface ContractCreationTransaction extends TransactionBase {
   methodId: string;
   receiptContractAddress: string;
 }
+
+// process related
+export type BatchHandler = (
+  batchStartBlock: number,
+  batchEndBlock: number
+) => Promise<void>;

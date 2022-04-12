@@ -1,0 +1,27 @@
+{
+  "name": "token-contracts",
+  "description": "Indexes ERC20, ERC721 & ERC1155 contracts",
+  "version": "0.0.1",
+  "main": "lib/index.js",
+  "scripts": {
+    "db:build": "docker-compose down && docker-compose up -d && yarn codegen && yarn build && rm -rf db/migrations/* && yarn migration && yarn migrate",
+    "dev": "nodemon src/index.ts",
+    "build": "rm -rf lib && tsc",
+    "start": "node lib/index.js",
+    "prettier": "node_modules/.bin/prettier --write '**/*.ts'",
+    "typecheck": "yarn tsc --noEmit",
+    "query-node": "squid-graphql-server",
+    "codegen": "sqd codegen",
+    "_postinstall": "yarn run build",
+    "migrate": "sqd db:migrate",
+    "migration": "sqd db:create-migration Data"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.5.0",
+    "@subsquid/cli": "^0.2.1",
+    "@subsquid/graphql-server": "^0.1.5",
+    "dotenv": "^10.0.0",
+    "processor": "0.0.1",
+    "typeorm": "^0.3.4"
+  }
+}
