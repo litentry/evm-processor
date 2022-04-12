@@ -1,5 +1,5 @@
 import { writeFileSync, readFileSync, existsSync } from 'fs';
-import { queryChainHeight, queryTransactionsAndLogs } from './archive-queries';
+import { query } from 'archive-utils';
 import { ProcessorConfig, ContractSpec } from './types';
 import { getMethodIdFromSignature } from './utils';
 
@@ -7,7 +7,7 @@ export async function processor(config: ProcessorConfig) {
   const startBlock = getStartBlock(config.startBlock);
   const { batchSize, endBlock, contracts: _contracts } = config;
   const contracts = contractsWithMethodIds(_contracts);
-  const initialChainHeight = await queryChainHeight();
+  const initialChainHeight = await query.latestBlock();
   const combinations = getCombinations(config.contracts);
 
   let currentBlock = startBlock;
@@ -21,29 +21,22 @@ export async function processor(config: ProcessorConfig) {
 
     const allTxs = await Promise.all(
       combinations.map(({ contract, methodId }) =>
-        queryTransactionsAndLogs({
-          startBlock: currentBlock,
-          endBlock: batchEndBlock,
-          methodId,
+        query.contractTransactionsWithLogs(
+          currentBlock,
+          batchEndBlock,
           contract,
-        })
+          methodId
+        )
       )
     );
 
     const txs = allTxs.flat();
-    txs.sort((a, b) => {
-      if (b.block_number < a.block_number) return 1;
-      if (a.block_number < b.block_number) return -1;
-      if (b.transaction_index < a.transaction_index) return 1;
-      if (a.transaction_index < b.transaction_index) return -1;
-      return 0;
-    });
 
     for (let i = 0; i < txs.length; i++) {
-      await contracts[txs[i].to_address][txs[i].input.substring(2, 10)](txs[i]);
+      await contracts[txs[i].to][txs[i].methodId](txs[i]);
 
       console.log(
-        `Processed block ${txs[i].block_number}: Transaction ${txs[i].transaction_index}`
+        `Processed block ${txs[i].blockNumber}: Transaction ${txs[i].transactionIndex}`
       );
     }
 

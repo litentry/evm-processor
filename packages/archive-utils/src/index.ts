@@ -2,6 +2,7 @@ export {
   NativeTokenTransaction,
   ContractCreationTransaction,
   ContractTransaction,
+  ContractTransactionWithLogs,
   Log,
   ContractSignature,
   Block,

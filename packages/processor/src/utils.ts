@@ -1,5 +1,7 @@
 import * as ethers from 'ethers';
 
+// TODO move these into archive-utils
+
 export function removePrefix(input: string) {
   if (input.substring(0, 2) === '0x') {
     return input.substring(2);
