@@ -47,6 +47,10 @@ Build the Postgres database: `yarn db:build`.
 
 Run the indexer: `yarn start:prod`.
 
+## Moonbeam Token Contract Query Node
+
+This uses database env from the same env file as the indexer. The `PORT` env is optional, it defaults to `4000`. To run the query node just run `yarn query-node`.
+
 ## TODO - Uniswap
 
 - pair account to track aggregate volumes
