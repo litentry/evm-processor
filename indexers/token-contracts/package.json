@@ -5,9 +5,9 @@
   "main": "lib/index.js",
   "scripts": {
     "db:build": "docker-compose down && docker-compose up -d && yarn codegen && yarn build && rm -rf db/migrations/* && yarn migration && yarn migrate",
-    "dev": "nodemon src/index.ts",
+    "start": "nodemon src/index.ts",
     "build": "rm -rf lib && tsc",
-    "start": "node lib/index.js",
+    "start:prod": "yarn build && node lib/index",
     "prettier": "node_modules/.bin/prettier --write '**/*.ts'",
     "typecheck": "yarn tsc --noEmit",
     "query-node": "squid-graphql-server",

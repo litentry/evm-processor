@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rm -rf lib && tsc",
-    "start:prod": "node lib/index",
+    "start:prod": "yarn build && node lib/index",
     "mongo:reset": "yarn mongo:down && rm -rf ./data && yarn mongo:up",
     "mongo:up": "docker-compose -f docker-compose.mongo.yml up -d",
     "mongo:down": "docker-compose -f docker-compose.mongo.yml down",
