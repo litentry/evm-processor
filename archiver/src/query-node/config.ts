@@ -20,19 +20,19 @@ const config: Config = {
   port: parseInt(process.env.PORT || '4050'),
   // this is a bit minging, but we do want to stop people querying a terabyte of data... and we do need it to be configurable as ethereum mainnet is quite a lot busier than some other networks
   maxBlockRange: {
-    blocks: parseInt(process.env.MAX_RANGE_BLOCKS || '1000'),
+    blocks: parseInt(process.env.MAX_RANGE_BLOCKS || '10000'),
     contractCreationTransactions: parseInt(
-      process.env.MAX_RANGE_CONTRACT_CREATION_TRANSACTIONS || '500'
+      process.env.MAX_RANGE_CONTRACT_CREATION_TRANSACTIONS || '10000'
     ),
     contractTransactions: parseInt(
-      process.env.MAX_RANGE_CONTRACT_TRANSACTIONS || '500'
+      process.env.MAX_RANGE_CONTRACT_TRANSACTIONS || '10000'
     ),
     nativeTokenTransactions: parseInt(
-      process.env.MAX_RANGE_NATIVE_TOKEN_TRANSACTIONS || '500'
+      process.env.MAX_RANGE_NATIVE_TOKEN_TRANSACTIONS || '10000'
     ),
-    logs: parseInt(process.env.MAX_RANGE_LOGS || '500'),
+    logs: parseInt(process.env.MAX_RANGE_LOGS || '10000'),
     contractTransactionsWithLogs: parseInt(
-      process.env.MAX_RANGE_CONTRACT_TRANSACTIONS_WITH_LOGS || '200'
+      process.env.MAX_RANGE_CONTRACT_TRANSACTIONS_WITH_LOGS || '10000'
     ),
   },
 };
