@@ -5,7 +5,7 @@ services:
   archiver:
     build:
       context: ../.
-      target: archiver
+      target: indexer
       dockerfile: Dockerfile
       args:
         - BUILD_CONTEXT=archiver
@@ -17,10 +17,10 @@ services:
   archive-query-node:
     build:
       context: ../.
-      target: archiveQueryNode
+      target: queryNode
       dockerfile: Dockerfile
       args:
         - BUILD_CONTEXT=archiver
     ports:
-      - 4050:4050
+      - 80:4050
     restart: unless-stopped

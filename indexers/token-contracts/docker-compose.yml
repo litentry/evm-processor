@@ -28,7 +28,7 @@ services:
   index-query-node:
     build:
       context: ../../.
-      target: indexQueryNode
+      target: queryNode
       dockerfile: Dockerfile
       args:
         - BUILD_CONTEXT=indexers/token-contracts
