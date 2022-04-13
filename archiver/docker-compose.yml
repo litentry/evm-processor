@@ -1,5 +1,10 @@
 version: '3'
 
+networks:
+  host:
+    external: true
+    driver: bridge
+
 services:
 
   archiver:
@@ -14,7 +19,7 @@ services:
       - MONGO_URI
     restart: unless-stopped
 
-  query-node:
+  archive-query-node:
     build:
       context: ../.
       target: queryNode
