@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "main": "lib/index.js",
   "scripts": {
-    "db:build": "docker-compose down && rm -rf db/data/* && docker-compose up -d && yarn codegen && yarn build && sleep 20 && yarn create-schema",
+    "db:build": "docker-compose -f docker-compose.postgres.yml down && rm -rf db/data/* && docker-compose -f docker-compose.postgres.yml  up -d && yarn codegen && yarn build && sleep 20 && yarn create-schema",
     "start": "nodemon src/index.ts",
     "start:prod": "node lib/index",
     "build": "rm -rf lib && yarn codegen && tsc",
@@ -14,7 +14,7 @@
     "query-node": "squid-graphql-server",
     "codegen": "sqd codegen",
     "_postinstall": "yarn run build",
-    "create-schema": "sqd db:create-migration Data && sqd db:migrate && rm -rf db/migrations/*"
+    "create-schema": "sqd db:create-migration Data && sqd db:migrate"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.5.0",
