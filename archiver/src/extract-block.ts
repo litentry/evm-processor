@@ -8,7 +8,9 @@ async function getReceipts(transactionHashes: string[]) {
 
       if (!receipt) {
         // some providers fail to provide receipts
-        throw new Error(`Failed to fetch receipt for tx: ${hash}`);
+        throw new Error(
+          `Failed to fetch receipt for tx: ${hash}. You must provide an RPC_ENDPOINT for a full archive node.`
+        );
       }
       return receipt;
     })
