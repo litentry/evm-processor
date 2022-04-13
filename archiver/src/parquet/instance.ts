@@ -1,13 +1,23 @@
 import parquetjs, { ParquetSchema } from "parquetjs";
 import path from "path";
-import { contractSignatureSchema, logSchema, transactionSchema, blockSchema, convert } from "./schema";
+import schemas, {
+  blocks,
+  contractCreationTransactions,
+  contractSignatures,
+  contractTransactions,
+  logs,
+  nativeTokenTransactions
+} from "./schema";
 import { mkdir } from "fs/promises";
+import { convert } from "./convert-to-schema";
 
 interface ParquetBlockSet {
-  logs: ParquetWriter;
-  transactions: ParquetWriter;
-  contractSignatures: ParquetWriter;
   blocks: ParquetWriter;
+  contractSignatures: ParquetWriter;
+  logs: ParquetWriter;
+  nativeTokenTransactions: ParquetWriter;
+  contractTransactions: ParquetWriter;
+  contractCreationTransactions: ParquetWriter;
 }
 
 type Rows = {
@@ -34,27 +44,30 @@ export interface ParquetInstance {
 }
 
 export function getParquet(blocksPerFile: number): ParquetInstance {
-  let writers = Promise.resolve();
+  const writers = Promise.resolve();
 
-  const closing: Closing = {
-    logs: [],
-    blocks: [],
-    contractSignatures: [],
-    transactions: []
-  }
-  const bufferedRowSets: Rows = {
-    logs: [],
-    blocks: [],
-    contractSignatures: [],
-    transactions: []
-  }
+  const closing: Closing = Object.keys(schemas).reduce((existing, key) => {
+    return {
+      ...existing,
+      [key]: []
+    };
+  }, {} as { [type in keyof ParquetBlockSet]: any });
 
-  const schemaMap: { [k: string]: ParquetSchema } = {
-    logs: logSchema,
-    blocks: blockSchema,
-    contractSignatures: contractSignatureSchema,
-    transactions: transactionSchema
-  };
+  const bufferedRowSets: Rows = Object.keys(schemas).reduce((existing, key) => {
+    return {
+      ...existing,
+      [key]: []
+    };
+  }, {} as { [type in keyof ParquetBlockSet]: any });
+
+  const schemaMap: { [k: string]: ParquetSchema } = Object
+    .entries(schemas)
+    .reduce((currentSchemas, [key, schema]) => {
+      return {
+        ...currentSchemas,
+        [key]: new ParquetSchema(schema)
+      }
+    }, {});
 
   /**
    * Main synchronous data buffering function. Calls write when a new block range has been entered but doesn't care

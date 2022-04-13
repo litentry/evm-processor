@@ -1,58 +1,6 @@
-import parquetjs from 'parquetjs';
-import { RowInterface } from "parquetjs/lib/row.interface";
+import { ParquetTypes } from "./types";
 
-enum ParquetTypes {
-  INT64 = 'INT64',
-  BOOLEAN = 'BOOLEAN',
-  UTF8 = 'UTF8',
-}
-
-export const contractSignatureSchema = new parquetjs.ParquetSchema({
-  blockNumber: { type: ParquetTypes.INT64 },
-  blockTimestamp: { type: ParquetTypes.INT64 },
-  contractAddress: { type: ParquetTypes.UTF8 },
-  signature: { type: ParquetTypes.UTF8 },
-});
-
-export const logSchema = new parquetjs.ParquetSchema({
-  blockNumber: { type: ParquetTypes.INT64 },
-  transactionHash: { type: ParquetTypes.UTF8 },
-  address: { type: ParquetTypes.UTF8 },
-  topic0: { type: ParquetTypes.UTF8 },
-  topic1: { type: ParquetTypes.UTF8, optional: true },
-  topic2: { type: ParquetTypes.UTF8, optional: true },
-  topic3: { type: ParquetTypes.UTF8, optional: true },
-  topic4: { type: ParquetTypes.UTF8, optional: true },
-  data: { type: ParquetTypes.UTF8 },
-  logIndex: { type: ParquetTypes.INT64 },
-});
-
-export const transactionSchema = new parquetjs.ParquetSchema({
-  hash: { type: ParquetTypes.UTF8 },
-  nonce: { type: ParquetTypes.INT64 },
-  blockHash: { type: ParquetTypes.UTF8 },
-  blockNumber: { type: ParquetTypes.INT64 },
-  blockTimestamp: { type: ParquetTypes.INT64 },
-  transactionIndex: { type: ParquetTypes.INT64 },
-  from: { type: ParquetTypes.UTF8 },
-  to: { type: ParquetTypes.UTF8, optional: true },
-  value: { type: ParquetTypes.UTF8 },
-  gasPrice: { type: ParquetTypes.UTF8 },
-  gas: { type: ParquetTypes.INT64 },
-  maxPriorityFeePerGas: { type: ParquetTypes.UTF8, optional: true },
-  maxFeePerGas: { type: ParquetTypes.UTF8, optional: true },
-  input: { type: ParquetTypes.UTF8 },
-
-  methodId: { type: ParquetTypes.UTF8, optional: true },
-
-  receiptStatus: { type: ParquetTypes.BOOLEAN, optional: true },
-  receiptGasUsed: { type: ParquetTypes.INT64, optional: true },
-  receiptCumulativeGasUsed: { type: ParquetTypes.INT64, optional: true },
-  receiptEffectiveGasPrice: { type: ParquetTypes.INT64, optional: true },
-  receiptContractAddress: { type: ParquetTypes.UTF8, optional: true },
-});
-
-export const blockSchema = new parquetjs.ParquetSchema({
+export const blocks = {
   number: { type: ParquetTypes.INT64 },
   hash: { type: ParquetTypes.UTF8 },
   parentHash: { type: ParquetTypes.UTF8 },
@@ -71,26 +19,68 @@ export const blockSchema = new parquetjs.ParquetSchema({
   difficulty: { type: ParquetTypes.UTF8 },
   totalDifficulty: { type: ParquetTypes.UTF8 },
   uncles: { type: ParquetTypes.UTF8, optional: true },
-});
+};
 
-export function convert(row: RowInterface, schema: parquetjs.ParquetSchema) {
-  const converters: {[k: string]: (value: any) => any} = {
-    [ParquetTypes.INT64]: (value: number | BigInt) => value.toString()
-  }
+export const contractSignatures = {
+  blockNumber: { type: ParquetTypes.INT64 },
+  blockTimestamp: { type: ParquetTypes.INT64 },
+  contractAddress: { type: ParquetTypes.UTF8 },
+  signature: { type: ParquetTypes.UTF8 },
+};
 
-  const convertedRow = Object.entries(row).reduce((newRow, [key, value]) => {
-    let newValue = value;
-    const field = schema.fields[key];
-    if (field) {
-      const converter = converters[field.primitiveType || ""];
-      if (converter) {
-        newValue = converter(value);
-      }
-    }
-    return {
-      ...newRow,
-      [key]: newValue
-    }
-  }, row);
-  return convertedRow;
+export const logs = {
+  blockNumber: { type: ParquetTypes.INT64 },
+  transactionHash: { type: ParquetTypes.UTF8 },
+  address: { type: ParquetTypes.UTF8 },
+  topic0: { type: ParquetTypes.UTF8 },
+  topic1: { type: ParquetTypes.UTF8, optional: true },
+  topic2: { type: ParquetTypes.UTF8, optional: true },
+  topic3: { type: ParquetTypes.UTF8, optional: true },
+  topic4: { type: ParquetTypes.UTF8, optional: true },
+  data: { type: ParquetTypes.UTF8 },
+  logIndex: { type: ParquetTypes.INT64 },
+};
+
+const baseTransaction = {
+  hash: { type: ParquetTypes.UTF8 },
+  nonce: { type: ParquetTypes.INT64 },
+  blockHash: { type: ParquetTypes.UTF8 },
+  blockNumber: { type: ParquetTypes.INT64 },
+  blockTimestamp: { type: ParquetTypes.INT64 },
+  transactionIndex: { type: ParquetTypes.INT64 },
+  from: { type: ParquetTypes.UTF8 },
+  value: { type: ParquetTypes.UTF8 },
+  gasPrice: { type: ParquetTypes.UTF8 },
+  gas: { type: ParquetTypes.INT64 },
+  receiptStatus: { type: ParquetTypes.BOOLEAN, optional: true },
+  receiptGasUsed: { type: ParquetTypes.INT64 },
+  receiptCumulativeGasUsed: { type: ParquetTypes.INT64 },
+};
+
+export const nativeTokenTransactions = {
+  ...baseTransaction,
+  to: { type: ParquetTypes.UTF8 },
+};
+
+export const contractTransactions = {
+  ...baseTransaction,
+  to: { type: ParquetTypes.UTF8, },
+  methodId: { type: ParquetTypes.UTF8, },
+  input: { type: ParquetTypes.UTF8, },
+};
+
+export const contractCreationTransactions = {
+  ...baseTransaction,
+  methodId: { type: ParquetTypes.UTF8, },
+  input: { type: ParquetTypes.UTF8 },
+  receiptContractAddress: { type: ParquetTypes.UTF8 },
+};
+
+export default {
+  blocks,
+  contractSignatures,
+  logs,
+  nativeTokenTransactions,
+  contractTransactions,
+  contractCreationTransactions,
 }

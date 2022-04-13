@@ -1,0 +1,10 @@
+services:
+  db:
+    image: postgres:12
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./data/:/data/db/
+    ports:
+      - 5432

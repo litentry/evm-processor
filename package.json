@@ -17,6 +17,9 @@
   "workspaces": [
     "processor",
     "archiver",
-    "uniswap-indexer"
+    "archive-sdk",
+    "indexers/*",
+    "uniswap-indexer",
+    "processor_uniswap"
   ]
 }
