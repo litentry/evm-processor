@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:12
+    restart: always
+    environment:
+      - POSTGRES_DB=token-contracts
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '8002:5432'
+    volumes:
+      - ./db/data/:/var/lib/postgresql/data
+      # command: ["postgres", "-c", "log_statement=all"]

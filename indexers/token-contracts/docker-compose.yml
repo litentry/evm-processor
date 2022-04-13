@@ -1,15 +1,41 @@
 version: '3'
 
 services:
-  db:
-    image: postgres:12
-    restart: always
+  migrate:
+    build:
+      context: ../../.
+      target: archiver
+      dockerfile: Dockerfile
+      args:
+        - BUILD_CONTEXT=indexers/token-contracts
     environment:
-      - POSTGRES_DB=token-contracts
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - DB_NAME
+      - DB_HOST
+      - DB_PORT
+  indexer:
+    build:
+      context: ../../.
+      target: archiver
+      dockerfile: Dockerfile
+      args:
+        - BUILD_CONTEXT=indexers/token-contracts
+    restart: unless-stopped
+    environment:
+      - ARCHIVE_GRAPH
+      - DB_NAME
+      - DB_HOST
+      - DB_PORT
+  query-node:
+    build:
+      context: ../../.
+      target: queryNode
+      dockerfile: Dockerfile
+      args:
+        - BUILD_CONTEXT=indexers/token-contracts
+    restart: unless-stopped
     ports:
-      - '8002:5432'
-    volumes:
-      - ./db/data/:/var/lib/postgresql/data
-      # command: ["postgres", "-c", "log_statement=all"]
+      - 80:80
+    environment:
+      - DB_NAME
+      - DB_HOST
+      - DB_PORT

@@ -14,6 +14,9 @@ RUN yarn build
 FROM build AS archiver
 CMD ["yarn", "start:prod"]
 
+FROM build AS migrate
+CMD ["yarn", "migrate"]
+
 FROM build AS queryNode
 EXPOSE 4050
 CMD ["yarn", "query-node:prod"]

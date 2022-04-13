@@ -1,6 +1,7 @@
 version: '3'
 
 services:
+
   archiver:
     build:
       context: ../.
@@ -11,6 +12,8 @@ services:
     environment:
       - RPC_ENDPOINT
       - MONGO_URI
+    restart: unless-stopped
+
   query-node:
     build:
       context: ../.
@@ -20,3 +23,4 @@ services:
         - BUILD_CONTEXT=archiver
     ports:
       - 4050:4050
+    restart: unless-stopped
