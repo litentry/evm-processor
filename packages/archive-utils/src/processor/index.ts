@@ -1,7 +1,7 @@
 import colors from 'colors';
 import batchBlocks from './batch-blocks';
 
-export default async function asyncProcessor(
+export default async function processor(
   start: number,
   end: number | (() => Promise<number>),
   batchSize: number,
