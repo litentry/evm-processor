@@ -24,18 +24,19 @@ export default async function logs(
   transactionHash?: string,
   properties: (keyof Log)[] = defaultProperties
 ) {
-  const response = await axios({
-    url: endpoint,
-    method: 'post',
-    data: {
-      variables: {
-        startBlock,
-        endBlock,
-        contractAddress,
-        eventId,
-        transactionHash,
-      },
-      query: `
+  try {
+    const response = await axios({
+      url: endpoint,
+      method: 'post',
+      data: {
+        variables: {
+          startBlock,
+          endBlock,
+          contractAddress,
+          eventId,
+          transactionHash,
+        },
+        query: `
         query Logs($startBlock: Int!, $endBlock: Int!, $contractAddress: String, $eventId: String, $transactionHash: String) {
           logs(
             startBlock: $startBlock,
@@ -48,7 +49,10 @@ export default async function logs(
           }
         }
       `,
-    },
-  });
-  return response.data.data.logs as Log[];
+      },
+    });
+    return response.data.data.logs as Log[];
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
 }

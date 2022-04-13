@@ -47,17 +47,18 @@ export default async function contractTransactionsWithLogs(
   transactionProperties: (keyof ContractTransaction)[] = defaultTxProperties,
   logProperties: (keyof Log)[] = defaultLogProperties
 ) {
-  const response = await axios({
-    url: endpoint,
-    method: 'post',
-    data: {
-      variables: {
-        startBlock,
-        endBlock,
-        contractAddress,
-        methodId,
-      },
-      query: `
+  try {
+    const response = await axios({
+      url: endpoint,
+      method: 'post',
+      data: {
+        variables: {
+          startBlock,
+          endBlock,
+          contractAddress,
+          methodId,
+        },
+        query: `
         query ContractTransactionWithLogss($startBlock: Int!, $endBlock: Int!, $contractAddress: String, $methodId: String) {
           contractTransactionsWithLogs(
             startBlock: $startBlock,
@@ -72,8 +73,11 @@ export default async function contractTransactionsWithLogs(
           }
         }
       `,
-    },
-  });
-  return response.data.data
-    .contractTransactionsWithLogs as ContractTransactionWithLogs[];
+      },
+    });
+    return response.data.data
+      .contractTransactionsWithLogs as ContractTransactionWithLogs[];
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
 }

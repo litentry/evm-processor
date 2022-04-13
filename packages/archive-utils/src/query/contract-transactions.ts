@@ -28,17 +28,18 @@ export default async function contractTransactions(
   methodId?: string,
   properties: (keyof ContractTransaction)[] = defaultProperties
 ) {
-  const response = await axios({
-    url: endpoint,
-    method: 'post',
-    data: {
-      variables: {
-        startBlock,
-        endBlock,
-        contractAddress,
-        methodId,
-      },
-      query: `
+  try {
+    const response = await axios({
+      url: endpoint,
+      method: 'post',
+      data: {
+        variables: {
+          startBlock,
+          endBlock,
+          contractAddress,
+          methodId,
+        },
+        query: `
         query ContractTransactions($startBlock: Int!, $endBlock: Int!, $contractAddress: String, $methodId: String) {
           contractTransactions(
             startBlock: $startBlock,
@@ -50,7 +51,10 @@ export default async function contractTransactions(
           }
         }
       `,
-    },
-  });
-  return response.data.data.contractTransactions as ContractTransaction[];
+      },
+    });
+    return response.data.data.contractTransactions as ContractTransaction[];
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
 }
