@@ -3,9 +3,11 @@ import { processor, query } from 'archive-utils';
 import dataSource from './data-source';
 import handleContractCreation from './handle-contract-creation';
 
-const start = 0;
+const start = process.env.START_BLOCK ? parseInt(process.env.START_BLOCK) : 0;
 const end = process.env.END_BLOCK ? parseInt(process.env.END_BLOCK) : null;
-const batchSize = 500;
+const batchSize = process.env.BATCH_SIZE
+  ? parseInt(process.env.BATCH_SIZE)
+  : 500;
 
 async function run() {
   await dataSource.initialize();

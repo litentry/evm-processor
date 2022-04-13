@@ -7,6 +7,6 @@ yarn-error.log
 .DS_Store
 last-indexed-block
 indexers/*/src/model
-indexers/*/db/migrations/*.js
+indexers/*/db
 uniswap-indexer/src/model
 uniswap-indexer/db/migrations/*.js

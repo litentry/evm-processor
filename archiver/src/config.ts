@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { Config } from './types';
 import { web3 } from 'archive-utils';
 
