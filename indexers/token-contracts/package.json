@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "main": "lib/index.js",
   "scripts": {
-    "db:build": "docker-compose down && rm -rf db/data/* && docker-compose up -d && yarn codegen && yarn build && rm -rf db/migrations/* && yarn migration && yarn migrate",
+    "db:build": "docker-compose down && rm -rf db/data/* && docker-compose up -d && yarn codegen && yarn build && rm -rf db/migrations/* && sleep 20 && yarn migration && yarn migrate",
     "start": "nodemon src/index.ts",
     "build": "rm -rf lib && tsc",
     "start:prod": "yarn build && node lib/index",
