@@ -3,7 +3,7 @@ services:
     image: mongo:latest
     container_name: mongodb
     volumes:
-      - ./data/:/data/db/
+      - ./data/mongo:/data/db/
     #   - ./.docker/mongodb/mongod.conf:/etc/mongod.conf
     #   - ./.docker/mongodb/initdb.d/:/docker-entrypoint-initdb.d/
     #   - ./.docker/mongodb/data/log/:/var/log/mongodb/
