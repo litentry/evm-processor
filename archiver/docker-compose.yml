@@ -22,5 +22,5 @@ services:
       args:
         - BUILD_CONTEXT=archiver
     ports:
-      - 80:4050
+      - 4050:80
     restart: unless-stopped
