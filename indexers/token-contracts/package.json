@@ -6,10 +6,11 @@
   "scripts": {
     "db:build": "docker-compose down && rm -rf db/data/* && docker-compose up -d && yarn codegen && yarn build && rm -rf db/migrations/* && yarn migration && yarn migrate",
     "start": "nodemon src/index.ts",
-    "start:prod": "node src/index",
+    "start:prod": "node lib/index",
     "build": "rm -rf lib && yarn codegen && tsc",
     "prettier": "node_modules/.bin/prettier --write '**/*.ts'",
     "typecheck": "yarn tsc --noEmit",
+    "query-node:prod": "squid-graphql-server",
     "query-node": "squid-graphql-server",
     "codegen": "sqd codegen",
     "_postinstall": "yarn run build",
