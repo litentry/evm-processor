@@ -10,10 +10,10 @@ export default function isContractType(type: ContractType, sigs: string[]) {
   //   }
   // );
   const hasExtrinsics = CONTRACT_SIGNATURES[type].EXTRINSICS.every(
-    ({ ID, REQUIRED }) => {
+    ({ ID, REQUIRED, _ID }) => {
       if (!REQUIRED) return true;
 
-      return sigs.includes(ID);
+      return sigs.includes(ID) || sigs.includes(_ID);
     }
   );
   return hasExtrinsics;

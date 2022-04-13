@@ -12,6 +12,8 @@ We return the ContractSignatures type and assign it to CONTRACT_SIGNATURES. Each
 4. Required, used along with the ID to identifying contract types in contract creation transactions
 
 The ugly uppercase is because these are constants. Apologies but it's important to keep that clear.
+
+ODD NOTE: some contracts prefix methods with an underscore, we use _ID to allow us to check that hash too
  */
 
 type SimpleContractSignatures = {
@@ -30,6 +32,7 @@ type SimpleContractSignatures = {
 type ContractSignatureItem = {
   SIGNATURE: string;
   ID: string;
+  _ID: string;
   PARAMS: string[];
   REQUIRED: boolean;
 };
@@ -148,7 +151,7 @@ export const CONTRACT_SIGNATURES = Object.keys(
 function createSignatureItemArray(
   contract: ContractType,
   type: 'EVENTS' | 'EXTRINSICS'
-) {
+): ContractSignatureItem[] {
   return [
     ...SIMPLE_CONTRACT_SIGNATURES[contract][type].REQUIRED.map((signature) =>
       createSignatureItem(signature, true)
@@ -159,11 +162,15 @@ function createSignatureItemArray(
   ];
 }
 
-function createSignatureItem(signature: string, required: boolean) {
+function createSignatureItem(
+  signature: string,
+  required: boolean
+): ContractSignatureItem {
   return {
     REQUIRED: required,
     SIGNATURE: signature,
     ID: getMethodIdFromSignature(signature),
+    _ID: getMethodIdFromSignature(`_${signature}`),
     PARAMS: getParamsFromSignature(signature),
   };
 }
