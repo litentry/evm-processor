@@ -35,7 +35,7 @@ Set `.env`:
 ARCHIVE_GRAPH='http://localhost:4050/graphql'
 
 # keep these consistent with docker
-DB_NAME=tokens
+DB_NAME=token-contracts
 DB_HOST=0.0.0.0
 DB_PORT=8002
 
