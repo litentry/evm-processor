@@ -1,9 +1,9 @@
-import {
-  BlockModel,
-  ContractSignatureModel,
-  LogModel,
-  TransactionModel,
-} from '../postgres-models';
+// import {
+//   BlockModel,
+//   ContractSignatureModel,
+//   LogModel,
+//   TransactionModel,
+// } from '../postgres-models';
 import { LoadBlock } from '../types';
 
 /**
