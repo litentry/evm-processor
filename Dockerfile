@@ -19,4 +19,5 @@ EXPOSE 80
 CMD ["yarn", "query-node:prod"]
 
 FROM build AS migrate
+RUN yarn migration
 CMD ["yarn", "migrate"]
