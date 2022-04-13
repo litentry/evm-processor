@@ -11,7 +11,7 @@ services:
     environment:
       - RPC_ENDPOINT
       - MONGO_URI
-  queryNode:
+  query-node:
     build:
       context: ../.
       target: queryNode
@@ -19,4 +19,4 @@ services:
       args:
         - BUILD_CONTEXT=archiver
     ports:
-    - 4050
+      - 4050
