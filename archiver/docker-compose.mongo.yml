@@ -16,4 +16,6 @@ services:
     #   MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     ports:
       - 27017:27017
+    networks:
+      - db-network
     # command: ['-f', '/etc/mongod.conf']

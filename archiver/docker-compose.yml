@@ -1,5 +1,13 @@
 version: '3'
 
+networks:
+  web-network:
+    external:
+      name: web-network
+  db-network:
+    name: db-network
+
+
 services:
 
   archiver:
@@ -13,6 +21,8 @@ services:
       - RPC_ENDPOINT
       - MONGO_URI
     restart: unless-stopped
+    networks:
+      - db-network
 
   archive-query-node:
     build:
@@ -24,3 +34,9 @@ services:
     ports:
       - 4050:80
     restart: unless-stopped
+    networks:
+      - web-network
+
+  mongodb:
+    networks:
+      - db-network
