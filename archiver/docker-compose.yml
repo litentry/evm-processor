@@ -19,4 +19,4 @@ services:
       args:
         - BUILD_CONTEXT=archiver
     ports:
-      - 4050
+      - 4050:4050
