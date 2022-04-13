@@ -38,7 +38,10 @@ services:
       - DB_HOST
       - DB_PORT
     volumes:
-      - "./data/last-indexed-block:/base/indexers/token-contracts/last-indexed-block"
+      volumes:
+        - type: bind
+          source: "${PWD}/data/last-indexed-block"
+          target: "/base/indexers/token-contracts/last-indexed-block"
     networks:
       - db-network
       - web-network
