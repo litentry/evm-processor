@@ -21,7 +21,9 @@ services:
       - RPC_ENDPOINT
       - MONGO_URI
     volumes:
-      - "${PWD}/data/last-indexed-block:/base/archiver/last-indexed-block"
+      - type: bind
+        source: "${PWD}/data/last-indexed-block"
+        target: "/base/archiver/last-indexed-block"
     restart: unless-stopped
     networks:
       - db-network
