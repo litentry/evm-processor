@@ -9,42 +9,60 @@ export default async function asyncProcessor(
 ) {
   const stream = typeof end !== 'number';
 
-  let lastBlockInRange = stream ? await end() : end;
+  let endBlock = stream ? await end() : end;
 
   if (stream) {
-    console.log(colors.green(`Initial chain height: ${lastBlockInRange}`));
+    console.log(colors.green(`Initial chain height: ${endBlock}`));
   }
 
   let lastBlockIndexed = await batchBlocks(
     start,
-    lastBlockInRange,
+    endBlock,
     batchSize,
     batchHandler
   );
 
-  console.log(colors.green(`Caught up to block: ${lastBlockInRange}`));
+  console.log(colors.green(`Caught up to block: ${endBlock}`));
 
   if (!stream) {
     process.exit(0);
   }
 
-  lastBlockInRange = await end();
+  endBlock = await end();
 
-  console.log(colors.green(`New chain height: ${lastBlockInRange}`));
+  console.log(colors.green(`New chain height: ${endBlock}`));
 
   // catch up with chain height then re-check chain height
-  while (lastBlockInRange - lastBlockIndexed) {
+  while (endBlock - lastBlockIndexed) {
     lastBlockIndexed = await batchBlocks(
       lastBlockIndexed + 1,
-      lastBlockInRange,
+      endBlock,
       batchSize,
       batchHandler
     );
-    lastBlockInRange = await end();
+    endBlock = await end();
   }
-  console.log(
-    colors.green(`In sync with with chain height: ${lastBlockInRange}`)
-  );
+  console.log(colors.green(`In sync with with chain height: ${endBlock}`));
 
   // subscribe
+  let busy = false; // in case a batch handler takes longer than the interval
+  setInterval(async () => {
+    if (busy) {
+      return;
+    }
+
+    busy = true;
+    endBlock = await end();
+
+    if (endBlock - lastBlockIndexed) {
+      lastBlockIndexed = await batchBlocks(
+        lastBlockIndexed + 1,
+        endBlock,
+        batchSize,
+        batchHandler
+      );
+    }
+
+    busy = false;
+  }, 5000);
 }

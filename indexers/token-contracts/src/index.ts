@@ -1,17 +1,16 @@
 import 'dotenv/config';
-import { process, query } from 'archive-utils';
+import { processor, query } from 'archive-utils';
 import dataSource from './data-source';
 import handleContractCreation from './handle-contract-creation';
 
-const start = 200000;
-const end = 300000;
+const start = 0;
+const end = process.env.END_BLOCK ? parseInt(process.env.END_BLOCK) : null;
 const batchSize = 500;
 
 async function run() {
   await dataSource.initialize();
 
-  await process.batchBlocks(start, end, batchSize, async (start, end) => {
-    console.log(`Processing ${start} to ${end}`);
+  processor(start, query.latestBlock, batchSize, async (start, end) => {
     const txs = await query.contractCreationTransactions(
       start,
       end,

@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { BatchHandler } from '../types';
 
 export default async function batchBlocks(
@@ -15,9 +16,12 @@ export default async function batchBlocks(
       batchEndBlock = endBlock;
     }
 
+    console.log(`Processing ${batchStartBlock} to ${batchEndBlock}`);
     await batchHandler(batchStartBlock, batchEndBlock);
 
     batchStartBlock = batchEndBlock + 1;
+
+    fs.writeFileSync('last-indexed-block', batchEndBlock.toString());
   }
 
   return batchStartBlock - 1;
