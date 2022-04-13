@@ -4,9 +4,19 @@ services:
   archiver:
     build:
       context: ../.
+      target: archiver
       dockerfile: Dockerfile
       args:
         - BUILD_CONTEXT=archiver
     environment:
       - RPC_ENDPOINT
       - MONGO_URI
+  queryNode:
+    build:
+      context: ../.
+      target: queryNode
+      dockerfile: Dockerfile
+      args:
+        - BUILD_CONTEXT=archiver
+    ports:
+    - 4050
