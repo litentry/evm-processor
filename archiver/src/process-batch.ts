@@ -31,8 +31,6 @@ export default async function processBatch(start: number, end: number) {
     })
   );
 
-  fs.writeFileSync('last-indexed-block', end.toString());
-
   console.log(colors.blue(`Processed batch ${start} to ${end}`));
   console.timeEnd('Batch time');
   console.log('\n');
