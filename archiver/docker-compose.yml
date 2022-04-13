@@ -20,6 +20,8 @@ services:
     environment:
       - RPC_ENDPOINT
       - MONGO_URI
+    volumes:
+      - "./data/last-indexed-block:/base/archiver/last-indexed-block"
     restart: unless-stopped
     networks:
       - db-network
