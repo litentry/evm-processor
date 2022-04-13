@@ -4,7 +4,7 @@ services:
   migrate:
     build:
       context: ../../.
-      target: archiver
+      target: migrate
       dockerfile: Dockerfile
       args:
         - BUILD_CONTEXT=indexers/token-contracts
@@ -15,7 +15,7 @@ services:
   indexer:
     build:
       context: ../../.
-      target: archiver
+      target: indexer
       dockerfile: Dockerfile
       args:
         - BUILD_CONTEXT=indexers/token-contracts
@@ -28,7 +28,7 @@ services:
   index-query-node:
     build:
       context: ../../.
-      target: queryNode
+      target: indexQueryNode
       dockerfile: Dockerfile
       args:
         - BUILD_CONTEXT=indexers/token-contracts

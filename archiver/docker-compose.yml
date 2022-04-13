@@ -17,7 +17,7 @@ services:
   archive-query-node:
     build:
       context: ../.
-      target: queryNode
+      target: archiveQueryNode
       dockerfile: Dockerfile
       args:
         - BUILD_CONTEXT=archiver
