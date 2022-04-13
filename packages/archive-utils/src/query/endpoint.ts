@@ -1,7 +1,9 @@
 if (!process.env.ARCHIVE_GRAPH) {
-  throw new Error('archive-utils requires process.env.ARCHIVE_GRAPH to be set');
+  console.log(
+    'process.env.ARCHIVE_GRAPH to be set, ignore if you are not querying the archive'
+  );
 }
 
-const endpoint = process.env.ARCHIVE_GRAPH;
+const endpoint = process.env.ARCHIVE_GRAPH!;
 
 export default endpoint;
