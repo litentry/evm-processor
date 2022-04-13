@@ -26,15 +26,16 @@ export default async function blocks(
   endBlock: number,
   properties: (keyof Block)[] = defaultProperties
 ) {
-  const response = await axios({
-    url: endpoint,
-    method: 'post',
-    data: {
-      variables: {
-        startBlock,
-        endBlock,
-      },
-      query: `
+  try {
+    const response = await axios({
+      url: endpoint,
+      method: 'post',
+      data: {
+        variables: {
+          startBlock,
+          endBlock,
+        },
+        query: `
         query Blocks($startBlock: Int!, $endBlock: Int!) {
           blocks(
             startBlock: $startBlock,
@@ -44,7 +45,10 @@ export default async function blocks(
           }
         }
       `,
-    },
-  });
-  return response.data.data.blocks as Block[];
+      },
+    });
+    return response.data.data.blocks as Block[];
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
 }

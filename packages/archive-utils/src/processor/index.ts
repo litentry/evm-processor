@@ -1,3 +1,4 @@
+import fs from 'fs';
 import colors from 'colors';
 import batchBlocks from './batch-blocks';
 
@@ -10,13 +11,14 @@ export default async function processor(
   const stream = typeof end !== 'number';
 
   let endBlock = stream ? await end() : end;
+  const startBlock = getStartBlock(start);
 
   if (stream) {
     console.log(colors.green(`Initial chain height: ${endBlock}`));
   }
 
   let lastBlockIndexed = await batchBlocks(
-    start,
+    startBlock,
     endBlock,
     batchSize,
     batchHandler
@@ -65,4 +67,13 @@ export default async function processor(
 
     busy = false;
   }, 5000);
+}
+
+function getStartBlock(startBlock: number) {
+  if (fs.existsSync('last-indexed-block')) {
+    const file = fs.readFileSync('last-indexed-block');
+    return parseInt(file.toString()) + 1;
+  }
+
+  return startBlock;
 }

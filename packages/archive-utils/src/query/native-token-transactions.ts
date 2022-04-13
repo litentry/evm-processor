@@ -26,17 +26,18 @@ export default async function contractTransactions(
   to?: string,
   properties: (keyof NativeTokenTransaction)[] = defaultProperties
 ) {
-  const response = await axios({
-    url: endpoint,
-    method: 'post',
-    data: {
-      variables: {
-        startBlock,
-        endBlock,
-        from,
-        to,
-      },
-      query: `
+  try {
+    const response = await axios({
+      url: endpoint,
+      method: 'post',
+      data: {
+        variables: {
+          startBlock,
+          endBlock,
+          from,
+          to,
+        },
+        query: `
         query NativeTokenTransactions($startBlock: Int!, $endBlock: Int!, $from: String, $to: String) {
           nativeTokenTransactions(
             startBlock: $startBlock,
@@ -48,7 +49,11 @@ export default async function contractTransactions(
           }
         }
       `,
-    },
-  });
-  return response.data.data.nativeTokenTransactions as NativeTokenTransaction[];
+      },
+    });
+    return response.data.data
+      .nativeTokenTransactions as NativeTokenTransaction[];
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
 }

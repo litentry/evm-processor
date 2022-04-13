@@ -8,30 +8,41 @@ type ERC20Contract @entity {
   # contract address
   id: ID!
   creator: String! @index
-  blockNumber: Int!
+  blockNumber: Int! @index
   timestamp: Int!
 
   symbol: String
   name: String
   decimals: Int
+
+  erc165: Boolean! @index
 }
 
 type ERC721Contract @entity {
   # contract address
   id: ID!
   creator: String! @index
-  blockNumber: Int!
+  blockNumber: Int! @index
   timestamp: Int!
 
   name: String
+
+  erc165: Boolean! @index
+  erc721TokenReceiver: Boolean! @index
+  erc721Metadata: Boolean! @index
+  erc721Enumerable: Boolean! @index
 }
 
 type ERC1155Contract @entity {
   # contract address
   id: ID!
   creator: String! @index
-  blockNumber: Int!
+  blockNumber: Int! @index
   timestamp: Int!
 
   name: String
+
+  erc165: Boolean! @index
+  erc1155TokenReceiver: Boolean! @index
+  erc1155MetadataURI: Boolean! @index
 }

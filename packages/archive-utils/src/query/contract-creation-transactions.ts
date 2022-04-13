@@ -27,16 +27,17 @@ export default async function contractCreationTransactions(
   contractAddress?: string,
   properties: (keyof ContractCreationTransaction)[] = defaultProperties
 ) {
-  const response = await axios({
-    url: endpoint,
-    method: 'post',
-    data: {
-      variables: {
-        startBlock,
-        endBlock,
-        contractAddress,
-      },
-      query: `
+  try {
+    const response = await axios({
+      url: endpoint,
+      method: 'post',
+      data: {
+        variables: {
+          startBlock,
+          endBlock,
+          contractAddress,
+        },
+        query: `
         query ContractCreationTransactions($startBlock: Int!, $endBlock: Int!, $contractAddress: String) {
           contractCreationTransactions(
             startBlock: $startBlock,
@@ -47,8 +48,11 @@ export default async function contractCreationTransactions(
           }
         }
       `,
-    },
-  });
-  return response.data.data
-    .contractCreationTransactions as ContractCreationTransaction[];
+      },
+    });
+    return response.data.data
+      .contractCreationTransactions as ContractCreationTransaction[];
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
 }
