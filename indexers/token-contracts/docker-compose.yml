@@ -59,3 +59,8 @@ services:
     networks:
       - db-network
       - web-network
+
+  db:
+    networks:
+      - db-network
+
