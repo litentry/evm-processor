@@ -32,7 +32,7 @@ services:
       args:
         - BUILD_CONTEXT=archiver
     ports:
-      - 4050:4050
+      - 4049:4050
     restart: unless-stopped
     networks:
       - web-network

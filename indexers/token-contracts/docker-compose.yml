@@ -50,9 +50,9 @@ services:
         - BUILD_CONTEXT=indexers/token-contracts
     restart: unless-stopped
     ports:
-      - 80:80
+      - 80:4050
     environment:
-      - GQL_PORT=80
+      - GQL_PORT=4050
       - DB_NAME
       - DB_HOST
       - DB_PORT

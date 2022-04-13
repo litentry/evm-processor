@@ -15,7 +15,7 @@ FROM build AS indexer
 CMD ["yarn", "start:prod"]
 
 FROM build AS queryNode
-EXPOSE 80
+EXPOSE 4050
 CMD ["yarn", "query-node:prod"]
 
 FROM build AS migrate
