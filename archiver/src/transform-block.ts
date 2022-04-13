@@ -81,7 +81,7 @@ const transformBlock: TransformBlock = ({
           receiptContractAddress: contractAddress,
         });
 
-        const signatures = utils.getContractSignatures(tx.input);
+        const signatures = utils.contract.getContractSignatures(tx.input);
         contractSignatures.push(
           ...signatures.map((signature) => ({
             signature,
