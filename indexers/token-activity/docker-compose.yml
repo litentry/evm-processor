@@ -1,0 +1,8 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongo-token-activity
+    volumes:
+      - ./db/:/data/db/
+    ports:
+      - '27019:27017'

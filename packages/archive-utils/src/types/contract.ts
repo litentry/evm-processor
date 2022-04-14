@@ -51,7 +51,7 @@ export interface ERC20Transaction extends Document {
   _id: string; // hash
   contract: string;
   signer: string;
-  method?: string;
+  method: string;
   methodId: string;
 
   blockNumber: number;
@@ -59,5 +59,5 @@ export interface ERC20Transaction extends Document {
 
   value: string;
   input: string;
-  inputDecoded?: string;
+  inputDecoded: string;
 }

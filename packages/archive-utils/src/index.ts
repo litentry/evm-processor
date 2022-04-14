@@ -16,6 +16,7 @@ export {
   ERC1155Contract,
   ERC721Contract,
 } from './types';
+export { default as filter } from './filter';
 export { default as graphqlServer } from './graphql-server';
 export { default as query } from './query';
 export { default as processor } from './processor';

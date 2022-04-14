@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 import { schemaComposer } from 'graphql-compose';
 import { composeMongoose } from 'graphql-compose-mongoose';
-import { ERC20Contract, ERC1155Contract, ERC721Contract } from 'archive-utils';
-
-const filter = {
-  lean: true,
-  filter: { onlyIndexed: true },
-};
+import {
+  ERC20Contract,
+  ERC1155Contract,
+  ERC721Contract,
+  filter,
+} from 'archive-utils';
 
 const ERC20ContractSchema = new mongoose.Schema<ERC20Contract>({
   _id: String,
