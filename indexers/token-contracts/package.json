@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "main": "lib/index.js",
   "scripts": {
-    "db:reset": "docker-compose down && rm -rf ./data && docker-compose up -d",
+    "db:reset": "docker-compose down && rm -rf ./db && docker-compose up -d",
     "start": "ts-node src/index.ts",
     "build": "rm -rf lib && tsc",
     "start:prod": "yarn build && node lib/index",
