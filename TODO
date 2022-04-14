@@ -1,0 +1,4 @@
+Make all query params objects
+Migrate archive to mongoose graph
+Add rest of contract activity data
+Sort out axios gql mess
