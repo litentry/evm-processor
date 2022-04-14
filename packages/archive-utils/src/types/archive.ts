@@ -1,11 +1,3 @@
-export enum ContractType {
-  ERC165 = 'ERC165',
-  ERC20 = 'ERC20',
-  ERC721 = 'ERC721',
-  ERC1155 = 'ERC1155',
-}
-
-// archive models
 export interface ContractSignature {
   blockNumber: number; // index
   blockTimestamp: number;
@@ -92,9 +84,3 @@ export interface ContractCreationTransaction extends TransactionBase {
   methodId: string;
   receiptContractAddress: string;
 }
-
-// process related
-export type BatchHandler = (
-  batchStartBlock: number,
-  batchEndBlock: number
-) => Promise<void>;
