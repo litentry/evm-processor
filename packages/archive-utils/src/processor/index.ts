@@ -72,7 +72,9 @@ export default async function processor(
 function getStartBlock(startBlock: number) {
   if (fs.existsSync('last-indexed-block')) {
     const file = fs.readFileSync('last-indexed-block');
-    return parseInt(file.toString()) + 1;
+    if (file.toString()) {
+      return parseInt(file.toString()) + 1;
+    }
   }
 
   return startBlock;
