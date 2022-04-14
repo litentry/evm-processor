@@ -1,6 +1,6 @@
 {
-  "name": "token-contracts",
-  "description": "Indexes ERC20, ERC721 & ERC1155 contracts",
+  "name": "token-activity",
+  "description": "Indexes ERC20, ERC721 & ERC1155 activity",
   "version": "0.0.1",
   "main": "lib/index.js",
   "scripts": {

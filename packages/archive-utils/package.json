@@ -9,10 +9,6 @@
     "watch": "tsc --watch"
   },
   "dependencies": {
-    "axios": "^0.26.1",
-    "colors": "^1.4.0",
-    "evm": "^0.2.0",
-    "mongoose": "^6.2.10",
-    "web3": "^v3.0.0-rc.5"
+    "evm": "^0.2.0"
   }
 }
