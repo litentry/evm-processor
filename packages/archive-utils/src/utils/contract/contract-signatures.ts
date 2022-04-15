@@ -157,23 +157,24 @@ function createSignatureItemArray(
 ): ContractSignatureItem[] {
   return [
     ...SIMPLE_CONTRACT_SIGNATURES[contract][type].REQUIRED.map((signature) =>
-      createSignatureItem(signature, true)
+      createSignatureItem(signature, true, type === 'EVENTS')
     ),
     ...SIMPLE_CONTRACT_SIGNATURES[contract][type].OPTIONAL.map((signature) =>
-      createSignatureItem(signature, false)
+      createSignatureItem(signature, false, type === 'EVENTS')
     ),
   ];
 }
 
 function createSignatureItem(
   signature: string,
-  required: boolean
+  required: boolean,
+  events: boolean
 ): ContractSignatureItem {
   return {
     REQUIRED: required,
     SIGNATURE: signature,
-    ID: getMethodIdFromSignature(signature),
-    _ID: getMethodIdFromSignature(`_${signature}`),
+    ID: getMethodIdFromSignature(signature, events),
+    _ID: getMethodIdFromSignature(`_${signature}`, events),
     PARAMS: getParamsFromSignature(signature),
   };
 }

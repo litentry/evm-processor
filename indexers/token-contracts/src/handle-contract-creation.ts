@@ -17,10 +17,9 @@ export default async function handleContractCreation({
   // failure (or pre byzantium... may need to handle this better)
   if (!receiptStatus) return;
 
-  const sigs = utils.contract.getContractSignatures(input);
   const erc165 = utils.contract.isType(
     Types.Contract.ContractType.ERC165,
-    sigs
+    input
   );
   const common = {
     _id,
@@ -30,7 +29,7 @@ export default async function handleContractCreation({
     erc165,
   };
 
-  if (utils.contract.isType(Types.Contract.ContractType.ERC20, sigs)) {
+  if (utils.contract.isType(Types.Contract.ContractType.ERC20, input)) {
     const data = await fetchTokenData(_id);
     await ERC20ContractModel.create({
       ...common,
@@ -39,25 +38,25 @@ export default async function handleContractCreation({
     return;
   }
 
-  if (utils.contract.isType(Types.Contract.ContractType.ERC721, sigs)) {
+  if (utils.contract.isType(Types.Contract.ContractType.ERC721, input)) {
     const data = await fetchTokenData(_id, true);
     await ERC721ContractModel.create({
       ...common,
       ...data,
-      erc721Enumerable: utils.contract.supports.ERC721Enumerable(sigs),
-      erc721Metadata: utils.contract.supports.ERC721Metadata(sigs),
-      erc721TokenReceiver: utils.contract.supports.ERC721TokenReceiver(sigs),
+      erc721Enumerable: utils.contract.supports.ERC721Enumerable(input),
+      erc721Metadata: utils.contract.supports.ERC721Metadata(input),
+      erc721TokenReceiver: utils.contract.supports.ERC721TokenReceiver(input),
     });
     return;
   }
 
-  if (utils.contract.isType(Types.Contract.ContractType.ERC1155, sigs)) {
+  if (utils.contract.isType(Types.Contract.ContractType.ERC1155, input)) {
     const data = await fetchTokenData(_id, true);
     await ERC1155ContractModel.create({
       ...common,
       ...data,
-      erc1155MetadataURI: utils.contract.supports.ERC1155Metadata_URI(sigs),
-      erc1155TokenReceiver: utils.contract.supports.ERC1155TokenReceiver(sigs),
+      erc1155MetadataURI: utils.contract.supports.ERC1155Metadata_URI(input),
+      erc1155TokenReceiver: utils.contract.supports.ERC1155TokenReceiver(input),
     });
     return;
   }

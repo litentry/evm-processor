@@ -9,7 +9,7 @@ const start = process.env.START_BLOCK ? parseInt(process.env.START_BLOCK) : 0;
 const end = process.env.END_BLOCK ? parseInt(process.env.END_BLOCK) : null;
 const batchSize = process.env.BATCH_SIZE
   ? parseInt(process.env.BATCH_SIZE)
-  : 500;
+  : 10000;
 
 async function run() {
   await mongoose.connect(process.env.MONGO_URI!);

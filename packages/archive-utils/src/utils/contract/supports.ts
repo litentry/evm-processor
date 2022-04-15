@@ -28,21 +28,18 @@ const ERC1155Metadata_URISig = CONTRACT_SIGNATURES.ERC721.EXTRINSICS.find(
 )!;
 
 export default {
-  ERC721Enumerable: (sigs: string[]) => supports(ERC721EnumerableSigs, sigs),
-  ERC721TokenReceiver: (sigs: string[]) =>
-    supports([ERC721TokenReceiverSig], sigs),
-  ERC721Metadata: (sigs: string[]) => supports(ERC721MetadataSigs, sigs),
-  ERC1155Metadata_URI: (sigs: string[]) =>
-    supports([ERC1155Metadata_URISig], sigs),
-  ERC1155TokenReceiver: (sigs: string[]) =>
-    supports(ERC1155TokenReceiverSigs, sigs),
+  ERC721Enumerable: (input: string) => supports(ERC721EnumerableSigs, input),
+  ERC721TokenReceiver: (input: string) =>
+    supports([ERC721TokenReceiverSig], input),
+  ERC721Metadata: (input: string) => supports(ERC721MetadataSigs, input),
+  ERC1155Metadata_URI: (input: string) =>
+    supports([ERC1155Metadata_URISig], input),
+  ERC1155TokenReceiver: (input: string) =>
+    supports(ERC1155TokenReceiverSigs, input),
 };
 
-function supports(
-  interfaceSigs: ContractSignatureItem[],
-  contractSigs: string[]
-) {
+function supports(interfaceSigs: ContractSignatureItem[], input: string) {
   return interfaceSigs.every((sig) => {
-    return contractSigs.includes(sig.ID) || contractSigs.includes(sig._ID);
+    return input.includes(sig.ID) || input.includes(sig._ID);
   });
 }

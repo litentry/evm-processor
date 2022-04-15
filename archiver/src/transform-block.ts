@@ -71,16 +71,6 @@ const transformBlock: TransformBlock = ({
           methodId: tx.input.substring(2, 10),
           receiptContractAddress: contractAddress,
         });
-
-        const signatures = utils.contract.getContractSignatures(tx.input);
-        contractSignatures.push(
-          ...signatures.map((signature) => ({
-            signature,
-            contractAddress,
-            blockNumber: block.number,
-            blockTimestamp: block.timestamp,
-          }))
-        );
         break;
       }
 
