@@ -1,5 +1,5 @@
 import { query, Types } from 'archive-utils';
-import decode from './decode';
+import { decodeParams } from './decode';
 import {
   ERC1155TransactionDecodedModel,
   ERC20TransactionDecodedModel,
@@ -79,7 +79,7 @@ export default async function extrinsicsHandler(
         signature: ex.SIGNATURE,
         blockNumber: tx.blockNumber,
         blockTimestamp: tx.blockTimestamp,
-        ...decode(ex.PARAMS, tx.input),
+        ...decodeParams(ex.PARAMS, tx.input),
       } as Types.Contract.DecodedContractTransaction;
     })
   );

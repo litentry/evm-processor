@@ -83,3 +83,20 @@ export interface DecodedContractTransaction extends Document {
   type5?: string;
   type6?: string;
 }
+
+export interface DecodedContractEvent extends Document {
+  _id: string; // block + logIndex
+  contract: string;
+  transactionHash: string;
+  signature: string;
+  blockNumber: number;
+  blockTimestamp: number;
+  value1?: string;
+  value2?: string;
+  value3?: string;
+  value4?: string;
+  type1?: string;
+  type2?: string;
+  type3?: string;
+  type4?: string;
+}

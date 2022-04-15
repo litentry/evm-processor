@@ -7,6 +7,6 @@ const end = process.env.END_BLOCK
   : query.latestBlock;
 const batchSize = process.env.BATCH_SIZE
   ? parseInt(process.env.BATCH_SIZE)
-  : 1000;
+  : 500;
 
 export { port, start, end, batchSize };

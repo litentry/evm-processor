@@ -5,25 +5,32 @@ import schema, {
   ERC20TransactionDecodedModel,
   ERC721TransactionDecodedModel,
   ERC1155TransactionDecodedModel,
+  ERC20EventDecodedModel,
+  ERC721EventDecodedModel,
+  ERC1155EventDecodedModel,
 } from './schema';
 import { port, start, end, batchSize } from './config';
 import extrinsicsHandler from './extrinsics-handler';
+import eventsHandler from './events-handler';
 
 const standards = [
   {
     type: 20,
-    model: ERC20TransactionDecodedModel,
-    extrinsics: utils.contract.CONTRACT_SIGNATURES.ERC20.EXTRINSICS,
+    txModel: ERC20TransactionDecodedModel,
+    evModel: ERC20EventDecodedModel,
+    sigs: utils.contract.CONTRACT_SIGNATURES.ERC20,
   },
   {
     type: 721,
-    model: ERC721TransactionDecodedModel,
-    extrinsics: utils.contract.CONTRACT_SIGNATURES.ERC721.EXTRINSICS,
+    txModel: ERC721TransactionDecodedModel,
+    evModel: ERC721EventDecodedModel,
+    sigs: utils.contract.CONTRACT_SIGNATURES.ERC721,
   },
   {
     type: 1155,
-    model: ERC1155TransactionDecodedModel,
-    extrinsics: utils.contract.CONTRACT_SIGNATURES.ERC1155.EXTRINSICS,
+    txModel: ERC1155TransactionDecodedModel,
+    evModel: ERC1155EventDecodedModel,
+    sigs: utils.contract.CONTRACT_SIGNATURES.ERC1155,
   },
 ];
 
@@ -33,12 +40,20 @@ const standards = [
   processor(start, end, batchSize, async (startBlock, endBlock) => {
     await Promise.all(
       standards.map(async (standard) => {
+        // todo -> pull the queries up here so we don't duplicate the isERCN checks
         await extrinsicsHandler(
           startBlock,
           endBlock,
           standard.type as 20 | 721 | 1155,
-          standard.extrinsics,
-          standard.model
+          standard.sigs.EXTRINSICS,
+          standard.txModel
+        );
+        await eventsHandler(
+          startBlock,
+          endBlock,
+          standard.type as 20 | 721 | 1155,
+          standard.sigs.EVENTS,
+          standard.evModel
         );
       })
     );
