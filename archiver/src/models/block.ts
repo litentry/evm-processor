@@ -1,7 +1,7 @@
-import type { Block } from 'archive-utils';
+import type { Types } from 'archive-utils';
 import { Schema, model } from 'mongoose';
 
-const blockSchema = new Schema<Block>({
+const blockSchema = new Schema<Types.Archive.Block>({
   number: { type: Number, required: true, unique: true },
   hash: { type: String, required: true, unique: true },
   parentHash: { type: String, required: true },
@@ -22,6 +22,6 @@ const blockSchema = new Schema<Block>({
 
 blockSchema.index({ number: 1 });
 
-const BlockModel = model<Block>('Block', blockSchema);
+const BlockModel = model<Types.Archive.Block>('Block', blockSchema);
 
 export default BlockModel;

@@ -3,7 +3,7 @@ import {
   ContractTransactionWithLogs,
   ContractTransaction,
   Log,
-} from '../types';
+} from '../types/archive';
 import endpoint from './endpoint';
 
 const defaultLogProperties: (keyof Log)[] = [

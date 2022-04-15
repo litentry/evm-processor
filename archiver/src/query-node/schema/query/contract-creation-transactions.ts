@@ -1,4 +1,4 @@
-import { ContractCreationTransaction } from 'archive-utils';
+import { Types } from 'archive-utils';
 import { FilterQuery } from 'mongoose';
 import { ContractCreationTransactionModel } from '../../../models';
 import maxRange from '../../max-range';
@@ -13,7 +13,7 @@ export default async function contractCreationTransactions(
 ) {
   maxRange('contractCreationTransactions', startBlock, endBlock);
 
-  const filter: FilterQuery<ContractCreationTransaction> = {
+  const filter: FilterQuery<Types.Archive.ContractCreationTransaction> = {
     blockNumber: {
       $gte: startBlock,
       $lte: endBlock,

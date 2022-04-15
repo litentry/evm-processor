@@ -1,9 +1,5 @@
 import { Schema, model } from 'mongoose';
-import type {
-  NativeTokenTransaction,
-  ContractCreationTransaction,
-  ContractTransaction,
-} from 'archive-utils';
+import type { Types } from 'archive-utils';
 
 const sharedSchema = {
   hash: { type: String, required: true, unique: true },
@@ -22,37 +18,42 @@ const sharedSchema = {
 };
 
 // no input/method, no contract created, must have a receiver (to)
-const nativeTokenTransactionSchema = new Schema<NativeTokenTransaction>({
-  ...sharedSchema,
-  to: { type: String, required: true },
-});
+const nativeTokenTransactionSchema =
+  new Schema<Types.Archive.NativeTokenTransaction>({
+    ...sharedSchema,
+    to: { type: String, required: true },
+  });
 nativeTokenTransactionSchema.index({ blockNumber: 1 });
 nativeTokenTransactionSchema.index({ to: 1 });
 nativeTokenTransactionSchema.index({ from: 1 });
 nativeTokenTransactionSchema.index({ value: 1 });
-export const NativeTokenTransactionModel = model<NativeTokenTransaction>(
-  'NativeTokenTransaction',
-  nativeTokenTransactionSchema
-);
+export const NativeTokenTransactionModel =
+  model<Types.Archive.NativeTokenTransaction>(
+    'NativeTokenTransaction',
+    nativeTokenTransactionSchema
+  );
 
 // to is the contract, must have an input
-const contractTransactionSchema = new Schema<ContractTransaction>({
-  ...sharedSchema,
-  to: { type: String, required: true },
-  methodId: { type: String, required: true },
-  input: { type: String, required: true },
-});
+const contractTransactionSchema = new Schema<Types.Archive.ContractTransaction>(
+  {
+    ...sharedSchema,
+    to: { type: String, required: true },
+    methodId: { type: String, required: true },
+    input: { type: String, required: true },
+  }
+);
 contractTransactionSchema.index({ blockNumber: 1 });
 contractTransactionSchema.index({ to: 1 });
 contractTransactionSchema.index({ methodId: 1 });
-export const ContractTransactionModel = model<ContractTransaction>(
-  'ContractTransaction',
-  contractTransactionSchema
-);
+export const ContractTransactionModel =
+  model<Types.Archive.ContractTransaction>(
+    'ContractTransaction',
+    contractTransactionSchema
+  );
 
 // no to address, input is contract creation code, must have contract address in receipt
 const contractCreationTransactionSchema =
-  new Schema<ContractCreationTransaction>({
+  new Schema<Types.Archive.ContractCreationTransaction>({
     ...sharedSchema,
     methodId: { type: String, required: true },
     input: { type: String, required: true },
@@ -61,7 +62,7 @@ const contractCreationTransactionSchema =
 contractCreationTransactionSchema.index({ blockNumber: 1 });
 contractCreationTransactionSchema.index({ receiptContractAddress: 1 });
 export const ContractCreationTransactionModel =
-  model<ContractCreationTransaction>(
+  model<Types.Archive.ContractCreationTransaction>(
     'ContractCreationTransaction',
     contractCreationTransactionSchema
   );

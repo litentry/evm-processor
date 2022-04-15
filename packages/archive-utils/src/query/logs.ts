@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Log } from '../types';
+import { Log } from '../types/archive';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof Log)[] = [

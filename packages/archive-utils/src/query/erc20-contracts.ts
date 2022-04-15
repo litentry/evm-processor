@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ERC20Contract } from '../types';
+import { ERC20Contract } from '../types/contract';
 import { contractEndpoint } from './endpoint';
 
 const defaultProperties: (keyof ERC20Contract)[] = [

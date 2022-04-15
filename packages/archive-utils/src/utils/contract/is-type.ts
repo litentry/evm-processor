@@ -1,5 +1,5 @@
 import { CONTRACT_SIGNATURES } from './contract-signatures';
-import { ContractType } from '../../types';
+import { ContractType } from '../../types/contract';
 
 export default function isType(type: ContractType, sigs: string[]) {
   // const hasEvents = CONTRACT_SIGNATURES[type].EVENTS.every(

@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
-import type { ContractSignature } from 'archive-utils';
+import type { Types } from 'archive-utils';
 
-const contractSignatureSchema = new Schema<ContractSignature>({
+const contractSignatureSchema = new Schema<Types.Archive.ContractSignature>({
   blockNumber: { type: Number, required: true },
   blockTimestamp: { type: Number, required: true },
   contractAddress: { type: String, required: true },
@@ -11,7 +11,7 @@ const contractSignatureSchema = new Schema<ContractSignature>({
 contractSignatureSchema.index({ blockNumber: 1 });
 contractSignatureSchema.index({ signature: 1 });
 
-const ContractSignatureModel = model<ContractSignature>(
+const ContractSignatureModel = model<Types.Archive.ContractSignature>(
   'ContractSignature',
   contractSignatureSchema
 );

@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
-import type { Log } from 'archive-utils';
+import type { Types } from 'archive-utils';
 
-const logSchema = new Schema<Log>({
+const logSchema = new Schema<Types.Archive.Log>({
   blockNumber: { type: Number, required: true },
   blockTimestamp: { type: Number, required: true },
   transactionHash: { type: String, required: true },
@@ -20,6 +20,6 @@ logSchema.index({ transactionHash: 1 });
 logSchema.index({ address: 1 });
 logSchema.index({ topic0: 1 });
 
-const LogModel = model<Log>('Log', logSchema);
+const LogModel = model<Types.Archive.Log>('Log', logSchema);
 
 export default LogModel;

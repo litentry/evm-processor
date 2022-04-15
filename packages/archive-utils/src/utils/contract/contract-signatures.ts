@@ -1,6 +1,6 @@
 import getMethodIdFromSignature from './get-method-id-from-signature';
 import getParamsFromSignature from './get-params-from-signature';
-import { ContractType } from '../../types';
+import { ContractType, ContractSignatureItem } from '../../types/contract';
 /*
 This file is a bit complicated, but the aim is to just maintain SIMPLE_CONTRACT_SIGNATURES, where all the required and optional signatures are added by us (as well as new contract types).
 
@@ -27,14 +27,6 @@ type SimpleContractSignatures = {
       OPTIONAL: string[];
     };
   };
-};
-
-export type ContractSignatureItem = {
-  SIGNATURE: string;
-  ID: string;
-  _ID: string;
-  PARAMS: string[];
-  REQUIRED: boolean;
 };
 
 type ContractSignatures = {

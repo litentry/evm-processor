@@ -1,11 +1,4 @@
-import {
-  Block,
-  ContractCreationTransaction,
-  ContractSignature,
-  ContractTransaction,
-  Log,
-  NativeTokenTransaction,
-} from 'archive-utils';
+import { Types } from 'archive-utils';
 import Web3 from 'web3';
 import { BlockTransactionObject, TransactionReceipt } from 'web3-eth';
 
@@ -23,12 +16,12 @@ export interface ExtractedBlock {
 }
 
 export interface TransformedBlock {
-  nativeTokenTransactions: NativeTokenTransaction[];
-  contractCreationTransactions: ContractCreationTransaction[];
-  contractTransactions: ContractTransaction[];
-  logs: Log[];
-  contractSignatures: ContractSignature[];
-  block: Block;
+  nativeTokenTransactions: Types.Archive.NativeTokenTransaction[];
+  contractCreationTransactions: Types.Archive.ContractCreationTransaction[];
+  contractTransactions: Types.Archive.ContractTransaction[];
+  logs: Types.Archive.Log[];
+  contractSignatures: Types.Archive.ContractSignature[];
+  block: Types.Archive.Block;
 }
 
 export type ExtractBlock = (blockNumber: number) => Promise<ExtractedBlock>;

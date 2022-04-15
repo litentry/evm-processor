@@ -1,7 +1,5 @@
-import {
-  ContractSignatureItem,
-  CONTRACT_SIGNATURES,
-} from './contract-signatures';
+import { CONTRACT_SIGNATURES } from './contract-signatures';
+import { ContractSignatureItem } from '../../types/contract';
 
 const ERC721TokenReceiverSig = CONTRACT_SIGNATURES.ERC721.EXTRINSICS.find(
   (sig) => sig.SIGNATURE === 'onERC721Received(address,address,uint256,bytes)'

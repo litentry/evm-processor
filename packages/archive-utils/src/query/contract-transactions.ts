@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ContractTransaction } from '../types';
+import { ContractTransaction } from '../types/archive';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof ContractTransaction)[] = [

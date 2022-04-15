@@ -1,5 +1,5 @@
 import { FilterQuery } from 'mongoose';
-import { Log } from 'archive-utils';
+import { Types } from 'archive-utils';
 import { LogModel } from '../../../models';
 import maxRange from '../../max-range';
 
@@ -21,7 +21,7 @@ export default async function logs(
 ) {
   maxRange('logs', startBlock, endBlock);
 
-  const filter: FilterQuery<Log> = {
+  const filter: FilterQuery<Types.Archive.Log> = {
     blockNumber: {
       $gte: startBlock,
       $lte: endBlock,

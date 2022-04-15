@@ -7,6 +7,14 @@ export enum ContractType {
   ERC1155 = 'ERC1155',
 }
 
+export type ContractSignatureItem = {
+  SIGNATURE: string;
+  ID: string;
+  _ID: string;
+  PARAMS: string[];
+  REQUIRED: boolean;
+};
+
 export interface ERC20Contract extends Document {
   _id: string; // address
   creator: string;
@@ -47,17 +55,31 @@ export interface ERC1155Contract extends Document {
   erc1155MetadataURI: boolean;
 }
 
-export interface ERC20Transaction extends Document {
+interface SharedExtrinsicProperties extends Document {
   _id: string; // hash
   contract: string;
   signer: string;
-  method: string;
-  methodId: string;
-
   blockNumber: number;
   blockTimestamp: number;
+}
 
-  value: string;
-  input: string;
-  inputDecoded: string;
+export interface DecodedContractTransaction extends Document {
+  _id: string; // hash
+  contract: string;
+  signer: string;
+  signature: string;
+  blockNumber: number;
+  blockTimestamp: number;
+  value1?: string;
+  value2?: string;
+  value3?: string;
+  value4?: string;
+  value5?: string;
+  value6?: string;
+  type1?: string;
+  type2?: string;
+  type3?: string;
+  type4?: string;
+  type5?: string;
+  type6?: string;
 }

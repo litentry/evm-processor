@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { NativeTokenTransaction } from '../types';
+import { NativeTokenTransaction } from '../types/archive';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof NativeTokenTransaction)[] = [

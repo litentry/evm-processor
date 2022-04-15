@@ -1,6 +1,6 @@
 import lodash from 'lodash';
 import { FilterQuery } from 'mongoose';
-import { ContractTransaction } from 'archive-utils';
+import { Types } from 'archive-utils';
 import { ContractTransactionModel, LogModel } from '../../../models';
 import maxRange from '../../max-range';
 
@@ -20,7 +20,7 @@ export default async function contractTransactionsWithLogs(
 ) {
   maxRange('contractTransactionsWithLogs', startBlock, endBlock);
 
-  const filter: FilterQuery<ContractTransaction> = {
+  const filter: FilterQuery<Types.Archive.ContractTransaction> = {
     blockNumber: {
       $gte: startBlock,
       $lte: endBlock,

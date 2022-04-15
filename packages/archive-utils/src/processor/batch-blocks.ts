@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { BatchHandler } from '../types';
+import { BatchHandler } from '../types/process';
 
 export default async function batchBlocks(
   startBlock: number,

@@ -1,14 +1,9 @@
 import mongoose from 'mongoose';
 import { schemaComposer } from 'graphql-compose';
 import { composeMongoose } from 'graphql-compose-mongoose';
-import {
-  ERC20Contract,
-  ERC1155Contract,
-  ERC721Contract,
-  filter,
-} from 'archive-utils';
+import { Types, filter } from 'archive-utils';
 
-const ERC20ContractSchema = new mongoose.Schema<ERC20Contract>({
+const ERC20ContractSchema = new mongoose.Schema<Types.Contract.ERC20Contract>({
   _id: String,
   creator: { type: String, required: true, index: true },
   blockNumber: { type: Number, required: true, index: true },
@@ -19,28 +14,31 @@ const ERC20ContractSchema = new mongoose.Schema<ERC20Contract>({
   decimals: Number,
 });
 
-const ERC721ContractSchema = new mongoose.Schema<ERC721Contract>({
-  _id: String,
-  creator: { type: String, required: true, index: true },
-  blockNumber: { type: Number, required: true, index: true },
-  erc165: { type: Boolean, required: true, index: true },
-  erc721TokenReceiver: { type: Boolean, required: true, index: true },
-  erc721Metadata: { type: Boolean, required: true, index: true },
-  erc721Enumerable: { type: Boolean, required: true, index: true },
-  timestamp: { type: Number, required: true },
-  name: String,
-});
+const ERC721ContractSchema = new mongoose.Schema<Types.Contract.ERC721Contract>(
+  {
+    _id: String,
+    creator: { type: String, required: true, index: true },
+    blockNumber: { type: Number, required: true, index: true },
+    erc165: { type: Boolean, required: true, index: true },
+    erc721TokenReceiver: { type: Boolean, required: true, index: true },
+    erc721Metadata: { type: Boolean, required: true, index: true },
+    erc721Enumerable: { type: Boolean, required: true, index: true },
+    timestamp: { type: Number, required: true },
+    name: String,
+  }
+);
 
-const ERC1155ContractSchema = new mongoose.Schema<ERC1155Contract>({
-  _id: String,
-  creator: { type: String, required: true, index: true },
-  blockNumber: { type: Number, required: true, index: true },
-  erc165: { type: Boolean, required: true, index: true },
-  erc1155TokenReceiver: { type: Boolean, required: true, index: true },
-  erc1155MetadataURI: { type: Boolean, required: true, index: true },
-  timestamp: { type: Number, required: true },
-  name: String,
-});
+const ERC1155ContractSchema =
+  new mongoose.Schema<Types.Contract.ERC1155Contract>({
+    _id: String,
+    creator: { type: String, required: true, index: true },
+    blockNumber: { type: Number, required: true, index: true },
+    erc165: { type: Boolean, required: true, index: true },
+    erc1155TokenReceiver: { type: Boolean, required: true, index: true },
+    erc1155MetadataURI: { type: Boolean, required: true, index: true },
+    timestamp: { type: Number, required: true },
+    name: String,
+  });
 
 export const ERC20ContractModel = mongoose.model(
   'ERC20Contract',

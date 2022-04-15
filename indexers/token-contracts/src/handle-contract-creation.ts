@@ -1,8 +1,4 @@
-import {
-  ContractCreationTransaction,
-  utils,
-  ContractType,
-} from 'archive-utils';
+import { utils, Types } from 'archive-utils';
 import {
   ERC1155ContractModel,
   ERC20ContractModel,
@@ -17,12 +13,15 @@ export default async function handleContractCreation({
   blockTimestamp: timestamp,
   input,
   receiptStatus,
-}: ContractCreationTransaction) {
+}: Types.Archive.ContractCreationTransaction) {
   // failure (or pre byzantium... may need to handle this better)
   if (!receiptStatus) return;
 
   const sigs = utils.contract.getContractSignatures(input);
-  const erc165 = utils.contract.isType(ContractType.ERC165, sigs);
+  const erc165 = utils.contract.isType(
+    Types.Contract.ContractType.ERC165,
+    sigs
+  );
   const common = {
     _id,
     creator,
@@ -31,7 +30,7 @@ export default async function handleContractCreation({
     erc165,
   };
 
-  if (utils.contract.isType(ContractType.ERC20, sigs)) {
+  if (utils.contract.isType(Types.Contract.ContractType.ERC20, sigs)) {
     const data = await fetchTokenData(_id);
     await ERC20ContractModel.create({
       ...common,
@@ -40,7 +39,7 @@ export default async function handleContractCreation({
     return;
   }
 
-  if (utils.contract.isType(ContractType.ERC721, sigs)) {
+  if (utils.contract.isType(Types.Contract.ContractType.ERC721, sigs)) {
     const data = await fetchTokenData(_id, true);
     await ERC721ContractModel.create({
       ...common,
@@ -52,7 +51,7 @@ export default async function handleContractCreation({
     return;
   }
 
-  if (utils.contract.isType(ContractType.ERC1155, sigs)) {
+  if (utils.contract.isType(Types.Contract.ContractType.ERC1155, sigs)) {
     const data = await fetchTokenData(_id, true);
     await ERC1155ContractModel.create({
       ...common,

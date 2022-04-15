@@ -1,5 +1,5 @@
 import { FilterQuery } from 'mongoose';
-import { NativeTokenTransaction } from 'archive-utils';
+import { Types } from 'archive-utils';
 import { NativeTokenTransactionModel } from '../../../models';
 import maxRange from '../../max-range';
 
@@ -19,7 +19,7 @@ export default async function nativeTokenTransactions(
 ) {
   maxRange('nativeTokenTransactions', startBlock, endBlock);
 
-  const filter: FilterQuery<NativeTokenTransaction> = {
+  const filter: FilterQuery<Types.Archive.NativeTokenTransaction> = {
     blockNumber: {
       $gte: startBlock,
       $lte: endBlock,

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Block } from '../types';
+import { Block } from '../types/archive';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof Block)[] = [

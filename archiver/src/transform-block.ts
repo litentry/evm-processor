@@ -1,22 +1,12 @@
 import { Transaction as RpcTx, TransactionReceipt } from 'web3-eth';
-import {
-  Log,
-  Block,
-  ContractSignature,
-  NativeTokenTransaction,
-  ContractCreationTransaction,
-  ContractTransaction,
-  TransactionType,
-  TransactionBase,
-  utils,
-} from 'archive-utils';
+import { Types, utils } from 'archive-utils';
 import { TransformBlock } from './types';
 
 const transformBlock: TransformBlock = ({
   blockWithTransactions,
   receipts,
 }) => {
-  const block: Block = {
+  const block: Types.Archive.Block = {
     number: blockWithTransactions.number,
     hash: blockWithTransactions.hash,
     parentHash: blockWithTransactions.parentHash,
@@ -36,11 +26,12 @@ const transformBlock: TransformBlock = ({
       ? blockWithTransactions.uncles.join(',')
       : undefined,
   };
-  const nativeTokenTransactions: NativeTokenTransaction[] = [];
-  const contractCreationTransactions: ContractCreationTransaction[] = [];
-  const contractTransactions: ContractTransaction[] = [];
-  const logs: Log[] = [];
-  const contractSignatures: ContractSignature[] = [];
+  const nativeTokenTransactions: Types.Archive.NativeTokenTransaction[] = [];
+  const contractCreationTransactions: Types.Archive.ContractCreationTransaction[] =
+    [];
+  const contractTransactions: Types.Archive.ContractTransaction[] = [];
+  const logs: Types.Archive.Log[] = [];
+  const contractSignatures: Types.Archive.ContractSignature[] = [];
 
   blockWithTransactions.transactions.forEach((tx) => {
     const receipt = receipts.find(
@@ -53,14 +44,14 @@ const transformBlock: TransformBlock = ({
     }
 
     // define the transaction type
-    let txType: TransactionType;
+    let txType: Types.Archive.TransactionType;
 
     if (receipt.contractAddress) {
-      txType = TransactionType.ContractCreationTransaction;
+      txType = Types.Archive.TransactionType.ContractCreationTransaction;
     } else if (tx.input === '0x') {
-      txType = TransactionType.NativeTokenTransaction;
+      txType = Types.Archive.TransactionType.NativeTokenTransaction;
     } else {
-      txType = TransactionType.ContractTransaction;
+      txType = Types.Archive.TransactionType.ContractTransaction;
     }
 
     const txBase = mapTransactionBase(
@@ -72,7 +63,7 @@ const transformBlock: TransformBlock = ({
     );
 
     switch (txType) {
-      case TransactionType.ContractCreationTransaction: {
+      case Types.Archive.TransactionType.ContractCreationTransaction: {
         const contractAddress = receipt.contractAddress!.toLowerCase();
         contractCreationTransactions.push({
           ...txBase,
@@ -93,7 +84,7 @@ const transformBlock: TransformBlock = ({
         break;
       }
 
-      case TransactionType.ContractTransaction: {
+      case Types.Archive.TransactionType.ContractTransaction: {
         contractTransactions.push({
           ...txBase,
           input: tx.input,
@@ -103,7 +94,7 @@ const transformBlock: TransformBlock = ({
         break;
       }
 
-      case TransactionType.NativeTokenTransaction: {
+      case Types.Archive.TransactionType.NativeTokenTransaction: {
         nativeTokenTransactions.push({
           ...txBase,
           to: tx.to!.toLowerCase(),
@@ -147,7 +138,7 @@ const mapTransactionBase = (
   blockTimestamp: number,
   tx: RpcTx,
   receipt: TransactionReceipt
-): TransactionBase => ({
+): Types.Archive.TransactionBase => ({
   hash: tx.hash,
   nonce: tx.nonce,
   blockHash,
