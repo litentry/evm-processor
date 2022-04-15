@@ -53,7 +53,7 @@ export default async function extrinsicsHandler(
           'receiptStatus',
         ]
       );
-      return [...txs, _txs];
+      return [...txs, ..._txs];
     })
   );
   // filter non-erc standard txs
