@@ -19,7 +19,6 @@ export default async function extrinsicsHandler(
   // get the extrinsics
   const txs = await Promise.all(
     extrinsics.map(async (extrinsic) => {
-      // todo: this is not handling the underscored version on _ID
       const txs = await query.contractTransactions(
         startBlock,
         endBlock,
@@ -37,7 +36,24 @@ export default async function extrinsicsHandler(
           'receiptStatus',
         ]
       );
-      return txs;
+      const _txs = await query.contractTransactions(
+        startBlock,
+        endBlock,
+        undefined,
+        extrinsic._ID,
+        [
+          'hash',
+          'blockNumber',
+          'blockTimestamp',
+          'to',
+          'from',
+          'methodId',
+          'value',
+          'input',
+          'receiptStatus',
+        ]
+      );
+      return [...txs, _txs];
     })
   );
   // filter non-erc standard txs
