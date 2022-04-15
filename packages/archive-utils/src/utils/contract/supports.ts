@@ -43,6 +43,6 @@ function supports(
   contractSigs: string[]
 ) {
   return interfaceSigs.every((sig) => {
-    contractSigs.includes(sig.ID) || contractSigs.includes(sig._ID);
+    return contractSigs.includes(sig.ID) || contractSigs.includes(sig._ID);
   });
 }
