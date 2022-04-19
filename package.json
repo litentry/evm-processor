@@ -32,7 +32,6 @@
   },
   "workspaces": [
     "packages/*",
-    "archiver",
     "indexers/*"
   ]
 }
