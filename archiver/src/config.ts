@@ -8,11 +8,11 @@ if (!process.env.MONGO_URI) {
 const config: Config = {
   web3,
   mongoUri: process.env.MONGO_URI,
-  startBlock: process.env.START_BLOCK
-    ? parseInt(process.env.START_BLOCK)
-    : undefined,
-  endBlock: process.env.END_BLOCK ? parseInt(process.env.END_BLOCK) : undefined,
-  batchSize: parseInt(process.env.BATCH_SIZE || '1'),
+  start: parseInt(process.env.START_BLOCK || '0'),
+  end: process.env.END_BLOCK
+    ? parseInt(process.env.END_BLOCK)
+    : web3.eth.getBlockNumber,
+  batchSize: parseInt(process.env.BATCH_SIZE || '20'),
 };
 
 export default config;

@@ -6,8 +6,8 @@ export interface Config {
   web3: Web3;
   mongoUri: string;
   batchSize: number;
-  startBlock?: number;
-  endBlock?: number;
+  start: number;
+  end: number | (() => Promise<number>);
 }
 
 export interface ExtractedBlock {
