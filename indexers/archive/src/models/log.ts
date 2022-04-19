@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import type { Types } from 'archive-utils';
+import type { Types } from 'indexer-utils';
 
 const logSchema = new Schema<Types.Archive.Log>({
   blockNumber: { type: Number, required: true },

@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import mongoose from 'mongoose';
-import { graphqlServer, processor } from 'archive-utils';
+import { graphqlServer, processor } from 'indexer-utils';
 import config from './config';
 import handler from './handler';
 import schema from './schema';

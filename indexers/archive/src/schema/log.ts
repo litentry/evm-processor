@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { composeMongoose } from 'graphql-compose-mongoose';
-import { Types, filter } from 'archive-utils';
+import { Types, filter } from 'indexer-utils';
 
 interface LogDocument extends Types.Archive.Log, mongoose.Document {}
 

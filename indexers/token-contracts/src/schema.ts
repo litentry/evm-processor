@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { schemaComposer } from 'graphql-compose';
 import { composeMongoose } from 'graphql-compose-mongoose';
-import { Types, filter } from 'archive-utils';
+import { Types, filter } from 'indexer-utils';
 
 const ERC20ContractSchema = new mongoose.Schema<Types.Contract.ERC20Contract>({
   _id: String,

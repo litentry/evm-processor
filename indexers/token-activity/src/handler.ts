@@ -1,4 +1,4 @@
-import { utils } from 'archive-utils';
+import { utils } from 'indexer-utils';
 import eventsHandler from './events-handler';
 import extrinsicsHandler from './extrinsics-handler';
 import {

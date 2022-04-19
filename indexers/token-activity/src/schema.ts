@@ -1,7 +1,7 @@
 import { schemaComposer } from 'graphql-compose';
 import { composeMongoose } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
-import { filter, Types } from 'archive-utils';
+import { filter, Types } from 'indexer-utils';
 
 export const DecodedEventSchema =
   new mongoose.Schema<Types.Contract.DecodedContractEvent>({

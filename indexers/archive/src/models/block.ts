@@ -1,4 +1,4 @@
-import type { Types } from 'archive-utils';
+import type { Types } from 'indexer-utils';
 import { Schema, model } from 'mongoose';
 
 const blockSchema = new Schema<Types.Archive.Block>({

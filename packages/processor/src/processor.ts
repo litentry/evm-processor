@@ -1,5 +1,5 @@
 import { writeFileSync, readFileSync, existsSync } from 'fs';
-import { query } from 'archive-utils';
+import { query } from 'indexer-utils';
 import { ProcessorConfig, ContractSpec } from './types';
 import { getMethodIdFromSignature } from './utils';
 

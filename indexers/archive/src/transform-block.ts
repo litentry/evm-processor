@@ -1,5 +1,5 @@
 import { Transaction as RpcTx, TransactionReceipt } from 'web3-eth';
-import { Types } from 'archive-utils';
+import { Types } from 'indexer-utils';
 import { TransformBlock } from './types';
 
 const transformBlock: TransformBlock = ({

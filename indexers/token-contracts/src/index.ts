@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import schema from './schema';
-import { graphqlServer, processor } from 'archive-utils';
+import { graphqlServer, processor } from 'indexer-utils';
 import handler from './handler';
 import { batchSize, end, mongoUri, port, start } from './config';
 

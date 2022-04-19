@@ -1,5 +1,5 @@
 import { Config } from './types';
-import { web3 } from 'archive-utils';
+import { web3 } from 'indexer-utils';
 
 if (!process.env.MONGO_URI) {
   throw new Error('MONGO_URI not set');

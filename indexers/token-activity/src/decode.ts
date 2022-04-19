@@ -1,9 +1,9 @@
-import { Types } from 'archive-utils';
+import { Types } from 'indexer-utils';
 import { ethers } from 'ethers';
 import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
 import ERC721 from '@openzeppelin/contracts/build/contracts/ERC721.json';
 import ERC1155 from '@openzeppelin/contracts/build/contracts/ERC1155.json';
-import { ContractType } from 'archive-utils/lib/types/contract';
+import { ContractType } from 'indexer-utils/lib/types/contract';
 
 const contractInterface: {
   [key: string]: ethers.utils.Interface;

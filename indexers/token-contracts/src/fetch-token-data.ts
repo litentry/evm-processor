@@ -1,4 +1,4 @@
-import { web3 } from 'archive-utils';
+import { web3 } from 'indexer-utils';
 import { AbiItem } from 'web3-utils';
 import { Contract } from 'web3-eth-contract';
 import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';

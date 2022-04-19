@@ -1,4 +1,4 @@
-import { query, Types } from 'archive-utils';
+import { query, Types } from 'indexer-utils';
 import { decodeEvent } from './decode';
 import {
   ERC1155EventDecodedModel,

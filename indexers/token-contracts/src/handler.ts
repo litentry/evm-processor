@@ -1,4 +1,4 @@
-import { query } from 'archive-utils';
+import { query } from 'indexer-utils';
 import handleContractCreation from './handle-contract-creation';
 
 export default async function handler(start: number, end: number) {

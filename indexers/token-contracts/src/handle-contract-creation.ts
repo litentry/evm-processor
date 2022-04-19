@@ -1,4 +1,4 @@
-import { utils, Types } from 'archive-utils';
+import { utils, Types } from 'indexer-utils';
 import {
   ERC1155ContractModel,
   ERC20ContractModel,

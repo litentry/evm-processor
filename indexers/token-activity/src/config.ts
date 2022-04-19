@@ -1,4 +1,4 @@
-import { query } from 'archive-utils';
+import { query } from 'indexer-utils';
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 4051;
 const start = process.env.START_BLOCK ? parseInt(process.env.START_BLOCK) : 0;

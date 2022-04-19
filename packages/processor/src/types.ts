@@ -1,4 +1,4 @@
-import { ContractTransactionWithLogs } from 'archive-utils';
+import { ContractTransactionWithLogs } from 'indexer-utils';
 export interface ProcessorConfig {
   startBlock: number;
   endBlock?: number;

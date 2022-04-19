@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import type { Types } from 'archive-utils';
+import type { Types } from 'indexer-utils';
 
 const sharedSchema = {
   hash: { type: String, required: true, unique: true },

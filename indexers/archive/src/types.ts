@@ -1,4 +1,4 @@
-import { Types } from 'archive-utils';
+import { Types } from 'indexer-utils';
 import Web3 from 'web3';
 import { BlockTransactionObject, TransactionReceipt } from 'web3-eth';
 

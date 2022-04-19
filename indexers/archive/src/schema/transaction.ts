@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { filter, Types } from 'archive-utils';
+import { filter, Types } from 'indexer-utils';
 import { composeMongoose } from 'graphql-compose-mongoose';
 import { LogTC, LogModel } from './log';
 
