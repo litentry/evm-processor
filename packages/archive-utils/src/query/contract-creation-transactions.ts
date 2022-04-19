@@ -38,11 +38,21 @@ export default async function contractCreationTransactions(
           contractAddress,
         },
         query: `
-        query ContractCreationTransactions($startBlock: Int!, $endBlock: Int!, $contractAddress: String) {
+        query ContractCreationTransactions(
+          $startBlock: Float!,
+          $endBlock: Float!,
+          $contractAddress: String
+        ) {
           contractCreationTransactions(
-            startBlock: $startBlock,
-            endBlock: $endBlock,
-            contractAddress: $contractAddress
+            filter: {
+              _operators: {
+                blockNumber: {
+                  gte: $startBlock,
+                  lte: $endBlock
+                }
+              }
+              receiptContractAddress: $contractAddress
+            }
           ) {
             ${properties.join(',')}
           }

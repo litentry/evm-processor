@@ -3,6 +3,7 @@ import Web3 from 'web3';
 import { BlockTransactionObject, TransactionReceipt } from 'web3-eth';
 
 export interface Config {
+  port: number;
   web3: Web3;
   mongoUri: string;
   batchSize: number;
@@ -20,7 +21,6 @@ export interface TransformedBlock {
   contractCreationTransactions: Types.Archive.ContractCreationTransaction[];
   contractTransactions: Types.Archive.ContractTransaction[];
   logs: Types.Archive.Log[];
-  contractSignatures: Types.Archive.ContractSignature[];
   block: Types.Archive.Block;
 }
 

@@ -1,5 +1,5 @@
 import { Transaction as RpcTx, TransactionReceipt } from 'web3-eth';
-import { Types, utils } from 'archive-utils';
+import { Types } from 'archive-utils';
 import { TransformBlock } from './types';
 
 const transformBlock: TransformBlock = ({
@@ -31,7 +31,6 @@ const transformBlock: TransformBlock = ({
     [];
   const contractTransactions: Types.Archive.ContractTransaction[] = [];
   const logs: Types.Archive.Log[] = [];
-  const contractSignatures: Types.Archive.ContractSignature[] = [];
 
   blockWithTransactions.transactions.forEach((tx) => {
     const receipt = receipts.find(
@@ -116,7 +115,6 @@ const transformBlock: TransformBlock = ({
     contractCreationTransactions,
     contractTransactions,
     logs,
-    contractSignatures,
   };
 };
 

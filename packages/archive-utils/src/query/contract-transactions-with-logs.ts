@@ -59,12 +59,23 @@ export default async function contractTransactionsWithLogs(
           methodId,
         },
         query: `
-        query ContractTransactionWithLogss($startBlock: Int!, $endBlock: Int!, $contractAddress: String, $methodId: String) {
-          contractTransactionsWithLogs(
-            startBlock: $startBlock,
-            endBlock: $endBlock,
-            contractAddress: $contractAddress,
-            methodId: $methodId
+        query ContractTransactionWithLogs(
+          $startBlock: Float!,
+          $endBlock: Float!,
+          $contractAddress: String,
+          $methodId: String
+        ) {
+          contractTransactions(
+            filter: {
+              _operators: {
+                blockNumber: {
+                  gte: $startBlock,
+                  lte: $endBlock
+                }
+              }
+              to: $contractAddress,
+              methodId: $methodId
+            }
           ) {
             ${transactionProperties.join(',')}
             logs {

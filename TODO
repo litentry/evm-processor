@@ -1,3 +1,3 @@
-Migrate archive to mongoose graph
 Make all query params objects
 Move config to library
+Remove extends mongoose.Document from types in archive-utils and do it in models

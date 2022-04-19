@@ -31,8 +31,8 @@
     "typescript": "~4.5.4"
   },
   "workspaces": [
+    "packages/*",
     "archiver",
-    "indexers/*",
-    "packages/*"
+    "indexers/*"
   ]
 }

@@ -38,12 +38,23 @@ export default async function contractTransactions(
           to,
         },
         query: `
-        query NativeTokenTransactions($startBlock: Int!, $endBlock: Int!, $from: String, $to: String) {
+        query NativeTokenTransactions(
+          $startBlock: Float!,
+          $endBlock: Float!,
+          $from: String,
+          $to: String
+        ) {
           nativeTokenTransactions(
-            startBlock: $startBlock,
-            endBlock: $endBlock,
-            from: $from,
-            to: $to
+            filter: {
+              _operators: {
+                blockNumber: {
+                  gte: $startBlock,
+                  lte: $endBlock
+                }
+              }
+              from: $from,
+              to: $to
+            }
           ) {
             ${properties.join(',')}
           }

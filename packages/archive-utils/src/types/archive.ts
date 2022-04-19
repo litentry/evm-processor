@@ -1,10 +1,3 @@
-export interface ContractSignature {
-  blockNumber: number; // index
-  blockTimestamp: number;
-  contractAddress: string;
-  signature: string; // index
-}
-
 export interface Block {
   number: number;
   hash: string;

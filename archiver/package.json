@@ -4,17 +4,16 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "db:reset": "docker-compose down && rm -rf ./db && docker-compose up -d && rm last-indexed-block",
+    "db:up": "docker-compose -f docker-compose.mongo.yml up -d",
+    "db:down": "docker-compose -f docker-compose.mongo.yml down",
+    "start": "ts-node src/index.ts",
     "build": "rm -rf lib && tsc",
     "start:prod": "yarn build && node lib/index",
-    "mongo:reset": "yarn mongo:down && rm -rf ./data && yarn mongo:up",
-    "mongo:up": "docker-compose -f docker-compose.mongo.yml up -d",
-    "mongo:down": "docker-compose -f docker-compose.mongo.yml down",
-    "mongo:stop": "docker-compose -f docker-compose.mongo.yml stop",
-    "start": "ts-node src/index.ts",
-    "query-node": "ts-node src/query-node/server.ts"
+    "typecheck": "yarn tsc --noEmit",
+    "postinstall": "yarn run build"
   },
   "dependencies": {
-    "@graphql-tools/schema": "^8.3.7",
     "archive-utils": "0.0.1"
   }
 }

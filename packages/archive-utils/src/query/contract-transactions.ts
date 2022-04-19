@@ -40,12 +40,23 @@ export default async function contractTransactions(
           methodId,
         },
         query: `
-        query ContractTransactions($startBlock: Int!, $endBlock: Int!, $contractAddress: String, $methodId: String) {
+        query ContractTransactions(
+          $startBlock: Float!,
+          $endBlock: Float!,
+          $contractAddress: String,
+          $methodId: String
+        ) {
           contractTransactions(
-            startBlock: $startBlock,
-            endBlock: $endBlock,
-            contractAddress: $contractAddress,
-            methodId: $methodId
+            filter: {
+              _operators: {
+                blockNumber: {
+                  gte: $startBlock,
+                  lte: $endBlock
+                }
+              }
+              to: $contractAddress
+              methodId: $methodId
+            }
           ) {
             ${properties.join(',')}
           }

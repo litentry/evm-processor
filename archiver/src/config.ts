@@ -6,6 +6,7 @@ if (!process.env.MONGO_URI) {
 }
 
 const config: Config = {
+  port: parseInt(process.env.PORT || '4050'),
   web3,
   mongoUri: process.env.MONGO_URI,
   start: parseInt(process.env.START_BLOCK || '0'),

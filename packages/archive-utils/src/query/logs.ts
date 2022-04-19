@@ -37,13 +37,25 @@ export default async function logs(
           transactionHash,
         },
         query: `
-        query Logs($startBlock: Int!, $endBlock: Int!, $contractAddress: String, $eventId: String, $transactionHash: String) {
+        query Logs(
+          $startBlock: Float!,
+          $endBlock: Float!,
+          $contractAddress: String,
+          $eventId: String,
+          $transactionHash: String
+        ) {
           logs(
-            startBlock: $startBlock,
-            endBlock: $endBlock,
-            contractAddress: $contractAddress,
-            eventId: $eventId,
-            transactionHash: $transactionHash
+            filter: {
+              _operators: {
+                blockNumber: {
+                  gte: $startBlock,
+                  lte: $endBlock
+                }
+              }
+              address: $contractAddress,
+              topic0: $eventId,
+              transactionHash: $transactionHash
+            }
           ) {
             ${properties.join(',')}
           }

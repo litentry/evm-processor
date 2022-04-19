@@ -1,11 +1,10 @@
 import {
-  ContractSignatureModel,
   LogModel,
   NativeTokenTransactionModel,
   ContractCreationTransactionModel,
   ContractTransactionModel,
   BlockModel,
-} from '../models';
+} from '../schema';
 import { LoadBlock } from '../types';
 
 /**
@@ -20,7 +19,6 @@ const mongo: LoadBlock = async ({
   contractCreationTransactions,
   contractTransactions,
   logs,
-  contractSignatures,
   block,
 }) => {
   try {
@@ -30,7 +28,6 @@ const mongo: LoadBlock = async ({
       ContractCreationTransactionModel.insertMany(contractCreationTransactions),
       ContractTransactionModel.insertMany(contractTransactions),
       LogModel.insertMany(logs),
-      ContractSignatureModel.insertMany(contractSignatures),
     ]);
   } catch (e) {
     console.error(e);
@@ -45,7 +42,6 @@ const mongo: LoadBlock = async ({
       await ContractCreationTransactionModel.deleteMany(filter);
       await ContractTransactionModel.deleteMany(filter);
       await LogModel.deleteMany(filter);
-      await ContractSignatureModel.deleteMany(filter);
     } catch (e) {
       console.error(e);
       console.error(`Clean up failed for block ${block.number}`);

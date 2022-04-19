@@ -36,10 +36,17 @@ export default async function blocks(
           endBlock,
         },
         query: `
-        query Blocks($startBlock: Int!, $endBlock: Int!) {
+        query Blocks($startBlock: Float!, $endBlock: Float!) {
           blocks(
-            startBlock: $startBlock,
-            endBlock: $endBlock
+            sort: BLOCKNUMBER_ASC
+            filter: {
+              _operators: {
+                blockNumber: {
+                  gte: $startBlock,
+                  lte: $endBlock
+                }
+              }
+            }
           ) {
             ${properties.join(',')}
           }
