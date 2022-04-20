@@ -9,7 +9,7 @@
     "db:down": "docker-compose down",
     "start": "ts-node src/index.ts",
     "build": "rm -rf lib && tsc",
-    "start:prod": "yarn build && node lib/index",
+    "start:prod": "node lib/index",
     "typecheck": "yarn tsc --noEmit",
     "postinstall": "yarn run build"
   },

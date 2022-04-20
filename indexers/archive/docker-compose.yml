@@ -1,12 +1,8 @@
-version: '3'
-
 services:
-  archiver:
-    build:
-      context: ../.
-      dockerfile: Dockerfile
-      args:
-        - BUILD_CONTEXT=archiver
-    environment:
-      RPC_ENDPOINT: 'TODO' # moonbeam
-      MONGO_URI: 'mongodb://0.0.0.0:27017/ethereum-archive'
+  mongodb:
+    image: mongo:latest
+    container_name: mongo-archive
+    volumes:
+      - ../../../mongodb/archive/:/data/db/
+    ports:
+      - '27017:27017'

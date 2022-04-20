@@ -1,8 +1,0 @@
-services:
-  mongodb:
-    image: mongo:latest
-    container_name: mongo-archive
-    volumes:
-      - ../../../mongodb/archive/:/data/db/
-    ports:
-      - '27017:27017'

@@ -21,7 +21,7 @@ RPC_ENDPOINT=your_rpc_endpoint
 Set mongo URI
 
 ```
-MONGO_URI="mongodb://0.0.0.0:27017/evm-archive"
+MONGO_URI="mongodb://localhost:27017/evm-archive"
 ```
 
 ### Run the Application
