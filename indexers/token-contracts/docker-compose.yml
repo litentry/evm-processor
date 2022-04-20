@@ -3,6 +3,6 @@ services:
     image: mongo:latest
     container_name: mongo-token-contracts
     volumes:
-      - ./db/:/data/db/
+      - ../../../mongodb/token-contracts/:/data/db/
     ports:
       - '27018:27017'

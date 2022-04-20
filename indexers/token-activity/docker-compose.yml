@@ -3,6 +3,6 @@ services:
     image: mongo:latest
     container_name: mongo-token-activity
     volumes:
-      - ./db/:/data/db/
+      - ../../../mongodb/token-activity/:/data/db/
     ports:
       - '27019:27017'
