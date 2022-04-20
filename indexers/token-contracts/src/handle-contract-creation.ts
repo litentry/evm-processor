@@ -29,15 +29,6 @@ export default async function handleContractCreation({
     erc165,
   };
 
-  if (utils.contract.isType(Types.Contract.ContractType.ERC20, input)) {
-    const data = await fetchTokenData(address);
-    await ERC20ContractModel.create({
-      ...common,
-      ...data,
-    });
-    return;
-  }
-
   if (utils.contract.isType(Types.Contract.ContractType.ERC721, input)) {
     const data = await fetchTokenData(address, true);
     await ERC721ContractModel.create({
@@ -57,6 +48,17 @@ export default async function handleContractCreation({
       ...data,
       erc1155MetadataURI: utils.contract.supports.ERC1155Metadata_URI(input),
       erc1155TokenReceiver: utils.contract.supports.ERC1155TokenReceiver(input),
+    });
+    return;
+  }
+
+  // todo investigate why erc721 is passing as erc20 https://moonscan.io/tx/0xf9ba5486e78200aac648c0dff6e9b552baf417b443c5bc161eee009c4945e2ff
+  // moving this check to last may fix it, but it's hardly a robust solution
+  if (utils.contract.isType(Types.Contract.ContractType.ERC20, input)) {
+    const data = await fetchTokenData(address);
+    await ERC20ContractModel.create({
+      ...common,
+      ...data,
     });
     return;
   }
