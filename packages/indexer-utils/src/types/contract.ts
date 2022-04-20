@@ -1,5 +1,3 @@
-import { Document } from 'mongoose';
-
 export enum ContractType {
   ERC165 = 'ERC165',
   ERC20 = 'ERC20',
@@ -15,8 +13,8 @@ export type ContractSignatureItem = {
   REQUIRED: boolean;
 };
 
-export interface ERC20Contract extends Document {
-  _id: string; // address
+export interface ERC20Contract {
+  address: string; // address
   creator: string;
   blockNumber: number;
   timestamp: number;
@@ -28,8 +26,8 @@ export interface ERC20Contract extends Document {
   erc165: boolean;
 }
 
-export interface ERC721Contract extends Document {
-  _id: string; // address
+export interface ERC721Contract {
+  address: string; // address
   creator: string;
   blockNumber: number;
   timestamp: number;
@@ -42,8 +40,8 @@ export interface ERC721Contract extends Document {
   erc721Enumerable: boolean;
 }
 
-export interface ERC1155Contract extends Document {
-  _id: string; // address
+export interface ERC1155Contract {
+  address: string; // address
   creator: string;
   blockNumber: number;
   timestamp: number;
@@ -55,16 +53,8 @@ export interface ERC1155Contract extends Document {
   erc1155MetadataURI: boolean;
 }
 
-interface SharedExtrinsicProperties extends Document {
-  _id: string; // hash
-  contract: string;
-  signer: string;
-  blockNumber: number;
-  blockTimestamp: number;
-}
-
-export interface DecodedContractTransaction extends Document {
-  _id: string; // hash
+export interface DecodedContractTransaction {
+  hash: string; // hash
   contract: string;
   signer: string;
   signature: string;
@@ -84,8 +74,7 @@ export interface DecodedContractTransaction extends Document {
   type6?: string;
 }
 
-export interface DecodedContractEvent extends Document {
-  _id: string; // block + logIndex
+export interface DecodedContractEvent {
   contract: string;
   transactionHash: string;
   signature: string;

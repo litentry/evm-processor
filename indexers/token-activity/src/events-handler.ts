@@ -41,9 +41,9 @@ export default async function eventsHandler(
     startBlock,
     endBlock,
     contractAddress: uniqueContractAddresses,
-    properties: ['_id'],
+    properties: ['address'],
   });
-  const ercContractAddresses = ercContracts.map((c) => c._id);
+  const ercContractAddresses = ercContracts.map((c) => c.address);
   const ercLogs = logs
     .flat()
     .filter((log) => ercContractAddresses.includes(log.address));
@@ -52,7 +52,6 @@ export default async function eventsHandler(
     ercLogs.map((log) => {
       const sig = sigs.find((sig) => `0x${sig.ID}` === log.topic0)!;
       return {
-        _id: `${log.blockNumber}:${log.logIndex}`,
         contract: log.address,
         blockNumber: log.blockNumber,
         blockTimestamp: log.blockTimestamp,

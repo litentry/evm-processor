@@ -1,2 +1,1 @@
 Move config to library
-Remove extends mongoose.Document from types in indexer-utils and do it in models

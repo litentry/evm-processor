@@ -3,9 +3,15 @@ import { composeMongoose } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
 import { filter, Types } from 'indexer-utils';
 
+interface DecodedContractEventDocument
+  extends Types.Contract.DecodedContractEvent,
+    mongoose.Document {}
+interface DecodedContractTransactionDocument
+  extends Types.Contract.DecodedContractTransaction,
+    mongoose.Document {}
+
 export const DecodedEventSchema =
-  new mongoose.Schema<Types.Contract.DecodedContractEvent>({
-    _id: String,
+  new mongoose.Schema<DecodedContractEventDocument>({
     blockNumber: { type: Number, required: true, index: true },
     contract: { type: String, required: true, index: true },
     transactionHash: { type: String, required: true, index: true },
@@ -22,8 +28,8 @@ export const DecodedEventSchema =
   });
 
 export const DecodedTransactionSchema =
-  new mongoose.Schema<Types.Contract.DecodedContractTransaction>({
-    _id: String,
+  new mongoose.Schema<DecodedContractTransactionDocument>({
+    hash: { type: String, required: true, index: true },
     blockNumber: { type: Number, required: true, index: true },
     contract: { type: String, required: true, index: true },
     signer: { type: String, required: true },

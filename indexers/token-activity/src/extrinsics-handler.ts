@@ -60,9 +60,9 @@ export default async function extrinsicsHandler(
     startBlock,
     endBlock,
     contractAddress: uniqueContractAddresses,
-    properties: ['_id'],
+    properties: ['address'],
   });
-  const ercContractAddresses = ercContracts.map((c) => c._id);
+  const ercContractAddresses = ercContracts.map((c) => c.address);
   const ercTxs = txs
     .flat()
     .filter((tx) => ercContractAddresses.includes(tx.to));
@@ -70,15 +70,16 @@ export default async function extrinsicsHandler(
   await model.insertMany(
     ercTxs.map((tx) => {
       const ex = extrinsics.find((ex) => ex.ID === tx.methodId)!;
-      return {
-        _id: tx.hash,
+      const transaction: Types.Contract.DecodedContractTransaction = {
+        hash: tx.hash,
         contract: tx.to,
         signer: tx.from,
         signature: ex.SIGNATURE,
         blockNumber: tx.blockNumber,
         blockTimestamp: tx.blockTimestamp,
         ...decodeParams(ex.PARAMS, tx.input),
-      } as Types.Contract.DecodedContractTransaction;
+      };
+      return transaction;
     })
   );
 }

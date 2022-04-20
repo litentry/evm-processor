@@ -8,7 +8,7 @@ import fetchTokenData from './fetch-token-data';
 
 export default async function handleContractCreation({
   from: creator,
-  receiptContractAddress: _id,
+  receiptContractAddress: address,
   blockNumber,
   blockTimestamp: timestamp,
   input,
@@ -22,7 +22,7 @@ export default async function handleContractCreation({
     input
   );
   const common = {
-    _id,
+    address,
     creator,
     blockNumber,
     timestamp,
@@ -30,7 +30,7 @@ export default async function handleContractCreation({
   };
 
   if (utils.contract.isType(Types.Contract.ContractType.ERC20, input)) {
-    const data = await fetchTokenData(_id);
+    const data = await fetchTokenData(address);
     await ERC20ContractModel.create({
       ...common,
       ...data,
@@ -39,7 +39,7 @@ export default async function handleContractCreation({
   }
 
   if (utils.contract.isType(Types.Contract.ContractType.ERC721, input)) {
-    const data = await fetchTokenData(_id, true);
+    const data = await fetchTokenData(address, true);
     await ERC721ContractModel.create({
       ...common,
       ...data,
@@ -51,7 +51,7 @@ export default async function handleContractCreation({
   }
 
   if (utils.contract.isType(Types.Contract.ContractType.ERC1155, input)) {
-    const data = await fetchTokenData(_id, true);
+    const data = await fetchTokenData(address, true);
     await ERC1155ContractModel.create({
       ...common,
       ...data,

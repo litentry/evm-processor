@@ -3,7 +3,7 @@ import { ERC20Contract } from '../types/contract';
 import { contractEndpoint } from './endpoint';
 
 const defaultProperties: (keyof ERC20Contract)[] = [
-  '_id',
+  'address',
   'blockNumber',
   'timestamp',
   'creator',
@@ -33,7 +33,7 @@ export default async function erc20Contracts({
 
   if (contractAddress?.length) {
     idsVar = ', $contractAddress: [String!]';
-    ids = `_id: {
+    ids = `address: {
       in: $contractAddress
     }`;
   }
