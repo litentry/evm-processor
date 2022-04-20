@@ -14,10 +14,7 @@ export default async function processor(
   const startBlock = getStartBlock(start);
 
   if (stream) {
-    console.log(
-      colors.green(`Initial chain height: ${endBlock}`),
-      typeof endBlock
-    );
+    console.log(colors.green(`Initial chain height: ${endBlock}`));
   }
 
   console.log(colors.green(`Start block: ${startBlock}`));
