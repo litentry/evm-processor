@@ -71,6 +71,7 @@ export default async function nativeTokenTransactions({
     return response.data.data
       .nativeTokenTransactions as NativeTokenTransaction[];
   } catch (e: any) {
+    console.log(JSON.stringify(e.response.data.errors, null, 2));
     throw new Error(e.message);
   }
 }

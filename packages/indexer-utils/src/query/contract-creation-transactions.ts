@@ -68,6 +68,7 @@ export default async function contractCreationTransactions({
     return response.data.data
       .contractCreationTransactions as ContractCreationTransaction[];
   } catch (e: any) {
+    console.log(JSON.stringify(e.response.data.errors, null, 2));
     throw new Error(e.message);
   }
 }

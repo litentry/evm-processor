@@ -60,6 +60,7 @@ export default async function blocks({
     });
     return response.data.data.blocks as Block[];
   } catch (e: any) {
+    console.log(JSON.stringify(e.response.data.errors, null, 2));
     throw new Error(e.message);
   }
 }
