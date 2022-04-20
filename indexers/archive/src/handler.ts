@@ -1,8 +1,7 @@
-import fs from 'fs';
 import colors from 'colors';
 import transformBlock from './transform-block';
 import extractBlock from './extract-block';
-import loadBlock from './load-block/mongo';
+import loadBlock from './load-block';
 
 export default async function processBatch(start: number, end: number) {
   console.time('Batch time');

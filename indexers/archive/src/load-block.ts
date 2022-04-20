@@ -4,8 +4,8 @@ import {
   ContractCreationTransactionModel,
   ContractTransactionModel,
   BlockModel,
-} from '../schema';
-import { LoadBlock } from '../types';
+} from './schema';
+import { LoadBlock } from './types';
 
 /**
  * Try bulk insert, if error try bulk delete to avoid partial imports
