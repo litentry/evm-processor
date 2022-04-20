@@ -1,5 +1,6 @@
 import { query } from 'indexer-utils';
 import handleContractCreation from './handle-contract-creation';
+import { BlockModel } from './schema';
 
 export default async function handler(startBlock: number, endBlock: number) {
   const txs = await query.archive.contractCreationTransactions({
@@ -14,5 +15,8 @@ export default async function handler(startBlock: number, endBlock: number) {
       'receiptStatus',
     ],
   });
-  if (txs) await Promise.all(txs.map(handleContractCreation));
+  await Promise.all(txs.map(handleContractCreation));
+
+  // todo this will only work in streaming mode, multiple instances need a more sophisticated progress schema
+  await BlockModel.create({ number: endBlock });
 }
