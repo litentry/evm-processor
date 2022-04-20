@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { ContractCreationTransaction } from '../types/archive';
+import { NativeTokenTransaction } from '../../types/archive';
 import endpoint from './endpoint';
 
-const defaultProperties: (keyof ContractCreationTransaction)[] = [
+const defaultProperties: (keyof NativeTokenTransaction)[] = [
   'hash',
   'nonce',
   'blockHash',
@@ -16,21 +16,21 @@ const defaultProperties: (keyof ContractCreationTransaction)[] = [
   'receiptStatus',
   'receiptCumulativeGasUsed',
   'receiptGasUsed',
-  'input',
-  'methodId',
-  'receiptContractAddress',
+  'to',
 ];
 
-export default async function contractCreationTransactions({
+export default async function nativeTokenTransactions({
   startBlock,
   endBlock,
-  contractAddress,
+  from,
+  to,
   properties = defaultProperties,
 }: {
   startBlock: number;
   endBlock: number;
-  contractAddress?: string;
-  properties?: (keyof ContractCreationTransaction)[];
+  from?: string;
+  to?: string;
+  properties: (keyof NativeTokenTransaction)[];
 }) {
   try {
     const response = await axios({
@@ -40,15 +40,17 @@ export default async function contractCreationTransactions({
         variables: {
           startBlock,
           endBlock,
-          contractAddress,
+          from,
+          to,
         },
         query: `
-        query ContractCreationTransactions(
+        query NativeTokenTransactions(
           $startBlock: Float!,
           $endBlock: Float!,
-          $contractAddress: String
+          $from: String,
+          $to: String
         ) {
-          contractCreationTransactions(
+          nativeTokenTransactions(
             filter: {
               _operators: {
                 blockNumber: {
@@ -56,7 +58,8 @@ export default async function contractCreationTransactions({
                   lte: $endBlock
                 }
               }
-              receiptContractAddress: $contractAddress
+              from: $from,
+              to: $to
             }
           ) {
             ${properties.join(',')}
@@ -66,7 +69,7 @@ export default async function contractCreationTransactions({
       },
     });
     return response.data.data
-      .contractCreationTransactions as ContractCreationTransaction[];
+      .nativeTokenTransactions as NativeTokenTransaction[];
   } catch (e: any) {
     console.log(JSON.stringify(e.response.data.errors, null, 2));
     throw new Error(e.message);

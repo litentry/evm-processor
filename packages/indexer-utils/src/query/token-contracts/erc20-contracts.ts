@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { ERC20Contract } from '../types/contract';
-import { contractEndpoint } from './endpoint';
+import { ERC20Contract } from '../../types/contract';
+import endpoint from './endpoint';
 
 const defaultProperties: (keyof ERC20Contract)[] = [
   'address',
@@ -40,7 +40,7 @@ export default async function erc20Contracts({
 
   try {
     const response = await axios({
-      url: contractEndpoint,
+      url: endpoint,
       method: 'post',
       data: {
         variables: {

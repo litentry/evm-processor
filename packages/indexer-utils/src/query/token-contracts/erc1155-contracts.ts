@@ -1,27 +1,25 @@
 import axios from 'axios';
-import { ERC721Contract } from '../types/contract';
-import { contractEndpoint } from './endpoint';
+import { ERC1155Contract } from '../../types/contract';
+import endpoint from './endpoint';
 
-const defaultProperties: (keyof ERC721Contract)[] = [
+const defaultProperties: (keyof ERC1155Contract)[] = [
   'address',
   'blockNumber',
   'timestamp',
   'creator',
   'name',
   'erc165',
-  'erc721Enumerable',
-  'erc721Metadata',
-  'erc721TokenReceiver',
+  'erc1155TokenReceiver',
+  'erc1155MetadataURI',
 ];
 
-export default async function erc721Contracts({
+export default async function erc1155Contracts({
   startBlock,
   endBlock,
   contractAddress,
   erc165,
-  erc721Enumerable,
-  erc721Metadata,
-  erc721TokenReceiver,
+  erc1155MetadataURI,
+  erc1155TokenReceiver,
   creator,
   properties = defaultProperties,
 }: {
@@ -29,11 +27,10 @@ export default async function erc721Contracts({
   endBlock: number;
   contractAddress?: string[];
   erc165?: boolean;
-  erc721Enumerable?: boolean;
-  erc721Metadata?: boolean;
-  erc721TokenReceiver?: boolean;
+  erc1155MetadataURI?: boolean;
+  erc1155TokenReceiver?: boolean;
   creator?: string;
-  properties?: (keyof ERC721Contract)[];
+  properties?: (keyof ERC1155Contract)[];
 }) {
   let ids = '';
   let idsVar = '';
@@ -47,7 +44,7 @@ export default async function erc721Contracts({
 
   try {
     const response = await axios({
-      url: contractEndpoint,
+      url: endpoint,
       method: 'post',
       data: {
         variables: {
@@ -55,14 +52,13 @@ export default async function erc721Contracts({
           endBlock,
           contractAddress,
           erc165,
-          erc721Enumerable,
-          erc721TokenReceiver,
-          erc721Metadata,
+          erc1155TokenReceiver,
+          erc1155MetadataURI,
           creator,
         },
         query: `
-        query ERC721Contracts($startBlock: Float!, $endBlock: Float!${idsVar}, $erc165: Boolean, $erc721Enumerable: Boolean, $erc721Metadata: Boolean, $erc721TokenReceiver: Boolean, $creator: String) {
-          erc721Contracts(
+        query ERC1155Contracts($startBlock: Float!, $endBlock: Float!${idsVar}, $erc165: Boolean, $erc1155MetadataURI: Boolean, $erc1155TokenReceiver: Boolean, $creator: String) {
+          erc1155Contracts(
             filter: {
               _operators: {
                 blockNumber: {
@@ -72,9 +68,8 @@ export default async function erc721Contracts({
                 ${ids}
               }
               erc165: $erc165
-              erc721Enumerable: $erc721Enumerable
-              erc721Metadata: $erc721Metadata
-              erc721TokenReceiver: $erc721TokenReceiver
+              erc1155MetadataURI: $erc1155MetadataURI
+              erc1155TokenReceiver: $erc1155TokenReceiver
               creator: $creator
             }
           ) {
@@ -84,7 +79,7 @@ export default async function erc721Contracts({
       `,
       },
     });
-    return response.data.data.erc721Contracts as ERC721Contract[];
+    return response.data.data.erc1155Contracts as ERC1155Contract[];
   } catch (e: any) {
     console.log(JSON.stringify(e.response.data.errors, null, 2));
     throw new Error(e.message);

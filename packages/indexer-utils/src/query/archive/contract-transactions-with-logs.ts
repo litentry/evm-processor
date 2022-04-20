@@ -1,8 +1,26 @@
 import axios from 'axios';
-import { ContractTransaction } from '../types/archive';
+import {
+  ContractTransactionWithLogs,
+  ContractTransaction,
+  Log,
+} from '../../types/archive';
 import endpoint from './endpoint';
 
-const defaultProperties: (keyof ContractTransaction)[] = [
+const defaultLogProperties: (keyof Log)[] = [
+  'blockNumber',
+  'blockTimestamp',
+  'transactionHash',
+  'address',
+  'topic0',
+  'topic1',
+  'topic2',
+  'topic3',
+  'topic4',
+  'data',
+  'logIndex',
+];
+
+const defaultTxProperties: (keyof ContractTransaction)[] = [
   'hash',
   'nonce',
   'blockHash',
@@ -21,18 +39,20 @@ const defaultProperties: (keyof ContractTransaction)[] = [
   'to',
 ];
 
-export default async function contractTransactions({
+export default async function contractTransactionsWithLogs({
   startBlock,
   endBlock,
   contractAddress,
   methodId,
-  properties = defaultProperties,
+  transactionProperties = defaultTxProperties,
+  logProperties = defaultLogProperties,
 }: {
   startBlock: number;
   endBlock: number;
   contractAddress?: string;
   methodId?: string;
-  properties?: (keyof ContractTransaction)[];
+  transactionProperties?: (keyof ContractTransaction)[];
+  logProperties?: (keyof Log)[];
 }) {
   try {
     const response = await axios({
@@ -46,7 +66,7 @@ export default async function contractTransactions({
           methodId,
         },
         query: `
-        query ContractTransactions(
+        query ContractTransactionWithLogs(
           $startBlock: Float!,
           $endBlock: Float!,
           $contractAddress: String,
@@ -60,17 +80,21 @@ export default async function contractTransactions({
                   lte: $endBlock
                 }
               }
-              to: $contractAddress
+              to: $contractAddress,
               methodId: $methodId
             }
           ) {
-            ${properties.join(',')}
+            ${transactionProperties.join(',')}
+            logs {
+              ${logProperties.join(',')}
+            }
           }
         }
       `,
       },
     });
-    return response.data.data.contractTransactions as ContractTransaction[];
+    return response.data.data
+      .contractTransactionsWithLogs as ContractTransactionWithLogs[];
   } catch (e: any) {
     console.log(JSON.stringify(e.response.data.errors, null, 2));
     throw new Error(e.message);

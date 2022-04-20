@@ -1,26 +1,8 @@
 import axios from 'axios';
-import {
-  ContractTransactionWithLogs,
-  ContractTransaction,
-  Log,
-} from '../types/archive';
+import { ContractCreationTransaction } from '../../types/archive';
 import endpoint from './endpoint';
 
-const defaultLogProperties: (keyof Log)[] = [
-  'blockNumber',
-  'blockTimestamp',
-  'transactionHash',
-  'address',
-  'topic0',
-  'topic1',
-  'topic2',
-  'topic3',
-  'topic4',
-  'data',
-  'logIndex',
-];
-
-const defaultTxProperties: (keyof ContractTransaction)[] = [
+const defaultProperties: (keyof ContractCreationTransaction)[] = [
   'hash',
   'nonce',
   'blockHash',
@@ -36,23 +18,19 @@ const defaultTxProperties: (keyof ContractTransaction)[] = [
   'receiptGasUsed',
   'input',
   'methodId',
-  'to',
+  'receiptContractAddress',
 ];
 
-export default async function contractTransactionsWithLogs({
+export default async function contractCreationTransactions({
   startBlock,
   endBlock,
   contractAddress,
-  methodId,
-  transactionProperties = defaultTxProperties,
-  logProperties = defaultLogProperties,
+  properties = defaultProperties,
 }: {
   startBlock: number;
   endBlock: number;
   contractAddress?: string;
-  methodId?: string;
-  transactionProperties?: (keyof ContractTransaction)[];
-  logProperties?: (keyof Log)[];
+  properties?: (keyof ContractCreationTransaction)[];
 }) {
   try {
     const response = await axios({
@@ -63,16 +41,14 @@ export default async function contractTransactionsWithLogs({
           startBlock,
           endBlock,
           contractAddress,
-          methodId,
         },
         query: `
-        query ContractTransactionWithLogs(
+        query ContractCreationTransactions(
           $startBlock: Float!,
           $endBlock: Float!,
-          $contractAddress: String,
-          $methodId: String
+          $contractAddress: String
         ) {
-          contractTransactions(
+          contractCreationTransactions(
             filter: {
               _operators: {
                 blockNumber: {
@@ -80,21 +56,17 @@ export default async function contractTransactionsWithLogs({
                   lte: $endBlock
                 }
               }
-              to: $contractAddress,
-              methodId: $methodId
+              receiptContractAddress: $contractAddress
             }
           ) {
-            ${transactionProperties.join(',')}
-            logs {
-              ${logProperties.join(',')}
-            }
+            ${properties.join(',')}
           }
         }
       `,
       },
     });
     return response.data.data
-      .contractTransactionsWithLogs as ContractTransactionWithLogs[];
+      .contractCreationTransactions as ContractCreationTransaction[];
   } catch (e: any) {
     console.log(JSON.stringify(e.response.data.errors, null, 2));
     throw new Error(e.message);

@@ -1,36 +1,35 @@
 import axios from 'axios';
-import { NativeTokenTransaction } from '../types/archive';
+import { Log } from '../../types/archive';
 import endpoint from './endpoint';
 
-const defaultProperties: (keyof NativeTokenTransaction)[] = [
-  'hash',
-  'nonce',
-  'blockHash',
+const defaultProperties: (keyof Log)[] = [
   'blockNumber',
   'blockTimestamp',
-  'transactionIndex',
-  'from',
-  'value',
-  'gasPrice',
-  'gas',
-  'receiptStatus',
-  'receiptCumulativeGasUsed',
-  'receiptGasUsed',
-  'to',
+  'transactionHash',
+  'address',
+  'topic0',
+  'topic1',
+  'topic2',
+  'topic3',
+  'topic4',
+  'data',
+  'logIndex',
 ];
 
-export default async function nativeTokenTransactions({
+export default async function logs({
   startBlock,
   endBlock,
-  from,
-  to,
+  contractAddress,
+  eventId,
+  transactionHash,
   properties = defaultProperties,
 }: {
   startBlock: number;
   endBlock: number;
-  from?: string;
-  to?: string;
-  properties: (keyof NativeTokenTransaction)[];
+  contractAddress?: string;
+  eventId?: string;
+  transactionHash?: string;
+  properties?: (keyof Log)[];
 }) {
   try {
     const response = await axios({
@@ -40,17 +39,19 @@ export default async function nativeTokenTransactions({
         variables: {
           startBlock,
           endBlock,
-          from,
-          to,
+          contractAddress,
+          eventId,
+          transactionHash,
         },
         query: `
-        query NativeTokenTransactions(
+        query Logs(
           $startBlock: Float!,
           $endBlock: Float!,
-          $from: String,
-          $to: String
+          $contractAddress: String,
+          $eventId: String,
+          $transactionHash: String
         ) {
-          nativeTokenTransactions(
+          logs(
             filter: {
               _operators: {
                 blockNumber: {
@@ -58,8 +59,9 @@ export default async function nativeTokenTransactions({
                   lte: $endBlock
                 }
               }
-              from: $from,
-              to: $to
+              address: $contractAddress,
+              topic0: $eventId,
+              transactionHash: $transactionHash
             }
           ) {
             ${properties.join(',')}
@@ -68,8 +70,7 @@ export default async function nativeTokenTransactions({
       `,
       },
     });
-    return response.data.data
-      .nativeTokenTransactions as NativeTokenTransaction[];
+    return response.data.data.logs as Log[];
   } catch (e: any) {
     console.log(JSON.stringify(e.response.data.errors, null, 2));
     throw new Error(e.message);

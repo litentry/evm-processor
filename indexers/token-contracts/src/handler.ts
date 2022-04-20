@@ -2,7 +2,7 @@ import { query } from 'indexer-utils';
 import handleContractCreation from './handle-contract-creation';
 
 export default async function handler(startBlock: number, endBlock: number) {
-  const txs = await query.contractCreationTransactions({
+  const txs = await query.archive.contractCreationTransactions({
     startBlock,
     endBlock,
     properties: [
