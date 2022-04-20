@@ -19,13 +19,19 @@ const defaultProperties: (keyof NativeTokenTransaction)[] = [
   'to',
 ];
 
-export default async function contractTransactions(
-  startBlock: number,
-  endBlock: number,
-  from?: string,
-  to?: string,
-  properties: (keyof NativeTokenTransaction)[] = defaultProperties
-) {
+export default async function nativeTokenTransactions({
+  startBlock,
+  endBlock,
+  from,
+  to,
+  properties = defaultProperties,
+}: {
+  startBlock: number;
+  endBlock: number;
+  from?: string;
+  to?: string;
+  properties: (keyof NativeTokenTransaction)[];
+}) {
   try {
     const response = await axios({
       url: endpoint,

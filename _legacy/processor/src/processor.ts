@@ -21,12 +21,12 @@ export async function processor(config: ProcessorConfig) {
 
     const allTxs = await Promise.all(
       combinations.map(({ contract, methodId }) =>
-        query.contractTransactionsWithLogs(
-          currentBlock,
-          batchEndBlock,
-          contract,
-          methodId
-        )
+        query.contractTransactionsWithLogs({
+          startBlock: currentBlock,
+          endBlock: batchEndBlock,
+          contractAddress: contract,
+          methodId,
+        })
       )
     );
 

@@ -21,11 +21,15 @@ const defaultProperties: (keyof Block)[] = [
   'uncles',
 ];
 
-export default async function blocks(
-  startBlock: number,
-  endBlock: number,
-  properties: (keyof Block)[] = defaultProperties
-) {
+export default async function blocks({
+  startBlock,
+  endBlock,
+  properties = defaultProperties,
+}: {
+  startBlock: number;
+  endBlock: number;
+  properties?: (keyof Block)[];
+}) {
   try {
     const response = await axios({
       url: endpoint,

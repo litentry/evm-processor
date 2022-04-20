@@ -39,14 +39,21 @@ const defaultTxProperties: (keyof ContractTransaction)[] = [
   'to',
 ];
 
-export default async function contractTransactionsWithLogs(
-  startBlock: number,
-  endBlock: number,
-  contractAddress?: string,
-  methodId?: string,
-  transactionProperties: (keyof ContractTransaction)[] = defaultTxProperties,
-  logProperties: (keyof Log)[] = defaultLogProperties
-) {
+export default async function contractTransactionsWithLogs({
+  startBlock,
+  endBlock,
+  contractAddress,
+  methodId,
+  transactionProperties = defaultTxProperties,
+  logProperties = defaultLogProperties,
+}: {
+  startBlock: number;
+  endBlock: number;
+  contractAddress?: string;
+  methodId?: string;
+  transactionProperties?: (keyof ContractTransaction)[];
+  logProperties?: (keyof Log)[];
+}) {
   try {
     const response = await axios({
       url: endpoint,

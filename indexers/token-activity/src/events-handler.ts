@@ -19,18 +19,16 @@ export default async function eventsHandler(
   // get the events
   const logs = await Promise.all(
     sigs.map(async (sig) => {
-      const logs = await query.logs(
+      const logs = await query.logs({
         startBlock,
         endBlock,
-        undefined,
-        `0x${sig.ID}`
-      );
-      const _logs = await query.logs(
+        eventId: `0x${sig.ID}`,
+      });
+      const _logs = await query.logs({
         startBlock,
         endBlock,
-        undefined,
-        `0x${sig._ID}`
-      );
+        eventId: `0x${sig._ID}`,
+      });
       return [...logs, ..._logs];
     })
   );

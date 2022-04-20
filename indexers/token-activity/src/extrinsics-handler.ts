@@ -19,12 +19,11 @@ export default async function extrinsicsHandler(
   // get the extrinsics
   const txs = await Promise.all(
     extrinsics.map(async (extrinsic) => {
-      const txs = await query.contractTransactions(
+      const txs = await query.contractTransactions({
         startBlock,
         endBlock,
-        undefined,
-        extrinsic.ID,
-        [
+        methodId: extrinsic.ID,
+        properties: [
           'hash',
           'blockNumber',
           'blockTimestamp',
@@ -34,14 +33,13 @@ export default async function extrinsicsHandler(
           'value',
           'input',
           'receiptStatus',
-        ]
-      );
-      const _txs = await query.contractTransactions(
+        ],
+      });
+      const _txs = await query.contractTransactions({
         startBlock,
         endBlock,
-        undefined,
-        extrinsic._ID,
-        [
+        methodId: extrinsic._ID,
+        properties: [
           'hash',
           'blockNumber',
           'blockTimestamp',
@@ -51,8 +49,8 @@ export default async function extrinsicsHandler(
           'value',
           'input',
           'receiptStatus',
-        ]
-      );
+        ],
+      });
       return [...txs, ..._txs];
     })
   );

@@ -21,12 +21,17 @@ const defaultProperties: (keyof ContractCreationTransaction)[] = [
   'receiptContractAddress',
 ];
 
-export default async function contractCreationTransactions(
-  startBlock: number,
-  endBlock: number,
-  contractAddress?: string,
-  properties: (keyof ContractCreationTransaction)[] = defaultProperties
-) {
+export default async function contractCreationTransactions({
+  startBlock,
+  endBlock,
+  contractAddress,
+  properties = defaultProperties,
+}: {
+  startBlock: number;
+  endBlock: number;
+  contractAddress?: string;
+  properties?: (keyof ContractCreationTransaction)[];
+}) {
   try {
     const response = await axios({
       url: endpoint,

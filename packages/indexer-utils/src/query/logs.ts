@@ -16,14 +16,21 @@ const defaultProperties: (keyof Log)[] = [
   'logIndex',
 ];
 
-export default async function logs(
-  startBlock: number,
-  endBlock: number,
-  contractAddress?: string,
-  eventId?: string,
-  transactionHash?: string,
-  properties: (keyof Log)[] = defaultProperties
-) {
+export default async function logs({
+  startBlock,
+  endBlock,
+  contractAddress,
+  eventId,
+  transactionHash,
+  properties = defaultProperties,
+}: {
+  startBlock: number;
+  endBlock: number;
+  contractAddress?: string;
+  eventId?: string;
+  transactionHash?: string;
+  properties?: (keyof Log)[];
+}) {
   try {
     const response = await axios({
       url: endpoint,
