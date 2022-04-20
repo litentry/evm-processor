@@ -37,7 +37,7 @@ export default async function eventsHandler(
   const uniqueContractAddresses = [
     ...new Set(logs.flat().map((log) => log.address)),
   ];
-  const ercContracts = await query[`erc${type}Contracts`]({
+  const ercContracts = await query.tokenContracts[`erc${type}Contracts`]({
     startBlock,
     endBlock,
     contractAddress: uniqueContractAddresses,
