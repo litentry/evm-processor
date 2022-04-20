@@ -14,26 +14,37 @@ const defaultProperties: (keyof ERC20Contract)[] = [
 ];
 
 export default async function erc20Contracts({
-  startBlock,
-  endBlock,
+  blockRange,
   contractAddress,
   erc165,
   creator,
   properties = defaultProperties,
 }: {
-  startBlock: number;
-  endBlock: number;
+  blockRange?: {
+    start: number;
+    end: number;
+  };
   contractAddress?: string[];
   erc165?: boolean;
   creator?: string;
-  properties: (keyof ERC20Contract)[];
+  properties?: (keyof ERC20Contract)[];
 }) {
-  let ids = '';
-  let idsVar = '';
+  let contractAddresses = '';
+  let contractAddressesVar = '';
+  let blockQuery = '';
+  let blockQueryVar = '';
+
+  if (blockRange) {
+    blockQueryVar = '$startBlock: Float, $endBlock: Float, ';
+    blockQuery = `blockNumber: {
+      gte: $startBlock,
+      lte: $endBlock
+    }`;
+  }
 
   if (contractAddress?.length) {
-    idsVar = ', $contractAddress: [String!]';
-    ids = `address: {
+    contractAddressesVar = '$contractAddress: [String!], ';
+    contractAddresses = `address: {
       in: $contractAddress
     }`;
   }
@@ -44,22 +55,19 @@ export default async function erc20Contracts({
       method: 'post',
       data: {
         variables: {
-          startBlock,
-          endBlock,
+          startBlock: blockRange?.start,
+          endBlock: blockRange?.end,
           contractAddress,
           erc165,
           creator,
         },
         query: `
-        query ERC20Contracts($startBlock: Float!, $endBlock: Float!${idsVar}, $erc165: Boolean, $creator: String) {
+        query ERC20Contracts(${blockQueryVar}${contractAddressesVar}$erc165: Boolean, $creator: String) {
           erc20Contracts(
             filter: {
               _operators: {
-                blockNumber: {
-                  gte: $startBlock,
-                  lte: $endBlock
-                }
-                ${ids}
+                ${blockQuery}
+                ${contractAddresses}
               }
               erc165: $erc165
               creator: $creator

@@ -15,8 +15,7 @@ const defaultProperties: (keyof ERC721Contract)[] = [
 ];
 
 export default async function erc721Contracts({
-  startBlock,
-  endBlock,
+  blockRange,
   contractAddress,
   erc165,
   erc721Enumerable,
@@ -25,8 +24,10 @@ export default async function erc721Contracts({
   creator,
   properties = defaultProperties,
 }: {
-  startBlock: number;
-  endBlock: number;
+  blockRange?: {
+    start: number;
+    end: number;
+  };
   contractAddress?: string[];
   erc165?: boolean;
   erc721Enumerable?: boolean;
@@ -35,12 +36,22 @@ export default async function erc721Contracts({
   creator?: string;
   properties?: (keyof ERC721Contract)[];
 }) {
-  let ids = '';
-  let idsVar = '';
+  let contractAddresses = '';
+  let contractAddressesVar = '';
+  let blockQuery = '';
+  let blockQueryVar = '';
+
+  if (blockRange) {
+    blockQueryVar = '$startBlock: Float, $endBlock: Float, ';
+    blockQuery = `blockNumber: {
+      gte: $startBlock,
+      lte: $endBlock
+    }`;
+  }
 
   if (contractAddress?.length) {
-    idsVar = ', $contractAddress: [String!]';
-    ids = `address: {
+    contractAddressesVar = '$contractAddress: [String!], ';
+    contractAddresses = `address: {
       in: $contractAddress
     }`;
   }
@@ -51,8 +62,8 @@ export default async function erc721Contracts({
       method: 'post',
       data: {
         variables: {
-          startBlock,
-          endBlock,
+          startBlock: blockRange?.start,
+          endBlock: blockRange?.end,
           contractAddress,
           erc165,
           erc721Enumerable,
@@ -61,15 +72,12 @@ export default async function erc721Contracts({
           creator,
         },
         query: `
-        query ERC721Contracts($startBlock: Float!, $endBlock: Float!${idsVar}, $erc165: Boolean, $erc721Enumerable: Boolean, $erc721Metadata: Boolean, $erc721TokenReceiver: Boolean, $creator: String) {
+        query ERC721Contracts(${blockQueryVar}${contractAddressesVar}$erc165: Boolean, $erc721Enumerable: Boolean, $erc721Metadata: Boolean, $erc721TokenReceiver: Boolean, $creator: String) {
           erc721Contracts(
             filter: {
               _operators: {
-                blockNumber: {
-                  gte: $startBlock,
-                  lte: $endBlock
-                }
-                ${ids}
+                ${blockQuery}
+                ${contractAddresses}
               }
               erc165: $erc165
               erc721Enumerable: $erc721Enumerable

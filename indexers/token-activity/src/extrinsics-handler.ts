@@ -57,8 +57,6 @@ export default async function extrinsicsHandler(
   // filter non-erc standard txs
   const uniqueContractAddresses = [...new Set(txs.flat().map((tx) => tx.to))];
   const ercContracts = await query.tokenContracts[`erc${type}Contracts`]({
-    startBlock,
-    endBlock,
     contractAddress: uniqueContractAddresses,
     properties: ['address'],
   });
