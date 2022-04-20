@@ -46,6 +46,8 @@ services:
     ports:
       - 4050
     restart: unless-stopped
+    volumes:
+      - ./indexers/archive/last-indexed-block:/base/indexers/archive/last-indexed-block
     environment:
       MONGO_URI: mongodb://mongo-archive:27017/archive
       PORT: 4050
@@ -62,6 +64,8 @@ services:
     ports:
       - 4051
     restart: unless-stopped
+    volumes:
+      - ./indexers/token-contracts/last-indexed-block:/base/indexers/token-contracts/last-indexed-block
     environment:
       ARCHIVE_GRAPH: http://indexer-archive:4050/graphql
       PORT: 4051
@@ -80,6 +84,8 @@ services:
     ports:
       - 4052
     restart: unless-stopped
+    volumes:
+      - ./indexers/token-activity/last-indexed-block:/base/indexers/token-activity/last-indexed-block
     environment:
       ARCHIVE_GRAPH: http://indexer-archive:4050/graphql
       CONTRACT_GRAPH: http://indexer-token-contracts:4051/graphql
