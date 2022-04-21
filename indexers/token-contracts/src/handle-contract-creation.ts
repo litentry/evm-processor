@@ -38,7 +38,6 @@ export default async function handleContractCreation({
       erc721Metadata: utils.contract.supports.ERC721Metadata(input),
       erc721TokenReceiver: utils.contract.supports.ERC721TokenReceiver(input),
     });
-    return;
   }
 
   if (utils.contract.isType(Types.Contract.ContractType.ERC1155, input)) {
@@ -49,7 +48,6 @@ export default async function handleContractCreation({
       erc1155MetadataURI: utils.contract.supports.ERC1155Metadata_URI(input),
       erc1155TokenReceiver: utils.contract.supports.ERC1155TokenReceiver(input),
     });
-    return;
   }
 
   // todo investigate why erc721 is passing as erc20 https://moonscan.io/tx/0xf9ba5486e78200aac648c0dff6e9b552baf417b443c5bc161eee009c4945e2ff
@@ -60,6 +58,5 @@ export default async function handleContractCreation({
       ...common,
       ...data,
     });
-    return;
   }
 }
