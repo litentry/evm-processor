@@ -17,7 +17,7 @@ services:
     volumes:
       - ../mongodb/archive/:/data/db/
     ports:
-      - 27017
+      - '5000:27017'
     networks:
       - db_archive_network
 
@@ -26,7 +26,7 @@ services:
     volumes:
       - ../mongodb/token-contracts/:/data/db/
     ports:
-      - 27017
+      - '5001:27017'
     networks:
       - db_token_contracts_network
 
@@ -35,7 +35,7 @@ services:
     volumes:
       - ../mongodb/token-activity/:/data/db/
     ports:
-      - 27017
+      - '5002:27017'
     networks:
       - db_token_activity_network
 
