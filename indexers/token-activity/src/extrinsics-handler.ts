@@ -67,7 +67,9 @@ export default async function extrinsicsHandler(
 
   await model.insertMany(
     ercTxs.map((tx) => {
-      const ex = extrinsics.find((ex) => ex.ID === tx.methodId)!;
+      const ex = extrinsics.find((ex) =>
+        [ex.ID, ex._ID].includes(tx.methodId)
+      )!;
       const transaction: Types.Contract.DecodedContractTransaction = {
         hash: tx.hash,
         contract: tx.to,

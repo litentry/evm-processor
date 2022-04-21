@@ -19,7 +19,6 @@ export function decodeEvent(
   data: string,
   topics: string[]
 ) {
-  // todo possibly ignoring underscored
   const decoded = contractInterface[`ERC${type}`].decodeEventLog(
     item.SIGNATURE,
     data,

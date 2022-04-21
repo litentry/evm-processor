@@ -48,7 +48,7 @@ export default async function eventsHandler(
 
   await model.insertMany(
     ercLogs.map((log) => {
-      const sig = sigs.find((sig) => `0x${sig.ID}` === log.topic0)!;
+      const sig = sigs.find((sig) => [sig.ID, sig._ID].includes(log.topic0))!;
       return {
         contract: log.address,
         blockNumber: log.blockNumber,
