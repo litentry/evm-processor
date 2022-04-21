@@ -7,7 +7,7 @@ const end = process.env.END_BLOCK
   : query.archive.latestBlock;
 const batchSize = process.env.BATCH_SIZE
   ? parseInt(process.env.BATCH_SIZE)
-  : 10000;
+  : 1000;
 const mongoUri = process.env.MONGO_URI!;
 
 export { port, start, end, batchSize, mongoUri };
