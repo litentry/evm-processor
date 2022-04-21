@@ -55,7 +55,10 @@ export default async function eventsHandler(
   await model.insertMany(
     ercLogs
       .map((log) => {
-        const sig = sigs.find((sig) => [sig.ID, sig._ID].includes(log.topic0))!;
+        const sig = sigs.find((sig) =>
+          [`0x${sig.ID}`, `0x${sig._ID}`].includes(log.topic0)
+        )!;
+
         let decoded: DecodedEvent;
         try {
           decoded = decodeEvent(
