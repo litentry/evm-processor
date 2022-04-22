@@ -90,11 +90,8 @@ BlockTC.addResolver({
 
 schemaComposer.Query.addFields({
   tokenContractsLatestBlock: BlockTC.getResolver('tokenContractsLatestBlock'),
-  erc20ContractById: ERC20ContractTC.mongooseResolvers.findById(filter),
   erc20Contracts: ERC20ContractTC.mongooseResolvers.findMany(filter),
-  erc721ContractById: ERC721ContractTC.mongooseResolvers.findById(filter),
   erc721Contracts: ERC721ContractTC.mongooseResolvers.findMany(filter),
-  erc1155ContractById: ERC1155ContractTC.mongooseResolvers.findById(filter),
   erc1155Contracts: ERC1155ContractTC.mongooseResolvers.findMany(filter),
 });
 
