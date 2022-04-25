@@ -3,6 +3,8 @@ import {
   ERC1155ContractModel,
   ERC20ContractModel,
   ERC721ContractModel,
+  UniswapV2ContractModel,
+  UniswapV3ContractModel,
 } from './schema';
 import fetchTokenData from './fetch-token-data';
 
@@ -56,5 +58,13 @@ export default async function handleContractCreation({
       ...common,
       ...data,
     });
+  }
+
+  if (utils.contract.isType(Types.Contract.ContractType.UNISWAPV2, input)) {
+    await UniswapV2ContractModel.create(common);
+  }
+
+  if (utils.contract.isType(Types.Contract.ContractType.UNISWAPV3, input)) {
+    await UniswapV3ContractModel.create(common);
   }
 }
