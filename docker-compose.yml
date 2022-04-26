@@ -49,6 +49,8 @@ services:
     environment:
       MONGO_URI: mongodb://mongo-archive:27017/archive
       PORT: 4050
+      AWS_ACCESS_KEY_ID: ''
+      AWS_SECRET_ACCESS_KEY: ''
     depends_on:
       - mongo-archive
     networks:
@@ -66,6 +68,8 @@ services:
       ARCHIVE_GRAPH: http://indexer-archive:4050/graphql
       PORT: 4051
       MONGO_URI: mongodb://mongo-token-contracts:27017/token-contracts
+      AWS_ACCESS_KEY_ID: ''
+      AWS_SECRET_ACCESS_KEY: ''
     depends_on:
       - indexer-archive
       - mongo-token-contracts
@@ -85,6 +89,8 @@ services:
       CONTRACT_GRAPH: http://indexer-token-contracts:4051/graphql
       MONGO_URI: mongodb://mongo-token-activity:27017/token-activity
       PORT: 4052
+      AWS_ACCESS_KEY_ID: ''
+      AWS_SECRET_ACCESS_KEY: ''
     depends_on:
       - indexer-archive
       - indexer-token-contracts

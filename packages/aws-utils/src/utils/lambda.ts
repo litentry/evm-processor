@@ -1,5 +1,5 @@
 import { DeleteMessageBatchRequestEntry } from '@aws-sdk/client-sqs';
-import { SQSEvent, SQSRecord } from 'aws-lambda';
+import { SQSEvent } from 'aws-lambda';
 import { Config, deleteBatchMessages } from './sqs';
 
 type ProcessorMessage = {
@@ -8,27 +8,25 @@ type ProcessorMessage = {
 }
 
 export const lambdaHandler = async (event: SQSEvent, config: Config, innerHandler: (startBlock: number, endBlock: number) => {}) => {
-  const records: SQSRecord[] = event.Records;
+  const successfulMessages: DeleteMessageBatchRequestEntry[] = (await Promise.all(
+    event.Records.map(async record => {
+      const message = getMessageFromBody(record.body);
 
-  let successfulMessages: DeleteMessageBatchRequestEntry[] = [];
+      if (!message) {
+        // TODO: maybe log it?
+        return;
+      }
 
-  records.forEach(record => {
-    const message = getMessageFromBody(record.body);
+      innerHandler(message.startBlock, message.endBlock);
 
-    if (!message) {
-      // TODO: maybe log it?
-      return;
-    }
+      return {
+        Id: record.messageId,
+        ReceiptHandle: record.receiptHandle,
+      };
+    })
+  )).filter(elem => elem !== undefined) as DeleteMessageBatchRequestEntry[];
 
-    innerHandler(message.startBlock, message.endBlock);
-
-    successfulMessages .push({
-      Id: record.messageId,
-      ReceiptHandle: record.receiptHandle,
-    });
-  });
-
-  deleteBatchMessages(config, successfulMessages);
+  await deleteBatchMessages(config, successfulMessages);
 }
 
 function getMessageFromBody(body: string): ProcessorMessage | null {

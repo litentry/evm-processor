@@ -21,7 +21,7 @@ class SQSInstance {
   }
 }
 
-export const deleteBatchMessages = (config: Config, entries: DeleteMessageBatchRequestEntry[]) => {
+export const deleteBatchMessages = async (config: Config, entries: DeleteMessageBatchRequestEntry[]) => {
   const client = SQSInstance.getInstance(config);
 
   const command = new DeleteMessageBatchCommand({
