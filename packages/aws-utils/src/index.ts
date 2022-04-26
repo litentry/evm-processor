@@ -1,1 +1,2 @@
-export { default as awsUtils } from './utils';
+export { AwsSqsConfig, default as awsUtils } from './utils';
+

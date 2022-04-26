@@ -1,13 +1,13 @@
 import { DeleteMessageBatchRequestEntry } from '@aws-sdk/client-sqs';
 import { SQSEvent, SQSRecord } from 'aws-lambda';
-import { deleteBatchMessages } from './sqs';
+import { Config, deleteBatchMessages } from './sqs';
 
 type ProcessorMessage = {
   startBlock: number,
   endBlock: number,
 }
 
-export const lambdaHandler = async (event: SQSEvent, innerHandler: (startBlock: number, endBlock: number) => {}) => {
+export const lambdaHandler = async (event: SQSEvent, config: Config, innerHandler: (startBlock: number, endBlock: number) => {}) => {
   const records: SQSRecord[] = event.Records;
 
   let successfulMessages: DeleteMessageBatchRequestEntry[] = [];
@@ -28,7 +28,7 @@ export const lambdaHandler = async (event: SQSEvent, innerHandler: (startBlock: 
     });
   });
 
-  deleteBatchMessages(successfulMessages);
+  deleteBatchMessages(config, successfulMessages);
 }
 
 function getMessageFromBody(body: string): ProcessorMessage | null {

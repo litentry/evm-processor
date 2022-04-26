@@ -1,23 +1,32 @@
 import { DeleteMessageBatchCommand, DeleteMessageBatchRequestEntry, SQSClient } from "@aws-sdk/client-sqs";
 
+export type Config = {
+  region: string,
+  credentials: {
+    accessKeyId: string;
+    secretAccessKey: string,
+  },
+  queueUrl: string
+}
+
 class SQSInstance {
   private static instance: SQSClient;
 
-  public static getInstance(): SQSClient {
+  public static getInstance(config: Config): SQSClient {
       if (!SQSInstance.instance) {
-          SQSInstance.instance = new SQSClient({'region': ''});
+          SQSInstance.instance = new SQSClient(config);
       }
 
       return SQSInstance.instance;
   }
 }
 
-export const deleteBatchMessages = (entries: DeleteMessageBatchRequestEntry[]) => {
-  const client = SQSInstance.getInstance();
+export const deleteBatchMessages = (config: Config, entries: DeleteMessageBatchRequestEntry[]) => {
+  const client = SQSInstance.getInstance(config);
 
   const command = new DeleteMessageBatchCommand({
     Entries: entries,
-    QueueUrl: '',
+    QueueUrl: config.queueUrl,
   });
 
   client.send(command).then(
