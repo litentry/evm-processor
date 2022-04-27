@@ -2,10 +2,6 @@ import { DeleteMessageBatchCommand, DeleteMessageBatchRequestEntry, SQSClient } 
 
 export type Config = {
   region: string,
-  credentials: {
-    accessKeyId: string;
-    secretAccessKey: string,
-  },
   queueUrl: string
 }
 
