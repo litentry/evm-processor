@@ -59,3 +59,16 @@ GETH or an alternative would allow us to request the data a lot faster, but it w
 Parquet is more complex, but it could offer improved query speed & storage savings.
 
 MongoDB is a lot simpler, and as we only read/write (no updates), it may be a good choice, depending on query performance.
+
+
+## Serverless
+
+### Running locally
+Run `yarn run start:local` in the folder of the indexer you wish to run.
+
+Some useful commands for once it is running:
+```
+aws --endpoint-url=http://localhost:4566 sqs get-queue-attributes --queue-url http://host.docker.internal:4566/000000000000/JobQueue --attribute-names All
+aws --endpoint-url=http://localhost:4566 logs tail /aws/lambda/archive-indexer-local-worker
+aws --endpoint-url=http://localhost:4566 logs tail /aws/lambda/archive-indexer-local-producer
+```

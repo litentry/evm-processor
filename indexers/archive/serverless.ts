@@ -6,7 +6,7 @@ import worker from '@functions/worker';
 const serverlessConfiguration: AWS = {
     service: 'archive-indexer',
     frameworkVersion: '3',
-    plugins: ['serverless-esbuild'],
+    plugins: ['serverless-esbuild', 'serverless-localstack'],
     provider: {
         name: 'aws',
         runtime: 'nodejs14.x',
@@ -56,6 +56,9 @@ const serverlessConfiguration: AWS = {
     },
     package: {individually: true},
     custom: {
+        localstack: {
+            stages: ['local'],
+        },
         esbuild: {
             bundle: true,
             minify: false,
