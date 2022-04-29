@@ -29,15 +29,6 @@ export default async function handleContractCreation({
     erc165,
   };
 
-  if (utils.contract.isType(Types.Contract.ContractType.ERC20, input)) {
-    const data = await fetchTokenData(address);
-    await ERC20ContractModel.create({
-      ...common,
-      ...data,
-    });
-    return;
-  }
-
   if (utils.contract.isType(Types.Contract.ContractType.ERC721, input)) {
     const data = await fetchTokenData(address, true);
     await ERC721ContractModel.create({
@@ -47,7 +38,6 @@ export default async function handleContractCreation({
       erc721Metadata: utils.contract.supports.ERC721Metadata(input),
       erc721TokenReceiver: utils.contract.supports.ERC721TokenReceiver(input),
     });
-    return;
   }
 
   if (utils.contract.isType(Types.Contract.ContractType.ERC1155, input)) {
@@ -58,6 +48,13 @@ export default async function handleContractCreation({
       erc1155MetadataURI: utils.contract.supports.ERC1155Metadata_URI(input),
       erc1155TokenReceiver: utils.contract.supports.ERC1155TokenReceiver(input),
     });
-    return;
+  }
+
+  if (utils.contract.isType(Types.Contract.ContractType.ERC20, input)) {
+    const data = await fetchTokenData(address);
+    await ERC20ContractModel.create({
+      ...common,
+      ...data,
+    });
   }
 }

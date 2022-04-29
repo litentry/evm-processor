@@ -1,9 +1,9 @@
 import { web3 } from 'indexer-utils';
 import { Config } from './types';
 
-if (!process.env.MONGO_URI) {
-  throw new Error('MONGO_URI not set');
-}
+// if (!process.env.MONGO_URI) {
+//   throw new Error('MONGO_URI not set');
+// }
 
 const config: Config = {
   port: parseInt(process.env.PORT || '4050'),

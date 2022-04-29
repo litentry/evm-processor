@@ -1,0 +1,20 @@
+{
+  "name": "web3go",
+  "description": "Creates Postgres tables for web3go use",
+  "version": "0.0.1",
+  "main": "lib/index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "build": "rm -rf lib && tsc",
+    "start:prod": "node lib/index",
+    "typecheck": "yarn tsc --noEmit",
+    "postinstall": "yarn run build"
+  },
+  "dependencies": {
+    "indexer-utils": "0.0.1",
+    "pg": "^8.7.3"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.6.5"
+  }
+}

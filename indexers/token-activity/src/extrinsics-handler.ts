@@ -1,10 +1,16 @@
 import { query, Types } from 'indexer-utils';
-import { decodeParams } from './decode';
+import { decodeParams, DecodedExtrinsic } from './decode';
 import {
   ERC1155TransactionDecodedModel,
   ERC20TransactionDecodedModel,
   ERC721TransactionDecodedModel,
 } from './schema';
+
+const CONFLICTING_SIGNATURES = [
+  'approve(address,uint256)',
+  'transferFrom(address,address,uint256)',
+  'setApprovalForAll(address,bool)',
+];
 
 export default async function extrinsicsHandler(
   startBlock: number,
@@ -57,8 +63,6 @@ export default async function extrinsicsHandler(
   // filter non-erc standard txs
   const uniqueContractAddresses = [...new Set(txs.flat().map((tx) => tx.to))];
   const ercContracts = await query.tokenContracts[`erc${type}Contracts`]({
-    startBlock,
-    endBlock,
     contractAddress: uniqueContractAddresses,
     properties: ['address'],
   });
@@ -68,18 +72,33 @@ export default async function extrinsicsHandler(
     .filter((tx) => ercContractAddresses.includes(tx.to));
 
   await model.insertMany(
-    ercTxs.map((tx) => {
-      const ex = extrinsics.find((ex) => ex.ID === tx.methodId)!;
-      const transaction: Types.Contract.DecodedContractTransaction = {
-        hash: tx.hash,
-        contract: tx.to,
-        signer: tx.from,
-        signature: ex.SIGNATURE,
-        blockNumber: tx.blockNumber,
-        blockTimestamp: tx.blockTimestamp,
-        ...decodeParams(ex.PARAMS, tx.input),
-      };
-      return transaction;
-    })
+    ercTxs
+      .map((tx) => {
+        const ex = extrinsics.find((ex) =>
+          [ex.ID, ex._ID].includes(tx.methodId)
+        )!;
+        let decoded: DecodedExtrinsic;
+
+        try {
+          decoded = decodeParams(ex.PARAMS, tx.input);
+        } catch (e) {
+          // contracts can be more than 1 standard, when the same methods are found on both we know this will blow up for 1 of the contract types as the log data won't match up (e.g. unit256 on transfer is indexed in 721 but not 20)
+          if (CONFLICTING_SIGNATURES.includes(ex.SIGNATURE)) {
+            return null;
+          }
+          throw new Error(JSON.stringify(e));
+        }
+        const transaction: Types.Contract.DecodedContractTransaction = {
+          hash: tx.hash,
+          contract: tx.to,
+          signer: tx.from,
+          signature: ex.SIGNATURE,
+          blockNumber: tx.blockNumber,
+          blockTimestamp: tx.blockTimestamp,
+          ...decoded,
+        };
+        return transaction;
+      })
+      .filter((tx) => tx)
   );
 }

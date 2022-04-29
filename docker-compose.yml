@@ -17,7 +17,7 @@ services:
     volumes:
       - ../mongodb/archive/:/data/db/
     ports:
-      - 27017
+      - '5000:27017'
     networks:
       - db_archive_network
 
@@ -26,7 +26,7 @@ services:
     volumes:
       - ../mongodb/token-contracts/:/data/db/
     ports:
-      - 27017
+      - '5001:27017'
     networks:
       - db_token_contracts_network
 
@@ -35,7 +35,7 @@ services:
     volumes:
       - ../mongodb/token-activity/:/data/db/
     ports:
-      - 27017
+      - '5002:27017'
     networks:
       - db_token_activity_network
 
@@ -46,6 +46,8 @@ services:
     ports:
       - 4050
     restart: unless-stopped
+    volumes:
+      - ./indexers/archive/last-indexed-block:/base/indexers/archive/last-indexed-block
     environment:
       MONGO_URI: mongodb://mongo-archive:27017/archive
       PORT: 4050
@@ -62,6 +64,8 @@ services:
     ports:
       - 4051
     restart: unless-stopped
+    volumes:
+      - ./indexers/token-contracts/last-indexed-block:/base/indexers/token-contracts/last-indexed-block
     environment:
       ARCHIVE_GRAPH: http://indexer-archive:4050/graphql
       PORT: 4051
@@ -80,6 +84,8 @@ services:
     ports:
       - 4052
     restart: unless-stopped
+    volumes:
+      - ./indexers/token-activity/last-indexed-block:/base/indexers/token-activity/last-indexed-block
     environment:
       ARCHIVE_GRAPH: http://indexer-archive:4050/graphql
       CONTRACT_GRAPH: http://indexer-token-contracts:4051/graphql
@@ -93,6 +99,28 @@ services:
       - db_token_activity_network
       - web_network
 
+  indexer-web3go:
+    build:
+      context: .
+      target: web3go
+    ports:
+      - 4053
+    restart: unless-stopped
+    volumes:
+      - ./indexers/web3go/last-indexed-block:/base/indexers/web3go/last-indexed-block
+    environment:
+      ARCHIVE_GRAPH: http://indexer-archive:4050/graphql
+      CONTRACT_GRAPH: http://indexer-token-contracts:4051/graphql
+      TOKEN_ACTIVITY_GRAPH: http://indexer-token-activity:4052/graphql
+      PORT: 4053
+
+    depends_on:
+      - indexer-archive
+      - indexer-token-contracts
+      - indexer-token-activity
+    networks:
+      - web_network
+
   nginx:
     image: nginx:1.15-alpine
     ports:
@@ -104,4 +132,4 @@ services:
     networks:
       - web_network
     depends_on:
-      - indexer-token-activity
+      - indexer-web3go

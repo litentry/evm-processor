@@ -30,7 +30,7 @@ export default async function nativeTokenTransactions({
   endBlock: number;
   from?: string;
   to?: string;
-  properties: (keyof NativeTokenTransaction)[];
+  properties?: (keyof NativeTokenTransaction)[];
 }) {
   try {
     const response = await axios({

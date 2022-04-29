@@ -8,6 +8,7 @@ import {
   ERC721EventDecodedModel,
   ERC1155TransactionDecodedModel,
   ERC1155EventDecodedModel,
+  BlockModel,
 } from './schema';
 
 const standards = [
@@ -51,4 +52,6 @@ export default async function handler(startBlock: number, endBlock: number) {
       );
     })
   );
+  // todo this will only work in streaming mode, multiple instances need a more sophisticated progress schema
+  await BlockModel.create({ number: endBlock });
 }
