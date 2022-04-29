@@ -11,7 +11,9 @@
     "build": "rm -rf lib && tsc",
     "start:prod": "node lib/index",
     "typecheck": "yarn tsc --noEmit",
-    "postinstall": "yarn run build"
+    "postinstall": "yarn run build",
+    "deploy:local": "serverless deploy --stage local",
+    "start:local": "docker-compose up -d && yarn run deploy:local"
   },
   "dependencies": {
     "indexer-utils": "0.0.1",
@@ -25,6 +27,7 @@
     "json-schema-to-ts": "^1.5.0",
     "serverless": "^3.0.0",
     "serverless-esbuild": "^1.23.3",
+    "serverless-localstack": "^0.4.35",
     "ts-node": "^10.4.0",
     "tsconfig-paths": "^3.9.0",
     "typescript": "^4.1.3"

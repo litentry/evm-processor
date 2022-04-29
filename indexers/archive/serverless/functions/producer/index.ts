@@ -4,7 +4,7 @@ export default {
     handler: `${handlerPath(__dirname)}/handler.default`,
     events: [
         {
-            schedule: "rate(2 minutes)"
+            schedule: "rate(1 minute)"
         }
     ],
     environment: {

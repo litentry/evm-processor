@@ -3,7 +3,7 @@ import config from "@app/config";
 const { SQS } = require("aws-sdk");
 
 const sqs = new SQS();
-const maxMessagesToQueuePerExecution = 100;
+const maxBlocksToQueuePerExecution = 50000;
 
 let lastQueuedEndBlock = 0;
 
@@ -25,7 +25,7 @@ export default async (_: any) => {
         return;
     }
 
-    const targetJobCount = Math.min(maxMessagesToQueuePerExecution, targetBlockHeight - lastQueuedEndBlock);
+    const targetJobCount = Math.min(maxBlocksToQueuePerExecution, targetBlockHeight - lastQueuedEndBlock);
     const targetLastQueuedEndBlock = lastQueuedEndBlock + targetJobCount;
 
     const dispatch = async (jobs: BatchSQSMessage[]) => {
