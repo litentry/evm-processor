@@ -9,11 +9,11 @@ const config: Config = {
   port: parseInt(process.env.PORT || '4050'),
   web3,
   mongoUri: process.env.MONGO_URI,
-  start: 14703780,
+  start: parseInt(process.env.START_BLOCK || '0'),
   end: process.env.END_BLOCK
     ? parseInt(process.env.END_BLOCK)
     : web3.eth.getBlockNumber,
-  batchSize: 1,
+  batchSize: parseInt(process.env.BATCH_SIZE || '20'),
   sqsConfig: {
     region: process.env.AWS_REGION || '',
     queueUrl: process.env.QUEUE_URL || '',

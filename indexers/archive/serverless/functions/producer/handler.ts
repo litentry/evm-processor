@@ -15,6 +15,7 @@ interface BatchSQSMessage {
 export default async (_: any) => {
 
     if (lastQueuedEndBlock < 1) {
+        lastQueuedEndBlock = config.start;
         //@todo then try to fetch it from mongo
     }
 
