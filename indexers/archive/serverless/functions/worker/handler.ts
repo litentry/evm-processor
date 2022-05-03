@@ -5,7 +5,7 @@ import { awsUtils } from 'aws-utils';
 
 const lambdaHandler: SQSHandler = async (event: SQSEvent) => {
     console.log('Calling initial lambda function');
-  awsUtils.lambdaHandler(event, config.sqsConfig, handler);
+    await awsUtils.lambdaHandler(event, config.sqsConfig, handler);
 }
 
 export default lambdaHandler;

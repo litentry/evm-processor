@@ -170,7 +170,6 @@ function createSignatureItem(
   required: boolean,
   events: boolean
 ): ContractSignatureItem {
-  console.log('running createSignatureItem');
   const r = {
     REQUIRED: required,
     SIGNATURE: signature,
@@ -178,7 +177,5 @@ function createSignatureItem(
     _ID: getMethodIdFromSignature(`_${signature}`, events),
     PARAMS: getParamsFromSignature(signature),
   };
-
-  console.log('after running createSignatureItem');
   return r;
 }
