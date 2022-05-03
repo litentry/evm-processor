@@ -19,14 +19,17 @@ async function getReceipts(transactionHashes: string[]) {
 }
 
 const rpc: ExtractBlock = async (blockNumber) => {
+  console.log('blockWithTransactions');
   const blockWithTransactions = await config.web3.eth.getBlock(
     blockNumber,
     true
   );
+  console.log('getReceipts');
   const receipts = await getReceipts(
     blockWithTransactions.transactions.map((tx) => tx.hash)
   );
 
+  console.log('return');
   return {
     blockWithTransactions,
     receipts,

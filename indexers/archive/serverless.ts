@@ -1,7 +1,7 @@
-import type {AWS} from '@serverless/typescript';
-
 import producer from '@functions/producer';
 import worker from '@functions/worker';
+import type { AWS } from '@serverless/typescript';
+
 
 const serverlessConfiguration: AWS = {
     service: 'archive-indexer',
@@ -45,7 +45,8 @@ const serverlessConfiguration: AWS = {
             JobQueue: {
                 Type: 'AWS::SQS::Queue',
                 Properties: {
-                    QueueName: 'JobQueue'
+                    QueueName: 'JobQueue',
+                    VisibilityTimeout: 60
                 }
             }
         }

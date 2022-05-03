@@ -10,5 +10,5 @@ export default {
     environment: {
         QUEUE_URL: { Ref: 'JobQueue' },
         RPC_ENDPOINT: 'https://rpc.ankr.com/eth'
-    }
+    },
 };

@@ -7,7 +7,8 @@ type ProcessorMessage = {
   endBlock: number,
 }
 
-export const lambdaHandler = async (event: SQSEvent, config: Config, innerHandler: (startBlock: number, endBlock: number) => {}) => {
+export const lambdaHandler = async (event: SQSEvent, config: Config, innerHandler: (startBlock: number, endBlock: number) => Promise<void>) => {
+  console.log('inside the lambda handler');
   const successfulMessages: DeleteMessageBatchRequestEntry[] = (await Promise.all(
     event.Records.map(async record => {
       const message = getMessageFromBody(record.body);
@@ -17,7 +18,9 @@ export const lambdaHandler = async (event: SQSEvent, config: Config, innerHandle
         return;
       }
 
-      innerHandler(message.startBlock, message.endBlock);
+      console.log('calling inner handler');
+      await innerHandler(message.startBlock, message.endBlock);
+      console.log('after inner handler');
 
       return {
         Id: record.messageId,
@@ -26,6 +29,7 @@ export const lambdaHandler = async (event: SQSEvent, config: Config, innerHandle
     })
   )).filter(elem => elem !== undefined) as DeleteMessageBatchRequestEntry[];
 
+  console.log(successfulMessages);
   await deleteBatchMessages(config, successfulMessages);
 }
 
