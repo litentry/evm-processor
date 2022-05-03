@@ -1,6 +1,6 @@
-import { DeleteMessageBatchRequestEntry } from '@aws-sdk/client-sqs';
-import { SQSEvent } from 'aws-lambda';
-import { Config, deleteBatchMessages } from './sqs';
+import { SQSEvent } from "aws-lambda";
+import { DeleteMessageBatchRequestEntry } from "aws-sdk/clients/sqs";
+import { Config, deleteBatchMessages } from "./sqs";
 
 type ProcessorMessage = {
   startBlock: number,
@@ -38,7 +38,7 @@ function getMessageFromBody(body: string): ProcessorMessage | null {
     };
   } catch (e) {
     console.error(e);
-    console.log('Failed to parse message from queue: ', body);
+    console.log("Failed to parse message from queue: ", body);
 
     return null;
   }

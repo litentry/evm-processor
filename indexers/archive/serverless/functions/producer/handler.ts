@@ -1,6 +1,5 @@
 import config from "@app/config";
-
-const { SQS } = require("aws-sdk");
+import { SQS } from "aws-sdk";
 
 const sqs = new SQS();
 const maxBlocksToQueuePerExecution = 50000;

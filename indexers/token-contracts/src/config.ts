@@ -12,7 +12,6 @@ const batchSize = process.env.BATCH_SIZE
 const mongoUri = process.env.MONGO_URI!;
 
 const sqsConfig: AwsSqsConfig = {
-  region: 'eu-west-1',
   queueUrl: '',
 }
 
