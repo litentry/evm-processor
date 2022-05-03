@@ -10,7 +10,6 @@ if (!process.env.RPC_ENDPOINT) {
   );
 }
 
-console.log(process.env.RPC_ENDPOINT);
 let provider: WebsocketProvider | HttpProvider;
 
 if (process.env.RPC_ENDPOINT?.startsWith('ws')) {
