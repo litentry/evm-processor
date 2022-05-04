@@ -1,9 +1,8 @@
 import config from "@app/config";
-
-const { SQS } = require("aws-sdk");
+import { SQS } from "aws-sdk";
 
 const sqs = new SQS();
-const maxMessagesToQueuePerExecution = 100;
+const maxBlocksToQueuePerExecution = 50000;
 
 let lastQueuedEndBlock = 0;
 
@@ -15,6 +14,7 @@ interface BatchSQSMessage {
 export default async (_: any) => {
 
     if (lastQueuedEndBlock < 1) {
+        lastQueuedEndBlock = config.start;
         //@todo then try to fetch it from mongo
     }
 
@@ -25,7 +25,7 @@ export default async (_: any) => {
         return;
     }
 
-    const targetJobCount = Math.min(maxMessagesToQueuePerExecution, targetBlockHeight - lastQueuedEndBlock);
+    const targetJobCount = Math.min(maxBlocksToQueuePerExecution, targetBlockHeight - lastQueuedEndBlock);
     const targetLastQueuedEndBlock = lastQueuedEndBlock + targetJobCount;
 
     const dispatch = async (jobs: BatchSQSMessage[]) => {

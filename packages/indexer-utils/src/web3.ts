@@ -1,6 +1,6 @@
-import Web3 from 'web3';
 import colors from 'colors';
-import { WebsocketProvider, HttpProvider } from 'web3-core';
+import Web3 from 'web3';
+import { HttpProvider, WebsocketProvider } from 'web3-core';
 
 if (!process.env.RPC_ENDPOINT) {
   console.log(

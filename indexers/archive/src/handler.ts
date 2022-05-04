@@ -1,7 +1,7 @@
 import colors from 'colors';
-import transformBlock from './transform-block';
 import extractBlock from './extract-block';
 import loadBlock from './load-block';
+import transformBlock from './transform-block';
 
 export default async function processBatch(start: number, end: number) {
   console.time('Batch time');
@@ -17,7 +17,6 @@ export default async function processBatch(start: number, end: number) {
 
       await loadBlock(transformedData);
 
-      console.log(`Processed block ${number}`);
       console.log(
         `Contract creations: ${transformedData.contractCreationTransactions.length}`
       );

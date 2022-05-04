@@ -6,6 +6,7 @@
   "private": true,
   "dependencies": {
     "@openzeppelin/contracts": "^4.5.0",
+    "aws-sdk": "^2.1126.0",
     "axios": "^0.26.1",
     "colors": "^1.4.0",
     "dotenv": "^10.0.0",
@@ -20,6 +21,7 @@
     "web3": "^v3.0.0-rc.5"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.94",
     "@types/express": "^4.17.13",
     "@types/lodash": "^4.14.181",
     "@types/node": "^16.11.17",
