@@ -19,6 +19,7 @@ const getParameterForStage = (
     }
 
     if (required) {
+        //The stack trace will show which parameter
         throw new Error(`Required parameter missing`);
     }
 }
