@@ -11,7 +11,6 @@
     "build": "rm -rf lib && tsc",
     "start:prod": "node lib/index",
     "typecheck": "yarn tsc --noEmit",
-    "postinstall": "yarn run build",
     "deploy:local": "serverless deploy --stage local",
     "start:local": "docker-compose up -d && yarn run deploy:local"
   },

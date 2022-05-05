@@ -90,7 +90,6 @@ export default function (params: Params) {
           Cluster: `\${cf:${params.clusterStackName}.EcsCluster}`,
           DesiredCount: 1,
           EnableEcsManagedTags: true,
-          LaunchType: 'EC2',
           ServiceRegistries: [{
             RegistryArn: {
               "Fn::GetAtt": [ "MongoServiceDiscovery", "Arn" ]

@@ -9,26 +9,40 @@ const context = getContext();
 const stageConfig = stageConfigFactory(context.options.stage);
 
 export type Params = {
-    org: string;
-    clusterStackName: string;
-    mongoImageVersion: string;
-    region: AWS['provider']['region'];
-    mongoDnsName: string;
-    ebsVolumeName: string;
+  org: string;
+  clusterStackName: string;
+  mongoImageVersion: string;
+  region: AWS['provider']['region'];
+  mongoDnsName: string;
+  ebsVolumeName: string;
 }
 
 const serviceName = 'archive-indexer';
 
 const params: Params = {
-    org: 'litentry',
-    clusterStackName: 'graph-aws-infrastructure-dev',
-    mongoImageVersion: '5.0.8',
-    region: 'eu-west-1',
-    mongoDnsName: `${serviceName}-mongo`,
-    ebsVolumeName: `${serviceName}-mongo-ebs`
+  org: 'litentry',
+  clusterStackName: 'graph-aws-infrastructure-dev',
+  mongoImageVersion: '5.0.8',
+  region: 'eu-west-1',
+  mongoDnsName: `${serviceName}-mongo`,
+  ebsVolumeName: `${serviceName}-mongo-ebs`,
 }
 
-const serverlessConfiguration: AWS = {
+const getStageEnv = (stage: string) => {
+  if (stage === 'production') {
+    return {
+      MONGO_URI: `mongodb://${params.mongoDnsName}.${params.org}:27017/archive`
+    };
+  }
+  return {
+    MONGO_URI: `mongodb://mongodb:27017/archive`
+  }
+}
+
+const getConfig = async () => {
+  const instance = await getContext();
+
+  const serverlessConfiguration: AWS = {
     service: serviceName,
     frameworkVersion: '3',
     plugins: ['serverless-esbuild', 'serverless-localstack'],
@@ -74,40 +88,45 @@ const serverlessConfiguration: AWS = {
                     }
                 ]
             }
+          ]
         }
+      }
     },
     resources: {
-        Resources: {
-            JobQueue: {
-                Type: 'AWS::SQS::Queue',
-                Properties: {
-                    QueueName: 'JobQueue',
-                    VisibilityTimeout: 60
-                }
-            },
-            ...containerResources(params).Resources
-        }
+      Resources: {
+        JobQueue: {
+          Type: 'AWS::SQS::Queue',
+          Properties: {
+            QueueName: 'JobQueue',
+            VisibilityTimeout: 60
+          }
+        },
+        ...containerResources(params).Resources
+      }
     },
     functions: {
-        producer,
-        worker
+      producer,
+      worker
     },
-    package: {individually: true},
+    package: { individually: true },
     custom: {
-        localstack: {
-            stages: ['local'],
-        },
-        esbuild: {
-            bundle: true,
-            minify: false,
-            sourcemap: true,
-            exclude: ['aws-sdk'],
-            target: 'node14',
-            define: {'require.resolve': undefined},
-            platform: 'node',
-            concurrency: 10,
-        },
+      localstack: {
+        stages: ['local'],
+      },
+      esbuild: {
+        bundle: true,
+        minify: false,
+        sourcemap: true,
+        exclude: ['aws-sdk'],
+        target: 'node14',
+        define: { 'require.resolve': undefined },
+        platform: 'node',
+        concurrency: 10,
+      },
     },
-};
+  };
 
-module.exports = serverlessConfiguration;
+  return serverlessConfiguration;
+}
+
+module.exports = new Promise((res) => res(getConfig()));
