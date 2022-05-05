@@ -60,7 +60,7 @@ export default (stage: string) => {
             stage,
             {
                 envVar: process.env['END_BLOCK'] ? Number(process.env['END_BLOCK']) : undefined,
-                local: 14000004,
+                local: 14000100,
                 default: undefined
             },
             false
@@ -76,5 +76,13 @@ export default (stage: string) => {
             },
             false
         ) as number | undefined,
+
+        getProducerBucketName: () => getParameterForStage(
+            stage,
+            {
+                envVar: process.env['PRODUCER_BUCKET_NAME'],
+                default: `${stage}-producer-bucket`
+            }
+        )
     }
 }

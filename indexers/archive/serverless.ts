@@ -1,6 +1,11 @@
 import producer from '@functions/producer';
 import worker from '@functions/worker';
 import type { AWS } from '@serverless/typescript';
+import stageConfigFactory from './serverless/config/stage-config';
+import {getContext} from "./serverless/util/context";
+
+const context = getContext();
+const stageConfig = stageConfigFactory(context.options.stage);
 
 
 const serverlessConfiguration: AWS = {
@@ -35,6 +40,16 @@ const serverlessConfiguration: AWS = {
                             }
                         ]
 
+                    },
+                    {
+                        Effect: 'Allow',
+                        Action: [
+                            's3:GetObject', 's3:PutObject'
+                        ],
+                        Resource: [
+                            `arn:aws:s3:::${stageConfig.getProducerBucketName()}/*`
+                        ]
+
                     }
                 ]
             }
@@ -47,6 +62,12 @@ const serverlessConfiguration: AWS = {
                 Properties: {
                     QueueName: 'JobQueue',
                     VisibilityTimeout: 60
+                }
+            },
+            ProducerBucket: {
+                Type: 'AWS::S3::Bucket',
+                Properties: {
+                    BucketName: stageConfig.getProducerBucketName()
                 }
             }
         }

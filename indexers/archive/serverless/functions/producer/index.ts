@@ -18,6 +18,7 @@ export default {
         RPC_ENDPOINT: 'https://rpc.ankr.com/eth',
         BATCH_SIZE: String(stageConfig.getProducerBatchSize()),
         START_BLOCK: String(stageConfig.getProducerStartBlock()),
-        END_BLOCK: String(stageConfig.getProducerStartBlock())
+        END_BLOCK: String(stageConfig.getProducerEndBlock()),
+        BUCKET_NAME: stageConfig.getProducerBucketName()
     },
 };
