@@ -1,7 +1,13 @@
 import { handlerPath } from '@libs/handler-resolver';
+import {getContext} from "../../util/context";
+import stageConfigFactory from "../../config/stage-config";
+
+const context = getContext();
+const stageConfig = stageConfigFactory(context.options.stage);
 
 export default {
     handler: `${handlerPath(__dirname)}/handler.default`,
+    reservedConcurrency: 1,
     events: [
         {
             schedule: "rate(1 minute)"
@@ -9,6 +15,9 @@ export default {
     ],
     environment: {
         QUEUE_URL: { Ref: 'JobQueue' },
-        RPC_ENDPOINT: 'https://rpc.ankr.com/eth'
+        RPC_ENDPOINT: 'https://rpc.ankr.com/eth',
+        BATCH_SIZE: String(stageConfig.getProducerBatchSize()),
+        START_BLOCK: String(stageConfig.getProducerStartBlock()),
+        END_BLOCK: String(stageConfig.getProducerStartBlock())
     },
 };
