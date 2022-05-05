@@ -16,8 +16,9 @@
     "start:local": "docker-compose up -d && yarn run deploy:local"
   },
   "dependencies": {
+    "aws-utils": "0.0.1",
     "indexer-utils": "0.0.1",
-    "aws-utils": "0.0.1"
+    "yargs": "^17.4.1"
   },
   "devDependencies": {
     "@serverless/typescript": "^3.0.0",
