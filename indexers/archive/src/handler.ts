@@ -2,23 +2,19 @@ import colors from 'colors';
 import extractBlock from './extract-block';
 import loadBlock from './load-block';
 import transformBlock from './transform-block';
-import mongoose from "mongoose";
-import config from "@app/config";
 
 export default async function processBatch(start: number, end: number) {
-  let failed = false;
-
   console.log(`Processing block batch ${start}-${end}`);
+
   const blocks: number[] = [];
-  for (let block = start; block <= end; block++) blocks.push(block);
-  console.time('Batch time');
+  for (let block = start; block <= end; block++) {
+    blocks.push(block);
+  }
 
   try {
-    await mongoose.connect(config.mongoUri);
-
-    await Promise.all(
+    console.time(`Batch time ${start}-${end}`);
+    await Promise.allSettled(
       blocks.map(async (number) => {
-        console.log(`Processing block ${number}`);
         const data = await extractBlock(number);
 
         const transformedData = transformBlock(data);
@@ -37,16 +33,10 @@ export default async function processBatch(start: number, end: number) {
       })
     );
     console.log(colors.blue(`Processed batch ${start} to ${end}`));
-    console.log('\n');
+    console.timeEnd(`Batch time ${start}-${end}`);
   } catch (e) {
     console.error(e);
-    failed = true;
+    throw new Error(`Failed to process batch ${start}-${end}`);
   }
 
-  console.timeEnd('Batch time');
-  await mongoose.disconnect();
-
-  if (failed) {
-    throw new Error(`Failed with batch ${start}-${end}`);
-  }
 }

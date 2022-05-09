@@ -1,6 +1,7 @@
 import config from "@app/config";
 import {SQS} from "aws-sdk";
 import {getLastQueuedEndBlock, saveLastQueuedEndBlock} from "./lastQueuedEndblockRepository";
+import mongoose from "mongoose";
 
 const sqs = new SQS();
 const maxBlocksToQueuePerExecution = 50000;
@@ -14,8 +15,10 @@ interface BatchSQSMessage {
 
 export default async (_: any) => {
 
+    await mongoose.connect(config.mongoUri);
+
     if (lastQueuedEndBlock < 1) {
-        lastQueuedEndBlock =  await getLastQueuedEndBlock() ?? config.start;
+        lastQueuedEndBlock =  await getLastQueuedEndBlock('archive') ?? config.start;
     }
 
     const targetBlockHeight = typeof config.end == "number" ? config.end : await config.end();
@@ -38,7 +41,7 @@ export default async (_: any) => {
 
         lastQueuedEndBlock = Number(jobs[jobs.length - 1].Id);
 
-        await saveLastQueuedEndBlock(lastQueuedEndBlock);
+        await saveLastQueuedEndBlock('archive', lastQueuedEndBlock);
     }
 
     let pendingJobs = [];
@@ -53,6 +56,8 @@ export default async (_: any) => {
             pendingJobs = [];
         }
     }
+
+    await mongoose.disconnect();
 
     console.log(`Queued ${targetJobCount} jobs. Last job end block: ${targetLastQueuedEndBlock}`);
 };

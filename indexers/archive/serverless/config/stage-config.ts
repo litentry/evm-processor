@@ -2,7 +2,7 @@ type StageConfigParameter = {
     envVar?: string | number,
     local?: string | number,
     dev?: string | number,
-    prod?: string | number,
+    production?: string | number,
     default?: string | number,
 }
 
@@ -32,6 +32,7 @@ export default (stage: string) => {
             {
                 envVar: process.env['MONGO_URI'],
                 local: 'mongodb://mongodb:27017/evm-archive',
+                production: 'mongodb://archive-indexer-mongo.litentry:27017/evm-archive',
             },
             true
         ) as string,
@@ -49,7 +50,7 @@ export default (stage: string) => {
         getProducerStartBlock: () => getParameterForStage(
             stage,
             {
-                envVar: process.env['END_BLOCK'] ? Number(process.env['END_BLOCK']) : undefined,
+                envVar: process.env['START_BLOCK'] ? Number(process.env['START_BLOCK']) : undefined,
                 local: 14000000,
                 default: undefined
             },

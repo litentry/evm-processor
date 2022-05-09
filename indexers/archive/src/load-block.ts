@@ -31,22 +31,8 @@ const mongo: LoadBlock = async ({
       upsertMongoModels(LogModel, logs, ['blockNumber', 'transactionHash']),
     ]);
   } catch (e) {
-    console.error(e);
-    console.log(`Cleaning up block ${block.number}`);
-
-    try {
-      const filter = {
-        blockNumber: block.number,
-      };
-      await BlockModel.deleteOne({ block: block.number });
-      await NativeTokenTransactionModel.deleteMany(filter);
-      await ContractCreationTransactionModel.deleteMany(filter);
-      await ContractTransactionModel.deleteMany(filter);
-      await LogModel.deleteMany(filter);
-    } catch (e) {
-      console.error(e);
-      console.error(`Clean up failed for block ${block.number}`);
-    }
+    console.error('Error in block mongo loader', e);
+    throw e;
   }
 };
 
