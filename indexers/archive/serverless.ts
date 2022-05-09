@@ -1,5 +1,6 @@
 import producer from '@functions/producer';
 import worker from '@functions/worker';
+import query from '@functions/query';
 import type { AWS } from '@serverless/typescript';
 import stageConfigFactory from './serverless/config/stage-config';
 import {getContext} from "./serverless/util/context";
@@ -60,7 +61,7 @@ const serverlessConfiguration: AWS = {
             JobQueue: {
                 Type: 'AWS::SQS::Queue',
                 Properties: {
-                    QueueName: 'JobQueue',
+                    QueueName: stageConfig.getJobQueueName(),
                     VisibilityTimeout: 60
                 }
             },
@@ -74,7 +75,8 @@ const serverlessConfiguration: AWS = {
     },
     functions: {
         producer,
-        worker
+        worker,
+        query
     },
     package: {individually: true},
     custom: {

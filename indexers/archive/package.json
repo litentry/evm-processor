@@ -16,6 +16,7 @@
     "start:local": "docker-compose up -d && yarn run deploy:local"
   },
   "dependencies": {
+    "@vendia/serverless-express": "^4.8.0",
     "aws-utils": "0.0.1",
     "indexer-utils": "0.0.1",
     "yargs": "^17.4.1"
