@@ -1,4 +1,5 @@
 import { handlerPath } from '@libs/handler-resolver';
+import { AWS } from "@serverless/typescript";
 import stageConfigFactory from '../../config/stage-config';
 import {getContext} from "../../util/context";
 
@@ -26,3 +27,4 @@ export default {
     },
     timeout: 20,
 };
+} as AWS['functions'][0];

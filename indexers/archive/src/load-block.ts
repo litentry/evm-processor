@@ -24,11 +24,11 @@ const mongo: LoadBlock = async ({
 }) => {
   try {
     await Promise.all([
-      upsertMongoModels(BlockModel, [block]),
-      upsertMongoModels(NativeTokenTransactionModel, nativeTokenTransactions),
-      upsertMongoModels(ContractCreationTransactionModel, contractCreationTransactions),
-      upsertMongoModels(ContractTransactionModel, contractTransactions),
-      upsertMongoModels(LogModel, logs),
+      upsertMongoModels(BlockModel, [block], ['number']),
+      upsertMongoModels(NativeTokenTransactionModel, nativeTokenTransactions, ['hash']),
+      upsertMongoModels(ContractCreationTransactionModel, contractCreationTransactions, ['hash']),
+      upsertMongoModels(ContractTransactionModel, contractTransactions, ['hash']),
+      upsertMongoModels(LogModel, logs, ['blockNumber', 'transactionHash']),
     ]);
   } catch (e) {
     console.error(e);

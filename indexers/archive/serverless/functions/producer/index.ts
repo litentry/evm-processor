@@ -1,4 +1,5 @@
 import { handlerPath } from '@libs/handler-resolver';
+import { AWS } from "@serverless/typescript";
 import {getContext} from "../../util/context";
 import stageConfigFactory from "../../config/stage-config";
 
@@ -22,3 +23,4 @@ export default {
         BUCKET_NAME: stageConfig.getProducerBucketName()
     },
 };
+} as AWS['functions'][0];

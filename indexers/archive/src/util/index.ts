@@ -1,9 +1,15 @@
 import mongoose from "mongoose";
 
-export async function upsertMongoModels (model: mongoose.Model<any>, documents: any[]) {
-  return model.bulkWrite(documents.map((document) => ({
-    insertOne: {
-      document,
+export async function upsertMongoModels (model: mongoose.Model<any>, documents: any[], primaryKey: string[]) {
+  return await model.bulkWrite(documents.map((document) => ({
+    updateOne: {
+      filter: primaryKey.reduce((filter, field) => ({
+        ...filter,
+        [field]: document[field]
+      }), {}),
+      update: {
+        ...document
+      },
       upsert: true
     }
   })));
