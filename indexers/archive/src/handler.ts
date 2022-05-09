@@ -6,34 +6,47 @@ import mongoose from "mongoose";
 import config from "@app/config";
 
 export default async function processBatch(start: number, end: number) {
-  //console.time('Batch time');
+  let failed = false;
 
-  await mongoose.connect(config.mongoUri);
-
+  console.log(`Processing block batch ${start}-${end}`);
   const blocks: number[] = [];
   for (let block = start; block <= end; block++) blocks.push(block);
+  console.time('Batch time');
 
-  await Promise.all(
-    blocks.map(async (number) => {
-      const data = await extractBlock(number);
+  try {
+    await mongoose.connect(config.mongoUri);
 
-      const transformedData = transformBlock(data);
+    await Promise.all(
+      blocks.map(async (number) => {
+        console.log(`Processing block ${number}`);
+        const data = await extractBlock(number);
 
-      await loadBlock(transformedData);
+        const transformedData = transformBlock(data);
 
-      console.log(
-        `Contract creations: ${transformedData.contractCreationTransactions.length}`
-      );
-      console.log(
-        `Contract interactions: ${transformedData.contractTransactions.length}`
-      );
-      console.log(
-        `Native token transfers: ${transformedData.nativeTokenTransactions.length}`
-      );
-    })
-  );
+        await loadBlock(transformedData);
 
-  console.log(colors.blue(`Processed batch ${start} to ${end}`));
-  //console.timeEnd('Batch time');
-  console.log('\n');
+        console.log(
+          `Contract creations: ${transformedData.contractCreationTransactions.length}`
+        );
+        console.log(
+          `Contract interactions: ${transformedData.contractTransactions.length}`
+        );
+        console.log(
+          `Native token transfers: ${transformedData.nativeTokenTransactions.length}`
+        );
+      })
+    );
+    console.log(colors.blue(`Processed batch ${start} to ${end}`));
+    console.log('\n');
+  } catch (e) {
+    console.error(e);
+    failed = true;
+  }
+
+  console.timeEnd('Batch time');
+  await mongoose.disconnect();
+
+  if (failed) {
+    throw new Error(`Failed with batch ${start}-${end}`);
+  }
 }

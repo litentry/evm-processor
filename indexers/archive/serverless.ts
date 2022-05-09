@@ -2,6 +2,7 @@ import producer from '@functions/producer';
 import worker from '@functions/worker';
 import type { AWS } from '@serverless/typescript';
 import containerResources from "./serverless/config/container-resources";
+import getInfraStack from "./serverless/util/get-infra-stack";
 import stageConfigFactory from './serverless/config/stage-config';
 import {getContext} from "./serverless/util/context";
 
@@ -37,6 +38,35 @@ const getStageEnv = (stage: string) => {
   return {
     MONGO_URI: `mongodb://mongodb:27017/archive`
   }
+}
+
+const vpcOptions = async (stage: string) => {
+  if (stage === 'production') {
+    const infraStack = await getInfraStack(params.clusterStackName);
+    const securityGroupIds = infraStack.Outputs
+      .filter((output) =>
+        ['SecurityGroupUniversal', 'SecurityGroupOutboundUniversal'].includes(output.OutputKey)
+      )
+      .map((output) => {
+        return output.OutputValue
+      });
+
+    const subnetIds = infraStack.Outputs
+      .filter((output) =>
+        output.OutputKey === 'PrivateSubnets'
+      )
+      .reduce((value, output) => {
+        return output.OutputValue.split(',')
+      }, <string[]>[]);
+
+    return {
+      vpc: {
+        securityGroupIds,
+        subnetIds
+      }
+    };
+  }
+  return {};
 }
 
 const getConfig = async () => {
@@ -90,7 +120,8 @@ const getConfig = async () => {
             }
           ]
         }
-      }
+      },
+      ...(await vpcOptions(instance.options.stage))
     },
     resources: {
       Resources: {
