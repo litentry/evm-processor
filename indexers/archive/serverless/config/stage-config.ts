@@ -42,7 +42,7 @@ export default (stage: string) => {
             {
                 envVar: process.env['WORKER_CONCURRENCY'] ? Number(process.env['WORKER_CONCURRENCY']) : undefined,
                 local: 1,
-                default: 10
+                default: 1
             },
             true
         ) as number,
@@ -50,9 +50,9 @@ export default (stage: string) => {
         getProducerStartBlock: () => getParameterForStage(
             stage,
             {
-                envVar: process.env['START_BLOCK'] ? Number(process.env['START_BLOCK']) : undefined,
+                envVar: process.env['START_BLOCK'] ? Number(process.env['START_BLOCK']) : 0,
                 local: 14000000,
-                default: undefined
+                default: 0
             },
             false
         ) as number | undefined,
