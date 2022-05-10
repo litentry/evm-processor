@@ -3,7 +3,6 @@ import worker from '@functions/worker';
 import type { AWS } from '@serverless/typescript';
 import containerResources from "./serverless/config/container-resources";
 import getInfraStack from "./serverless/util/get-infra-stack";
-import stageConfigFactory from './serverless/config/stage-config';
 import { getContext } from "./serverless/util/context";
 
 
@@ -123,7 +122,7 @@ const getConfig = async () => {
             VisibilityTimeout: 60
           }
         },
-        ...containerResources(params).Resources
+        ...containerResources(context.options.stage, params).Resources
       }
     },
     functions: {
