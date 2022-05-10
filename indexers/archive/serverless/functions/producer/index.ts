@@ -3,9 +3,10 @@ import { AWS } from "@serverless/typescript";
 import { getContext } from "../../util/context";
 import stageConfigFactory from "../../config/stage-config";
 
-export default async () => {
-  const context = await getContext();
-  const stageConfig = stageConfigFactory(context.options.stage);
+const context = getContext();
+const stageConfig = stageConfigFactory(context.options.stage);
+
+export default () => {
   return {
     handler: `${handlerPath(__dirname)}/handler.default`,
     reservedConcurrency: 1,

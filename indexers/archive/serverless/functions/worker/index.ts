@@ -3,9 +3,10 @@ import { AWS } from "@serverless/typescript";
 import stageConfigFactory from '../../config/stage-config';
 import { getContext } from "../../util/context";
 
-export default async () => {
-  const context = await getContext();
-  const stageConfig = stageConfigFactory(context.options.stage);
+const context = getContext();
+const stageConfig = stageConfigFactory(context.options.stage);
+
+export default () => {
   return {
     handler: `${handlerPath(__dirname)}/handler.default`,
     reservedConcurrency: stageConfig.getWorkerConcurrency(),
@@ -25,6 +26,6 @@ export default async () => {
       RPC_ENDPOINT: 'https://rpc.ankr.com/eth',
       MONGO_URI: stageConfig.getMongoURI()
     },
-    timeout: 20,
+    timeout: 60,
   } as AWS['functions'][0];
 }

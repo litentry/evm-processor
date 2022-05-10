@@ -1,3 +1,5 @@
+import { Params } from "../../serverless";
+
 type StageConfigParameter = {
     envVar?: string | number,
     local?: string | number,
@@ -32,7 +34,6 @@ export default (stage: string) => {
             {
                 envVar: process.env['MONGO_URI'],
                 local: 'mongodb://mongodb:27017/evm-archive',
-                production: 'mongodb://archive-indexer-mongo.litentry:27017/evm-archive',
             },
             true
         ) as string,

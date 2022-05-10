@@ -8,7 +8,7 @@ export type Context = {
     [k: string]: string
   }
 }
-export async function getContext (): Promise<Context> {
+export function getContext (): Context {
   const args = yargs(process.argv.slice(2)).argv;
   const context = {
     options: Object

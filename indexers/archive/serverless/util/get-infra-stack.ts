@@ -1,6 +1,6 @@
-import { CloudFormation} from "aws-sdk";
+import { CloudFormation } from "aws-sdk";
 
-const cachedStacks: {[stackId: string]: any} = {};
+const cachedStacks: { [stackId: string]: any } = {};
 
 export async function getInfraStack(stackName: string): Promise<CloudFormation.Stack> {
   if (!cachedStacks[stackName]) {

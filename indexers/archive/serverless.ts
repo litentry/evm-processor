@@ -35,7 +35,7 @@ const vpcOptions = async (stage: string) => {
         ['SecurityGroupUniversal', 'SecurityGroupOutboundUniversal'].includes(output.OutputKey)
       )
       .map((output) => {
-        return output.OutputValue
+        return output.OutputValue;
       });
 
     const subnetIds = infraStack.Outputs
@@ -56,9 +56,26 @@ const vpcOptions = async (stage: string) => {
   return {};
 }
 
+const augmentEnvVars = async (stage: string, params: Params): Promise<void> => {
+  if (stage === 'production') {
+    const infraStack = await getInfraStack(params.clusterStackName);
+    if (!process.env.MONGO_URI) {
+      const serviceDiscoveryDomain = infraStack.Outputs
+        .filter((output) =>
+          ['RealmDNSZone'].includes(output.OutputKey)
+        )
+        .reduce((str: string, output) => {
+          return output.OutputValue;
+        }, undefined);
+
+      process.env.MONGO_URI = `mongodb://${params.mongoDnsName}.${serviceDiscoveryDomain}:27017/evm-archive`;
+    }
+  }
+}
+
 const getConfig = async () => {
-  const context = await getContext();
-  const stageConfig = stageConfigFactory(context.options.stage);
+  const context = getContext();
+  await augmentEnvVars(context.options.stage, params);
 
   const serverlessConfiguration: AWS = {
     service: serviceName,
@@ -110,8 +127,8 @@ const getConfig = async () => {
       }
     },
     functions: {
-      producer: await producer(),
-      worker: await worker(),
+      producer: producer(),
+      worker: worker(),
     },
     package: { individually: true },
     custom: {
