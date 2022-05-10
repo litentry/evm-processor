@@ -1,19 +1,39 @@
 import colors from 'colors';
+import { startTimer } from 'monitoring';
 import extractBlock from './extract-block';
 import loadBlock from './load-block';
 import transformBlock from './transform-block';
 
 export default async function processBatch(start: number, end: number) {
-  console.time('Batch time');
-
   const blocks: number[] = [];
   for (let block = start; block <= end; block++) blocks.push(block);
 
   await Promise.all(
     blocks.map(async (number) => {
-      const data = await extractBlock(number);
 
+      let end = startTimer({
+        message: "",
+        level: "info",
+        functionId: "abc",
+        functionName: "extractBlock",
+        chain: "some",
+        metricName: "histo",
+        description: "asd"
+      });
+      const data = await extractBlock(number);
+      end();
+
+      end = startTimer({
+        message: "",
+        level: "info",
+        functionId: "abc",
+        functionName: "transformBlock",
+        chain: "some",
+        metricName: "histo",
+        description: "asd"
+      });
       const transformedData = transformBlock(data);
+      end();
 
       await loadBlock(transformedData);
 
@@ -30,6 +50,5 @@ export default async function processBatch(start: number, end: number) {
   );
 
   console.log(colors.blue(`Processed batch ${start} to ${end}`));
-  console.timeEnd('Batch time');
   console.log('\n');
 }

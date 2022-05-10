@@ -1,4 +1,5 @@
 import { web3 } from "indexer-utils";
+import winston from "winston";
 import { Config } from "./types";
 
 // if (!process.env.MONGO_URI) {
@@ -16,7 +17,12 @@ const config: Config = {
   batchSize: parseInt(process.env.BATCH_SIZE || "20"),
   sqsConfig: {
     queueUrl: process.env.QUEUE_URL || "",
-  }
+  },
+  logger: winston.createLogger({
+    transports: [
+      new winston.transports.Console()
+    ]
+  })
 };
 
 export default config;
