@@ -1,10 +1,14 @@
+import config from "@app/config";
 import colors from 'colors';
+import mongoose from "mongoose";
 import { startTimer } from 'monitoring';
 import extractBlock from './extract-block';
 import loadBlock from './load-block';
 import transformBlock from './transform-block';
 
 export default async function processBatch(start: number, end: number) {
+  await mongoose.connect(config.mongoUri);
+
   const blocks: number[] = [];
   for (let block = start; block <= end; block++) blocks.push(block);
 
@@ -50,5 +54,9 @@ export default async function processBatch(start: number, end: number) {
   );
 
   console.log(colors.blue(`Processed batch ${start} to ${end}`));
+<<<<<<< HEAD
+=======
+  //console.timeEnd('Batch time');
+>>>>>>> remotes/origin/main
   console.log('\n');
 }

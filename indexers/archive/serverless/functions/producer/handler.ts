@@ -1,5 +1,6 @@
 import config from "@app/config";
-import { SQS } from "aws-sdk";
+import {SQS} from "aws-sdk";
+import {getLastQueuedEndBlock, saveLastQueuedEndBlock} from "./lastQueuedEndblockRepository";
 
 const sqs = new SQS();
 const maxBlocksToQueuePerExecution = 50000;
@@ -14,8 +15,7 @@ interface BatchSQSMessage {
 export default async (_: any) => {
 
     if (lastQueuedEndBlock < 1) {
-        lastQueuedEndBlock = config.start;
-        //@todo then try to fetch it from mongo
+        lastQueuedEndBlock =  await getLastQueuedEndBlock() ?? config.start;
     }
 
     const targetBlockHeight = typeof config.end == "number" ? config.end : await config.end();
@@ -38,7 +38,7 @@ export default async (_: any) => {
 
         lastQueuedEndBlock = Number(jobs[jobs.length - 1].Id);
 
-        //@todo flush lastQueuedEndBlock to mongo
+        await saveLastQueuedEndBlock(lastQueuedEndBlock);
     }
 
     let pendingJobs = [];
