@@ -19,8 +19,7 @@
     "lodash": "^4.17.21",
     "mongoose": "^6.2.11",
     "prom-client": "^14.0.1",
-    "web3": "^v3.0.0-rc.5",
-    "winston": "^3.7.2"
+    "web3": "^v3.0.0-rc.5"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.94",

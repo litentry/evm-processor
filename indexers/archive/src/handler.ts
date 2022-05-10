@@ -54,9 +54,5 @@ export default async function processBatch(start: number, end: number) {
   );
 
   console.log(colors.blue(`Processed batch ${start} to ${end}`));
-<<<<<<< HEAD
-=======
-  //console.timeEnd('Batch time');
->>>>>>> remotes/origin/main
   console.log('\n');
 }
