@@ -15,7 +15,6 @@ export default async function processBatch(start: number, end: number) {
   await Promise.all(
     blocks.map(async (number) => {
 
-
       const extractBlockEndTimer = startTimer({
         functionName: "extractBlock",
         metricName: "timer",
