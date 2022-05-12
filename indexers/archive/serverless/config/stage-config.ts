@@ -83,6 +83,13 @@ export default (stage: string) => {
                 envVar: process.env['PRODUCER_BUCKET_NAME'],
                 default: `${stage}-producer-bucket`
             }
+        ),
+        getJobQueueName: () => getParameterForStage(
+            stage,
+            {
+                envVar: process.env['JOB_QUEUE_NAME'],
+                default: `${stage}-producer-bucket`
+            }
         )
     }
 }
