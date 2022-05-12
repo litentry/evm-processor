@@ -1,13 +1,12 @@
+import config from "@app/config";
 import colors from 'colors';
+import mongoose from "mongoose";
+import { startTimer } from 'monitoring';
 import extractBlock from './extract-block';
 import loadBlock from './load-block';
 import transformBlock from './transform-block';
-import mongoose from "mongoose";
-import config from "@app/config";
 
 export default async function processBatch(start: number, end: number) {
-  //console.time('Batch time');
-
   await mongoose.connect(config.mongoUri);
 
   const blocks: number[] = [];
@@ -15,9 +14,22 @@ export default async function processBatch(start: number, end: number) {
 
   await Promise.all(
     blocks.map(async (number) => {
-      const data = await extractBlock(number);
 
+      const extractBlockEndTimer = startTimer({
+        functionName: "extractBlock",
+        metricName: "timer",
+        description: "Elapsed time for the extractBlock function"
+      });
+      const data = await extractBlock(number);
+      extractBlockEndTimer();
+
+      const transformBlockEndTimer = startTimer({
+        functionName: "transformBlock",
+        metricName: "timer",
+        description: "Elapsed time for the transformBlock function"
+      });
       const transformedData = transformBlock(data);
+      transformBlockEndTimer();
 
       await loadBlock(transformedData);
 
@@ -34,6 +46,5 @@ export default async function processBatch(start: number, end: number) {
   );
 
   console.log(colors.blue(`Processed batch ${start} to ${end}`));
-  //console.timeEnd('Batch time');
   console.log('\n');
 }

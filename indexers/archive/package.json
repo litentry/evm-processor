@@ -19,6 +19,7 @@
     "@vendia/serverless-express": "^4.8.0",
     "aws-utils": "0.0.1",
     "indexer-utils": "0.0.1",
+    "monitoring": "0.0.1",
     "yargs": "^17.4.1"
   },
   "devDependencies": {

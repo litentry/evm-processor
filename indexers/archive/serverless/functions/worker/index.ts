@@ -1,6 +1,6 @@
 import { handlerPath } from '@libs/handler-resolver';
 import stageConfigFactory from '../../config/stage-config';
-import {getContext} from "../../util/context";
+import { getContext } from "../../util/context";
 
 const context = getContext();
 const stageConfig = stageConfigFactory(context.options.stage);

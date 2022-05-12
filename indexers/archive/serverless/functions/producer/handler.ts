@@ -1,6 +1,6 @@
 import config from "@app/config";
-import {SQS} from "aws-sdk";
-import {getLastQueuedEndBlock, saveLastQueuedEndBlock} from "./lastQueuedEndblockRepository";
+import { SQS } from "aws-sdk";
+import { getLastQueuedEndBlock, saveLastQueuedEndBlock } from "./lastQueuedEndblockRepository";
 
 const sqs = new SQS();
 const maxBlocksToQueuePerExecution = 50000;
