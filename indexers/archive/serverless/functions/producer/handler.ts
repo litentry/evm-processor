@@ -1,11 +1,11 @@
 import config from "@app/config";
-import {SQS} from "aws-sdk";
-import {getLastQueuedEndBlock, saveLastQueuedEndBlock} from "./lastQueuedEndblockRepository";
+import { SQS } from "aws-sdk";
+import { saveLastQueuedEndBlock } from "./lastQueuedEndblockRepository";
 
 const sqs = new SQS();
 const maxBlocksToQueuePerExecution = 50000;
 
-let lastQueuedEndBlock = 0;
+let lastQueuedEndBlock = config.start;
 
 interface BatchSQSMessage {
     Id: string,
@@ -15,7 +15,7 @@ interface BatchSQSMessage {
 export default async (_: any) => {
 
     if (lastQueuedEndBlock < 1) {
-        lastQueuedEndBlock =  await getLastQueuedEndBlock() ?? config.start;
+        // lastQueuedEndBlock =  await getLastQueuedEndBlock() ?? config.start;
     }
 
     const targetBlockHeight = typeof config.end == "number" ? config.end : await config.end();

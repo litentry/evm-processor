@@ -15,29 +15,22 @@ export default async function processBatch(start: number, end: number) {
   await Promise.all(
     blocks.map(async (number) => {
 
-      let end = startTimer({
-        message: "",
-        level: "info",
-        functionId: "abc",
+
+      const extractBlockEndTimer = startTimer({
         functionName: "extractBlock",
-        chain: "some",
-        metricName: "histo",
-        description: "asd"
+        metricName: "timer",
+        description: "Elapsed time for the extractBlock function"
       });
       const data = await extractBlock(number);
-      end();
+      extractBlockEndTimer();
 
-      end = startTimer({
-        message: "",
-        level: "info",
-        functionId: "abc",
+      const transformBlockEndTimer = startTimer({
         functionName: "transformBlock",
-        chain: "some",
-        metricName: "histo",
-        description: "asd"
+        metricName: "timer",
+        description: "Elapsed time for the transformBlock function"
       });
       const transformedData = transformBlock(data);
-      end();
+      transformBlockEndTimer();
 
       await loadBlock(transformedData);
 

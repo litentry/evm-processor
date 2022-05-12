@@ -1,11 +1,9 @@
 import { Counter, Histogram, LabelValues, Pushgateway, register as globalRegistry } from 'prom-client';
 
 export interface PrometheusTrackingData {
-  message: string,
-  level: string
-  functionId: string,
+  functionId?: string,
   functionName: string,
-  chain: string,
+  chain?: string,
   metricName: string,
   description: string,
 }
@@ -14,8 +12,7 @@ export function incCounter(data: PrometheusTrackingData) {
   const metric = getOrCreateCounter(data);
 
   metric.inc({
-    functionId: data.functionId,
-    level: data.level
+    functionId: data.functionId ?? "",
   });
 }
 
@@ -23,22 +20,20 @@ export function startTimer(data: PrometheusTrackingData): (labels?: LabelValues<
   const metric = getOrCreateHistogram(data);
 
   return metric.startTimer({
-    functionId: data.functionId,
-    level: data.level
+    functionId: data.functionId ?? "",
   });
 }
 
 export async function pushMetrics() {
   const gateway = new Pushgateway('http://host.docker.internal:9091', {}, globalRegistry);
 
-  console.log('Push Metrics');
   return gateway.pushAdd({ jobName: "pushgateway" });
 }
 
 const getOrCreateHistogram = (opts: PrometheusTrackingData): Histogram<string> => {
-  const name = `${opts.chain}_${opts.functionName}_${opts.metricName}`.toLocaleLowerCase();
+  const name = getNameFromOpts(opts);
 
-  const metric = globalRegistry.getSingleMetric(name);
+  const metric = globalRegistry.getSingleMetric(getNameFromOpts(opts));
   if (metric) {
     return metric as Histogram<string>;
   }
@@ -46,13 +41,13 @@ const getOrCreateHistogram = (opts: PrometheusTrackingData): Histogram<string> =
   return new Histogram({
     name,
     help: opts.description,
-    labelNames: ['functionId', 'level'],
+    labelNames: ['functionId'],
     registers: [globalRegistry],
   });
 }
 
 const getOrCreateCounter = (opts: PrometheusTrackingData): Counter<string> => {
-  const name = `${opts.chain}_${opts.functionName}_${opts.metricName}`.toLocaleLowerCase();
+  const name = getNameFromOpts(opts);
 
   const metric = globalRegistry.getSingleMetric(name);
   if (metric) {
@@ -62,7 +57,11 @@ const getOrCreateCounter = (opts: PrometheusTrackingData): Counter<string> => {
   return new Counter({
     name,
     help: opts.description || "",
-    labelNames: ['functionId', 'level'],
+    labelNames: ['functionId'],
     registers: [globalRegistry],
   });
+}
+
+function getNameFromOpts(opts: PrometheusTrackingData) {
+  return `${opts.functionName}_${opts.metricName}`.toLocaleLowerCase();
 }
