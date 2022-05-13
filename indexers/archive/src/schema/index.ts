@@ -1,5 +1,6 @@
 import { schemaComposer } from 'graphql-compose';
 import { blockQuery, BlockModel } from './block';
+import { LastIndexedBlockModel } from './last-indexed-block';
 import { logQuery, LogModel } from './log';
 import {
   transactionQuery,
@@ -20,6 +21,7 @@ export {
   ContractCreationTransactionModel,
   ContractTransactionModel,
   NativeTokenTransactionModel,
+  LastIndexedBlockModel,
 };
 
 export default schemaComposer.buildSchema();

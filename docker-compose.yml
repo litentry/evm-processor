@@ -99,6 +99,28 @@ services:
       - db_token_activity_network
       - web_network
 
+  indexer-web3go:
+    build:
+      context: .
+      target: web3go
+    ports:
+      - 4053
+    restart: unless-stopped
+    volumes:
+      - ./indexers/web3go/last-indexed-block:/base/indexers/web3go/last-indexed-block
+    environment:
+      ARCHIVE_GRAPH: http://indexer-archive:4050/graphql
+      CONTRACT_GRAPH: http://indexer-token-contracts:4051/graphql
+      TOKEN_ACTIVITY_GRAPH: http://indexer-token-activity:4052/graphql
+      PORT: 4053
+
+    depends_on:
+      - indexer-archive
+      - indexer-token-contracts
+      - indexer-token-activity
+    networks:
+      - web_network
+
   nginx:
     image: nginx:1.15-alpine
     ports:
@@ -110,4 +132,4 @@ services:
     networks:
       - web_network
     depends_on:
-      - indexer-token-activity
+      - indexer-web3go

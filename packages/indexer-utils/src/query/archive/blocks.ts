@@ -42,10 +42,10 @@ export default async function blocks({
         query: `
         query Blocks($startBlock: Float!, $endBlock: Float!) {
           blocks(
-            sort: BLOCKNUMBER_ASC
+            sort: NUMBER_ASC
             filter: {
               _operators: {
-                blockNumber: {
+                number: {
                   gte: $startBlock,
                   lte: $endBlock
                 }

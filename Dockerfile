@@ -23,3 +23,8 @@ FROM node AS token-activity
 WORKDIR /base/indexers/token-activity
 EXPOSE 4052
 CMD ["yarn", "start:prod"]
+
+FROM node AS web3go
+WORKDIR /base/indexers/web3go
+EXPOSE 4053
+CMD ["yarn", "start:prod"]

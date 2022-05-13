@@ -16,7 +16,6 @@ export default async function batchBlocks(
       batchEndBlock = endBlock;
     }
 
-    console.log(`Processing ${batchStartBlock} to ${batchEndBlock}`);
     await batchHandler(batchStartBlock, batchEndBlock);
 
     batchStartBlock = batchEndBlock + 1;

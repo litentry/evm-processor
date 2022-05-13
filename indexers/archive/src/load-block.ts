@@ -6,6 +6,7 @@ import {
   BlockModel,
 } from './schema';
 import { LoadBlock } from './types';
+import { upsertMongoModels } from './util';
 
 /**
  * Try bulk insert, if error try bulk delete to avoid partial imports
@@ -23,29 +24,23 @@ const mongo: LoadBlock = async ({
 }) => {
   try {
     await Promise.all([
-      BlockModel.create(block),
-      NativeTokenTransactionModel.insertMany(nativeTokenTransactions),
-      ContractCreationTransactionModel.insertMany(contractCreationTransactions),
-      ContractTransactionModel.insertMany(contractTransactions),
-      LogModel.insertMany(logs),
+      upsertMongoModels(BlockModel, [block], ['number']),
+      upsertMongoModels(NativeTokenTransactionModel, nativeTokenTransactions, [
+        'hash',
+      ]),
+      upsertMongoModels(
+        ContractCreationTransactionModel,
+        contractCreationTransactions,
+        ['hash']
+      ),
+      upsertMongoModels(ContractTransactionModel, contractTransactions, [
+        'hash',
+      ]),
+      upsertMongoModels(LogModel, logs, ['blockNumber', 'transactionHash']),
     ]);
   } catch (e) {
-    console.error(e);
-    console.log(`Cleaning up block ${block.number}`);
-
-    try {
-      const filter = {
-        blockNumber: block.number,
-      };
-      await BlockModel.deleteOne({ block: block.number });
-      await NativeTokenTransactionModel.deleteMany(filter);
-      await ContractCreationTransactionModel.deleteMany(filter);
-      await ContractTransactionModel.deleteMany(filter);
-      await LogModel.deleteMany(filter);
-    } catch (e) {
-      console.error(e);
-      console.error(`Clean up failed for block ${block.number}`);
-    }
+    console.error('Error in block mongo loader', e);
+    throw e;
   }
 };
 

@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@functions/*": ["serverless/functions/*"],
+      "@libs/*": ["serverless/libs/*"],
+      "@app/*": ["src/*"]
+    }
+  }
+}

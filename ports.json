@@ -11,5 +11,8 @@
   "token-activity": {
     "graph": 4052,
     "mongo": 27019
+  },
+  "web3go": {
+    "graph": 4053
   }
 }
