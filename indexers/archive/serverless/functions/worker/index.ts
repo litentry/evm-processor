@@ -24,7 +24,8 @@ export default () => {
     environment: {
       QUEUE_URL: { Ref: 'JobQueue' },
       RPC_ENDPOINT: 'https://rpc.ankr.com/eth',
-      MONGO_URI: stageConfig.getMongoURI()
+      MONGO_URI: stageConfig.getMongoURI(),
+      PUSHGATEWAY_URL: stageConfig.getPushGatewayURL()
     },
     timeout: 60,
   } as AWS['functions'][0];

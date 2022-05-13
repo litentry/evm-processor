@@ -85,6 +85,14 @@ export default (stage: string) => {
                 envVar: process.env['PRODUCER_BUCKET_NAME'],
                 default: `${stage}-producer-bucket`
             }
-        )
+        ),
+        getPushGatewayURL: () => getParameterForStage(
+            stage,
+            {
+                envVar: process.env['PUSHGATEWAY_URL'],
+                production: 'http://prometheus-push.litentry:9091',
+                default: 'http://host.docker.internal:9091',
+            }
+        ),
     }
 }
