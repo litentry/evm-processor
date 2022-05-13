@@ -2,10 +2,9 @@ import producer from '@functions/producer';
 import worker from '@functions/worker';
 import query from '@functions/query';
 import type { AWS } from '@serverless/typescript';
-import containerResources from "./serverless/config/container-resources";
-import getInfraStack from "./serverless/util/get-infra-stack";
-import { getContext } from "./serverless/util/context";
-
+import containerResources from './serverless/config/container-resources';
+import getInfraStack from './serverless/util/get-infra-stack';
+import { getContext } from './serverless/util/context';
 
 export type Params = {
   org: string;
@@ -14,7 +13,7 @@ export type Params = {
   region: AWS['provider']['region'];
   mongoDnsName: string;
   ebsVolumeName: string;
-}
+};
 
 const serviceName = 'archive-indexer';
 
@@ -25,53 +24,49 @@ const params: Params = {
   region: 'eu-west-1',
   mongoDnsName: `${serviceName}-mongo`,
   ebsVolumeName: `${serviceName}-mongo-ebs`,
-}
+};
 
 const vpcOptions = async (stage: string) => {
   if (stage === 'production') {
     const infraStack = await getInfraStack(params.clusterStackName);
-    const securityGroupIds = infraStack.Outputs
-      .filter((output) =>
-        ['SecurityGroupUniversal', 'SecurityGroupOutboundUniversal'].includes(output.OutputKey)
+    const securityGroupIds = infraStack.Outputs.filter((output) =>
+      ['SecurityGroupUniversal', 'SecurityGroupOutboundUniversal'].includes(
+        output.OutputKey
       )
-      .map((output) => {
-        return output.OutputValue;
-      });
+    ).map((output) => {
+      return output.OutputValue;
+    });
 
-    const subnetIds = infraStack.Outputs
-      .filter((output) =>
-        output.OutputKey === 'PrivateSubnets'
-      )
-      .reduce((value, output) => {
-        return output.OutputValue.split(',')
-      }, <string[]>[]);
+    const subnetIds = infraStack.Outputs.filter(
+      (output) => output.OutputKey === 'PrivateSubnets'
+    ).reduce((value, output) => {
+      return output.OutputValue.split(',');
+    }, <string[]>[]);
 
     return {
       vpc: {
         securityGroupIds,
-        subnetIds
-      }
+        subnetIds,
+      },
     };
   }
   return {};
-}
+};
 
 const augmentEnvVars = async (stage: string, params: Params): Promise<void> => {
   if (stage === 'production') {
     const infraStack = await getInfraStack(params.clusterStackName);
     if (!process.env.MONGO_URI) {
-      const serviceDiscoveryDomain = infraStack.Outputs
-        .filter((output) =>
-          ['RealmDNSZone'].includes(output.OutputKey)
-        )
-        .reduce((str: string, output) => {
-          return output.OutputValue;
-        }, undefined);
+      const serviceDiscoveryDomain = infraStack.Outputs.filter((output) =>
+        ['RealmDNSZone'].includes(output.OutputKey)
+      ).reduce((str: string, output) => {
+        return output.OutputValue;
+      }, undefined);
 
       process.env.MONGO_URI = `mongodb://${params.mongoDnsName}.${serviceDiscoveryDomain}:27017/evm-archive`;
     }
   }
-}
+};
 
 const getConfig = async () => {
   const context = getContext();
@@ -99,20 +94,23 @@ const getConfig = async () => {
             {
               Effect: 'Allow',
               Action: [
-                'sqs:SendMessage', 'sqs:GetQueueAttributes', 'sqs:GetQueueUrl', 'sqs:ListQueues', 'sqs:DeleteMessage', 'sqs:ReceiveMessage'
+                'sqs:SendMessage',
+                'sqs:GetQueueAttributes',
+                'sqs:GetQueueUrl',
+                'sqs:ListQueues',
+                'sqs:DeleteMessage',
+                'sqs:ReceiveMessage',
               ],
               Resource: [
                 {
-                  'Fn::GetAtt': [
-                    'JobQueue', 'Arn'
-                  ]
-                }
-              ]
-            }
-          ]
-        }
+                  'Fn::GetAtt': ['JobQueue', 'Arn'],
+                },
+              ],
+            },
+          ],
+        },
       },
-      ...(await vpcOptions(context.options.stage))
+      ...(await vpcOptions(context.options.stage)),
     },
     resources: {
       Resources: {
@@ -120,16 +118,16 @@ const getConfig = async () => {
           Type: 'AWS::SQS::Queue',
           Properties: {
             QueueName: 'JobQueue',
-            VisibilityTimeout: 60
-          }
+            VisibilityTimeout: 60,
+          },
         },
-        ...containerResources(context.options.stage, params).Resources
-      }
+        ...containerResources(context.options.stage, params).Resources,
+      },
     },
     functions: {
       producer,
       worker,
-      query
+      query,
     },
     package: { individually: true },
     custom: {
@@ -150,6 +148,6 @@ const getConfig = async () => {
   };
 
   return serverlessConfiguration;
-}
+};
 
 module.exports = new Promise((res) => res(getConfig()));

@@ -6,7 +6,7 @@ import {
   BlockModel,
 } from './schema';
 import { LoadBlock } from './types';
-import { upsertMongoModels } from './util'
+import { upsertMongoModels } from './util';
 
 /**
  * Try bulk insert, if error try bulk delete to avoid partial imports
@@ -25,9 +25,17 @@ const mongo: LoadBlock = async ({
   try {
     await Promise.all([
       upsertMongoModels(BlockModel, [block], ['number']),
-      upsertMongoModels(NativeTokenTransactionModel, nativeTokenTransactions, ['hash']),
-      upsertMongoModels(ContractCreationTransactionModel, contractCreationTransactions, ['hash']),
-      upsertMongoModels(ContractTransactionModel, contractTransactions, ['hash']),
+      upsertMongoModels(NativeTokenTransactionModel, nativeTokenTransactions, [
+        'hash',
+      ]),
+      upsertMongoModels(
+        ContractCreationTransactionModel,
+        contractCreationTransactions,
+        ['hash']
+      ),
+      upsertMongoModels(ContractTransactionModel, contractTransactions, [
+        'hash',
+      ]),
       upsertMongoModels(LogModel, logs, ['blockNumber', 'transactionHash']),
     ]);
   } catch (e) {

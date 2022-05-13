@@ -11,8 +11,8 @@ export default {
   reservedConcurrency: 1,
   events: [
     {
-      schedule: 'rate(1 minute)'
-    }
+      schedule: 'rate(1 minute)',
+    },
   ],
   environment: {
     QUEUE_URL: { Ref: 'JobQueue' },
@@ -21,6 +21,6 @@ export default {
     START_BLOCK: String(stageConfig.getProducerStartBlock()),
     END_BLOCK: String(stageConfig.getProducerEndBlock()),
     BUCKET_NAME: stageConfig.getProducerBucketName(),
-    MONGO_URI: stageConfig.getMongoURI()
-  }
+    MONGO_URI: stageConfig.getMongoURI(),
+  },
 } as AWS['functions'][0];

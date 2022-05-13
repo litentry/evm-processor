@@ -1,4 +1,4 @@
-import type { Params } from "../../serverless";
+import type { Params } from '../../serverless';
 
 export default function (stage: string, params: Params) {
   if (stage === 'production') {
@@ -7,25 +7,25 @@ export default function (stage: string, params: Params) {
         MongoLogGroup: {
           Type: 'AWS::Logs::LogGroup',
           Properties: {
-            LogGroupName: params.mongoDnsName
-          }
+            LogGroupName: params.mongoDnsName,
+          },
         },
         MongoServiceDiscovery: {
-          Type: "AWS::ServiceDiscovery::Service",
+          Type: 'AWS::ServiceDiscovery::Service',
           Properties: {
             Description: 'Mongo servers for archive indexer',
             DnsConfig: {
               DnsRecords: [
                 {
-                  Type: "A",
-                  TTL: 60
+                  Type: 'A',
+                  TTL: 60,
                 },
               ],
-              RoutingPolicy: "WEIGHTED",
+              RoutingPolicy: 'WEIGHTED',
             },
             Name: params.mongoDnsName,
             NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`,
-          }
+          },
         },
         MongoTask: {
           Type: 'AWS::ECS::TaskDefinition',
@@ -34,37 +34,37 @@ export default function (stage: string, params: Params) {
             ContainerDefinitions: [
               {
                 Name: 'mongo',
-                Essential: "true",
+                Essential: 'true',
                 Image: `mongo:${params.mongoImageVersion}`,
                 LogConfiguration: {
                   LogDriver: 'awslogs',
                   Options: {
                     'awslogs-region': params.region,
                     'awslogs-stream-prefix': params.mongoImageVersion,
-                    'awslogs-group': { Ref: 'MongoLogGroup' }
-                  }
+                    'awslogs-group': { Ref: 'MongoLogGroup' },
+                  },
                 },
                 MountPoints: [
                   {
                     ContainerPath: '/data/db',
-                    SourceVolume: params.ebsVolumeName
-                  }
+                    SourceVolume: params.ebsVolumeName,
+                  },
                 ],
-                PortMappings: [{
-                  ContainerPort: 27017,
-                  HostPort: 27017,
-                  Protocol: 'tcp',
-                }],
-                Privileged: "false",
-                PseudoTerminal: "false",
-              }
+                PortMappings: [
+                  {
+                    ContainerPort: 27017,
+                    HostPort: 27017,
+                    Protocol: 'tcp',
+                  },
+                ],
+                Privileged: 'false',
+                PseudoTerminal: 'false',
+              },
             ],
             Cpu: 2048,
             Memory: 3000,
             NetworkMode: 'awsvpc',
-            RequiresCompatibilities: [
-              'EC2'
-            ],
+            RequiresCompatibilities: ['EC2'],
             Volumes: [
               {
                 Name: params.ebsVolumeName,
@@ -72,44 +72,48 @@ export default function (stage: string, params: Params) {
                   Autoprovision: true,
                   Driver: 'rexray/ebs',
                   DriverOpts: {
-                    volumetype: "gp3",
-                    size: 100
+                    volumetype: 'gp3',
+                    size: 100,
                   },
-                  Scope: 'shared'
-                }
-              }
-            ]
-          }
+                  Scope: 'shared',
+                },
+              },
+            ],
+          },
         },
         MongoService: {
           Type: 'AWS::ECS::Service',
           Properties: {
             ServiceName: params.mongoDnsName,
             TaskDefinition: {
-              Ref: 'MongoTask'
+              Ref: 'MongoTask',
             },
             Cluster: `\${cf:${params.clusterStackName}.EcsCluster}`,
             DesiredCount: 1,
             EnableEcsManagedTags: true,
-            ServiceRegistries: [{
-              RegistryArn: {
-                "Fn::GetAtt": ["MongoServiceDiscovery", "Arn"]
-              }
-            }],
+            ServiceRegistries: [
+              {
+                RegistryArn: {
+                  'Fn::GetAtt': ['MongoServiceDiscovery', 'Arn'],
+                },
+              },
+            ],
             NetworkConfiguration: {
               AwsvpcConfiguration: {
-                SecurityGroups: [`\${cf:${params.clusterStackName}.SecurityGroupUniversal}`],
+                SecurityGroups: [
+                  `\${cf:${params.clusterStackName}.SecurityGroupUniversal}`,
+                ],
                 Subnets: {
-                  "Fn::Split": [
+                  'Fn::Split': [
                     ',',
-                    `\${cf:${params.clusterStackName}.PrivateSubnets}`
-                  ]
-                }
-              }
+                    `\${cf:${params.clusterStackName}.PrivateSubnets}`,
+                  ],
+                },
+              },
             },
-          }
-        }
-      }
+          },
+        },
+      },
     };
   }
   return {};

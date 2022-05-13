@@ -8,8 +8,11 @@ interface LastIndexedBlockDocument extends mongoose.Document {
 }
 
 const LastIndexedBlockSchema = new mongoose.Schema<LastIndexedBlockDocument>({
-  id: { type: String, required: true, unique: true, index: true},
-  number: { type: Number, required: true }
+  id: { type: String, required: true, unique: true, index: true },
+  number: { type: Number, required: true },
 });
 
-export const LastIndexedBlockModel = mongoose.model('LastIndexedBlock', LastIndexedBlockSchema);
+export const LastIndexedBlockModel = mongoose.model(
+  'LastIndexedBlock',
+  LastIndexedBlockSchema
+);

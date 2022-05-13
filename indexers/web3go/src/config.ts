@@ -12,4 +12,4 @@ const user = process.env.DB_USER;
 const password = process.env.DB_PASSWORD;
 const database = process.env.DB_DATABASE;
 
-export { start, end, host, port, database, password, user, query, batchSize};
+export { start, end, host, port, database, password, user, query, batchSize };
