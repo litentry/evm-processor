@@ -9,7 +9,7 @@ export interface Config {
   mongoUri: string;
   batchSize: number;
   start: number;
-  end: number | (() => Promise<number>);
+  end: number | (() => Promise<number>),
   sqsConfig: AwsSqsConfig,
 }
 
