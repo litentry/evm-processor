@@ -1,8 +1,8 @@
 import { LastIndexedBlockModel } from "../../../src/schema";
 
-export const getLastQueuedEndBlock = async (index: string): Promise<number | null> => {
+export const getLastQueuedEndBlock = async (indexer: string): Promise<number | null> => {
   const currentValue = await LastIndexedBlockModel.findOne({
-    id: index
+    id: indexer
   }).exec();
   if (!currentValue) {
     return null;
@@ -10,13 +10,13 @@ export const getLastQueuedEndBlock = async (index: string): Promise<number | nul
   return currentValue.get('number') as number;
 }
 
-export const saveLastQueuedEndBlock = async (index: string, lastQueuedEndBlock: number): Promise<void> => {
+export const saveLastQueuedEndBlock = async (indexer: string, lastQueuedEndBlock: number): Promise<void> => {
   const currentValue = await LastIndexedBlockModel.findOne({
-    id: index
+    id: indexer
   }).exec();
   if (!currentValue) {
     await LastIndexedBlockModel.create({
-      id: index,
+      id: indexer,
       number: lastQueuedEndBlock
     });
     return;
