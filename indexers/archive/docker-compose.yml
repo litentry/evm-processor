@@ -40,7 +40,6 @@ services:
       - AWS_DEFAULT_REGION=eu-west-1
       - EDGE_PORT=4566
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - LAMBDA_EXECUTOR=docker-reuse
       - NODE_TLS_REJECT_UNAUTHORIZED=0
       - HOSTNAME_EXTERNAL=host.docker.internal
     volumes:
