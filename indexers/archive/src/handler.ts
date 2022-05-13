@@ -21,7 +21,7 @@ export default async function processBatch(start: number, end: number) {
         const extractBlockEndTimer = startTimer({
           functionName: 'extractBlock',
           metricName: 'timer',
-          description: 'Elapsed time for the extractBlock function'
+          description: 'Elapsed time for the extractBlock function',
         });
         const data = await extractBlock(number);
         extractBlockEndTimer();
@@ -29,7 +29,7 @@ export default async function processBatch(start: number, end: number) {
         const transformBlockEndTimer = startTimer({
           functionName: 'transformBlock',
           metricName: 'timer',
-          description: 'Elapsed time for the transformBlock function'
+          description: 'Elapsed time for the transformBlock function',
         });
         const transformedData = transformBlock(data);
         transformBlockEndTimer();
@@ -53,5 +53,4 @@ export default async function processBatch(start: number, end: number) {
     console.error(e);
     throw new Error(`Failed to process batch ${start}-${end}`);
   }
-
 }

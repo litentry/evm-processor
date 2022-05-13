@@ -13,18 +13,16 @@ export default {
     {
       sqs: {
         arn: {
-          'Fn::GetAtt': [
-            'JobQueue', 'Arn'
-          ]
-        }
-      }
-    }
+          'Fn::GetAtt': ['JobQueue', 'Arn'],
+        },
+      },
+    },
   ],
   environment: {
     QUEUE_URL: { Ref: 'JobQueue' },
     RPC_ENDPOINT: 'https://rpc.ankr.com/eth',
     MONGO_URI: stageConfig.getMongoURI(),
-    PUSHGATEWAY_URL: stageConfig.getPushGatewayURL()
+    PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
   },
-  timeout: 60
+  timeout: 60,
 } as AWS['functions'][0];

@@ -13,6 +13,6 @@ const mongoUri = process.env.MONGO_URI!;
 
 const sqsConfig: AwsSqsConfig = {
   queueUrl: '',
-}
+};
 
 export { port, start, end, batchSize, mongoUri, sqsConfig };

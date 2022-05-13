@@ -1,4 +1,4 @@
-import { Client } from "pg";
+import { Client } from 'pg';
 
 export async function createSchema(client: Client) {
   await client.query(

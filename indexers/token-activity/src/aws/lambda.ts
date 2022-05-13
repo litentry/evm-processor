@@ -5,4 +5,4 @@ import handler from '../handler';
 
 export const lambdaHandler: SQSHandler = async (event: SQSEvent) => {
   await awsUtils.lambdaHandler(event, sqsConfig, handler);
-}
+};
