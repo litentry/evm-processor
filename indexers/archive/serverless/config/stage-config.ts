@@ -86,6 +86,13 @@ export default (stage: string) => {
                 default: `${stage}-producer-bucket`
             }
         ),
+        getJobQueueName: () => getParameterForStage(
+            stage,
+            {
+                envVar: process.env['JOB_QUEUE_NAME'],
+                default: `${stage}-producer-bucket`
+            }
+        ),
         getPushGatewayURL: () => getParameterForStage(
             stage,
             {
