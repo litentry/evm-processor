@@ -11,8 +11,8 @@
     "build": "rm -rf lib && tsc",
     "start:prod": "node lib/index",
     "typecheck": "yarn tsc --noEmit",
-    "postinstall": "yarn run build",
     "deploy:local": "serverless deploy --stage local",
+    "deploy:aws": "AWS_REGION=eu-west-1 serverless deploy --stage production",
     "start:local": "docker-compose up -d && yarn run deploy:local"
   },
   "dependencies": {
@@ -20,6 +20,7 @@
     "aws-utils": "0.0.1",
     "indexer-utils": "0.0.1",
     "monitoring": "0.0.1",
+    "mongoose": "^6.3.2",
     "yargs": "^17.4.1"
   },
   "devDependencies": {

@@ -25,7 +25,8 @@ export function startTimer(data: PrometheusTrackingData): (labels?: LabelValues<
 }
 
 export async function pushMetrics() {
-  const gateway = new Pushgateway('http://host.docker.internal:9091', {}, globalRegistry);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const gateway = new Pushgateway(process.env.PUSHGATEWAY_URL!, {}, globalRegistry);
 
   return gateway.pushAdd({ jobName: "pushgateway" });
 }

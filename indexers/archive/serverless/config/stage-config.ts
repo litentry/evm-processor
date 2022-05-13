@@ -1,8 +1,10 @@
+import { Params } from "../../serverless";
+
 type StageConfigParameter = {
     envVar?: string | number,
     local?: string | number,
     dev?: string | number,
-    prod?: string | number,
+    production?: string | number,
     default?: string | number,
 }
 
@@ -41,7 +43,7 @@ export default (stage: string) => {
             {
                 envVar: process.env['WORKER_CONCURRENCY'] ? Number(process.env['WORKER_CONCURRENCY']) : undefined,
                 local: 1,
-                default: 10
+                default: 1
             },
             true
         ) as number,
@@ -49,9 +51,9 @@ export default (stage: string) => {
         getProducerStartBlock: () => getParameterForStage(
             stage,
             {
-                envVar: process.env['END_BLOCK'] ? Number(process.env['END_BLOCK']) : undefined,
+                envVar: process.env['START_BLOCK'] ? Number(process.env['START_BLOCK']) : 0,
                 local: 14000000,
-                default: undefined
+                default: 0
             },
             false
         ) as number | undefined,
@@ -90,6 +92,14 @@ export default (stage: string) => {
                 envVar: process.env['JOB_QUEUE_NAME'],
                 default: `${stage}-producer-bucket`
             }
-        )
+        ),
+        getPushGatewayURL: () => getParameterForStage(
+            stage,
+            {
+                envVar: process.env['PUSHGATEWAY_URL'],
+                production: 'http://prometheus-push.litentry:9091',
+                default: 'http://host.docker.internal:9091',
+            }
+        ),
     }
 }
