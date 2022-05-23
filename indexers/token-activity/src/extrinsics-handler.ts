@@ -23,7 +23,7 @@ export default async function extrinsicsHandler(
     | typeof ERC1155TransactionDecodedModel
 ) {
   // get the extrinsics
-  const txs = await promise.allSettled(
+  const txs = await Promise.allSettled(
     extrinsics.map(async (extrinsic) => {
       const txs = await query.archive.contractTransactions({
         startBlock,

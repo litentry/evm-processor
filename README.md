@@ -183,7 +183,7 @@ export default async function handler(startBlock: number, endBlock: number) {
   });
 
   // do something with it
-  await promise.allSettled(txs.map(handleContractCreation));
+  await Promise.allSettled(txs.map(handleContractCreation));
 
   /*
   This allows us to store the latest indexed block,

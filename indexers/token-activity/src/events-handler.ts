@@ -23,7 +23,7 @@ export default async function eventsHandler(
     | typeof ERC1155EventDecodedModel
 ) {
   // get the events
-  const logs = await promise.allSettled(
+  const logs = await Promise.allSettled(
     sigs.map(async (sig) => {
       const logs = await query.archive.logs({
         startBlock,
