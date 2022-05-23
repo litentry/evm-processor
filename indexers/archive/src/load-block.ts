@@ -23,7 +23,7 @@ const mongo: LoadBlock = async ({
   block,
 }) => {
   try {
-    await Promise.all([
+    await Promise.allSettled([
       utils.upsertMongoModels(BlockModel, [block], ['number']),
       utils.upsertMongoModels(
         NativeTokenTransactionModel,

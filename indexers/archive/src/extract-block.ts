@@ -2,7 +2,7 @@ import config from './config';
 import { ExtractBlock } from './types';
 
 async function getReceipts(transactionHashes: string[]) {
-  const receipts = await Promise.all(
+  const receipts = await Promise.allSettled(
     transactionHashes.map(async (hash) => {
       const receipt = await config.web3.eth.getTransactionReceipt(hash);
 

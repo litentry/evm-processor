@@ -19,7 +19,7 @@ export async function processor(config: ProcessorConfig) {
       batchEndBlock = initialChainHeight;
     }
 
-    const allTxs = await Promise.all(
+    const allTxs = await Promise.allSettled(
       combinations.map(({ contract, methodId }) =>
         query.contractTransactionsWithLogs({
           startBlock: currentBlock,
