@@ -33,7 +33,7 @@ const standards = [
 ];
 
 export default async function handler(startBlock: number, endBlock: number) {
-  await Promise.all(
+  await promise.allSettled(
     standards.map(async (standard) => {
       // todo -> pull the queries up here so we don't duplicate the isERCN checks
       await extrinsicsHandler(
