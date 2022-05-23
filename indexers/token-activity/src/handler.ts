@@ -33,7 +33,7 @@ const standards = [
 ];
 
 export default async function handler(startBlock: number, endBlock: number) {
-  await Promise.allSettled(
+  const results = await Promise.allSettled(
     standards.map(async (standard) => {
       // todo -> pull the queries up here so we don't duplicate the isERCN checks
       await extrinsicsHandler(
@@ -52,6 +52,12 @@ export default async function handler(startBlock: number, endBlock: number) {
       );
     })
   );
+
+  const rejected = results.filter((result) => result.status === 'rejected');
+  if (rejected.length) {
+    throw rejected;
+  }
+
   // todo this will only work in streaming mode, multiple instances need a more sophisticated progress schema
   await BlockModel.create({ number: endBlock });
 }

@@ -18,7 +18,7 @@ async function processor(
   end: number | (() => Promise<number>),
   batchSize: number,
   batchHandler: (start: number, end: number) => Promise<void>
-)
+);
 ```
 
 If you want to index a fixed block range then stop, pass a number to `end`, if you want to stream live data, pass a method to fetch the latest block from the data source you depend on. This could be an RPC node (as in `indexers/archive`), or another indexer (as in `indexers/token-contracts` which depends on the archive indexer).
@@ -38,13 +38,7 @@ const txs = await query.archive.contractTransactions({
   startBlock,
   endBlock,
   methodId,
-  properties: [
-    'hash',
-    'to',
-    'from',
-    'value',
-    'receiptStatus',
-  ],
+  properties: ['hash', 'to', 'from', 'value', 'receiptStatus'],
 });
 ```
 
@@ -183,7 +177,7 @@ export default async function handler(startBlock: number, endBlock: number) {
   });
 
   // do something with it
-  await Promise.allSettled(txs.map(handleContractCreation));
+  await Promise.all(txs.map(handleContractCreation));
 
   /*
   This allows us to store the latest indexed block,

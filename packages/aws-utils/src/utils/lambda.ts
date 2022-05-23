@@ -13,7 +13,7 @@ export const lambdaHandler = async (
   innerHandler: (startBlock: number, endBlock: number) => Promise<void>
 ) => {
   const successfulMessages: DeleteMessageBatchRequestEntry[] = (
-    await Promise.allSettled(
+    await Promise.all(
       event.Records.map(async (record) => {
         const message = getMessageFromBody(record.body);
 

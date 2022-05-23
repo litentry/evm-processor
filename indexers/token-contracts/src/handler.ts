@@ -15,7 +15,12 @@ export default async function handler(startBlock: number, endBlock: number) {
       'receiptStatus',
     ],
   });
-  await Promise.allSettled(txs.map(handleContractCreation));
+  const results = await Promise.allSettled(txs.map(handleContractCreation));
+
+  const rejected = results.filter((result) => result.status === 'rejected');
+  if (rejected.length) {
+    throw rejected;
+  }
 
   // todo this will only work in streaming mode, multiple instances need a more sophisticated progress schema
   await BlockModel.create({ number: endBlock });

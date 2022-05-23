@@ -23,7 +23,7 @@ const mongo: LoadBlock = async ({
   block,
 }) => {
   try {
-    await Promise.allSettled([
+    const results = await Promise.allSettled([
       utils.upsertMongoModels(BlockModel, [block], ['number']),
       utils.upsertMongoModels(
         NativeTokenTransactionModel,
@@ -43,6 +43,11 @@ const mongo: LoadBlock = async ({
         'transactionHash',
       ]),
     ]);
+
+    const rejected = results.filter((result) => result.status === 'rejected');
+    if (rejected.length) {
+      throw rejected;
+    }
   } catch (e) {
     console.error('Error in block mongo loader', e);
     throw e;
