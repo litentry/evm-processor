@@ -16,7 +16,7 @@ const lambdaHandler: SQSHandler = async (event: SQSEvent) => {
     console.error('Outer handler error', e);
   }
   console.log('Disconnecting from mongo');
-  await mongoose.disconnect(config.mongoUri);
+  await mongoose.disconnect();
 };
 
 export default lambdaHandler;

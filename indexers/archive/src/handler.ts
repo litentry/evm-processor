@@ -1,10 +1,9 @@
-import config from '@app/config';
 import colors from 'colors';
-import mongoose from 'mongoose';
 import { startTimer } from 'monitoring';
 import extractBlock from './extract-block';
 import loadBlock from './load-block';
 import transformBlock from './transform-block';
+import { saveIndexedBlockRange } from 'indexer-utils/lib/repository/indexed-block-range-repository';
 
 export default async function processBatch(start: number, end: number) {
   console.log(`Processing block batch ${start}-${end}`);
@@ -49,6 +48,8 @@ export default async function processBatch(start: number, end: number) {
     );
     console.log(colors.blue(`Processed batch ${start} to ${end}`));
     console.timeEnd(`Batch time ${start}-${end}`);
+
+    await saveIndexedBlockRange(start, end);
   } catch (e) {
     console.error(e);
     throw new Error(`Failed to process batch ${start}-${end}`);

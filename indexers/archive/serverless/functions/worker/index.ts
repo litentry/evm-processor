@@ -12,6 +12,7 @@ export default {
   events: [
     {
       sqs: {
+        batchSize: 1,
         arn: {
           'Fn::GetAtt': ['JobQueue', 'Arn'],
         },
