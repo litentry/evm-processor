@@ -14,7 +14,7 @@ export const LastIndexedBlockModel = mongoose.model(
 );
 
 export const getLastIndexedBlock = async (): Promise<number | null> => {
-  const currentValue = await LastIndexedBlockModel.findOne().exec();
+  const currentValue = await LastIndexedBlockModel.findOne({}).exec();
   if (!currentValue) {
     return null;
   }

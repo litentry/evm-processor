@@ -1,6 +1,7 @@
 import producer from '@functions/producer';
 import worker from '@functions/worker';
 import query from '@functions/query';
+import lastIndexedBlock from '@functions/lastIndexedBlock';
 import type { AWS } from '@serverless/typescript';
 import containerResources from './serverless/config/container-resources';
 import getInfraStack from './serverless/util/get-infra-stack';
@@ -128,6 +129,7 @@ const getConfig = async () => {
       producer,
       worker,
       query,
+      lastIndexedBlock,
     },
     package: { individually: true },
     custom: {

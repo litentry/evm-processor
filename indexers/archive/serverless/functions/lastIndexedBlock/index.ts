@@ -1,29 +1,20 @@
 import { handlerPath } from '@libs/handler-resolver';
 import { AWS } from '@serverless/typescript';
-import stageConfigFactory from '../../config/stage-config';
 import { getContext } from '../../util/context';
+import stageConfigFactory from '../../config/stage-config';
 
 const context = getContext();
 const stageConfig = stageConfigFactory(context.options.stage);
 
 export default {
   handler: `${handlerPath(__dirname)}/handler.default`,
-  reservedConcurrency: stageConfig.getWorkerConcurrency(),
+  reservedConcurrency: 1,
   events: [
     {
-      sqs: {
-        batchSize: 10,
-        arn: {
-          'Fn::GetAtt': ['JobQueue', 'Arn'],
-        },
-      },
+      schedule: 'rate(1 minute)',
     },
   ],
   environment: {
-    QUEUE_URL: { Ref: 'JobQueue' },
-    RPC_ENDPOINT: 'https://rpc.ankr.com/eth',
     MONGO_URI: stageConfig.getMongoURI(),
-    PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
   },
-  timeout: 60,
 } as AWS['functions'][0];
