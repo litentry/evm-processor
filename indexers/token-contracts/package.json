@@ -14,6 +14,7 @@
     "postinstall": "yarn run build"
   },
   "dependencies": {
+    "indexer-serverless": "0.0.1",
     "indexer-utils": "0.0.1",
     "aws-utils": "0.0.1"
   }
