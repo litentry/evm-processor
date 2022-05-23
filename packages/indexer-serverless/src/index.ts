@@ -4,6 +4,7 @@ import containerResources from './config/container-resources';
 import producer from './functions/producer';
 import worker from './functions/worker';
 import query from './functions/query';
+import lastIndexedBlock from './functions/last-indexed-block';
 import getInfraStack from './util/get-infra-stack';
 import { getContext } from './util/context';
 
@@ -115,6 +116,7 @@ const getConfig = async (config: Config) => {
     functions: {
       producer: producer(config),
       worker: worker(config),
+      lastIndexedBlock,
       query,
     },
     package: { individually: true },
