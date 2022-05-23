@@ -6,7 +6,6 @@ yarn-error.log
 .idea
 .vscode
 .DS_Store
-last-indexed-block
 indexers/*/src/model
 indexers/*/db
 uniswap-indexer/src/model
