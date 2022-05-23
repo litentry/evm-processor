@@ -1,3 +1,4 @@
+import { utils } from 'indexer-utils';
 import {
   LogModel,
   NativeTokenTransactionModel,
@@ -6,7 +7,6 @@ import {
   BlockModel,
 } from './schema';
 import { LoadBlock } from './types';
-import { upsertMongoModels } from './util';
 
 /**
  * Try bulk insert, if error try bulk delete to avoid partial imports
@@ -24,19 +24,24 @@ const mongo: LoadBlock = async ({
 }) => {
   try {
     await Promise.all([
-      upsertMongoModels(BlockModel, [block], ['number']),
-      upsertMongoModels(NativeTokenTransactionModel, nativeTokenTransactions, [
-        'hash',
-      ]),
-      upsertMongoModels(
+      utils.upsertMongoModels(BlockModel, [block], ['number']),
+      utils.upsertMongoModels(
+        NativeTokenTransactionModel,
+        nativeTokenTransactions,
+        ['hash']
+      ),
+      utils.upsertMongoModels(
         ContractCreationTransactionModel,
         contractCreationTransactions,
         ['hash']
       ),
-      upsertMongoModels(ContractTransactionModel, contractTransactions, [
+      utils.upsertMongoModels(ContractTransactionModel, contractTransactions, [
         'hash',
       ]),
-      upsertMongoModels(LogModel, logs, ['blockNumber', 'transactionHash']),
+      utils.upsertMongoModels(LogModel, logs, [
+        'blockNumber',
+        'transactionHash',
+      ]),
     ]);
   } catch (e) {
     console.error('Error in block mongo loader', e);
