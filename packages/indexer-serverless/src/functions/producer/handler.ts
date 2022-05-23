@@ -27,7 +27,7 @@ export default async () => {
 
   console.log({ lastQueuedEndBlock, targetBlockHeight });
 
-  if (targetBlockHeight <= lastQueuedEndBlock) {
+  if (targetBlockHeight < lastQueuedEndBlock) {
     console.log(`Last queued message is up to the target block height`);
     return;
   }
@@ -52,8 +52,8 @@ export default async () => {
   };
 
   let pendingJobs = [];
-  for (let i = lastQueuedEndBlock; i <= targetLastQueuedEndBlock; i++) {
-    const startBlock = i + 1;
+  for (let i = lastQueuedEndBlock + 1; i <= targetLastQueuedEndBlock; i++) {
+    const startBlock = i;
     const endBlock = Math.min(
       i + parseInt(process.env.BATCH_SIZE!),
       targetLastQueuedEndBlock
