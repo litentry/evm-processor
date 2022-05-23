@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-export async function upsertMongoModels(
+export default async function upsertMongoModels(
   model: mongoose.Model<any>,
   documents: any[],
   primaryKey: string[]
