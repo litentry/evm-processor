@@ -1,9 +1,9 @@
-import { LastIndexedBlockModel } from '../../../src/schema';
+import { repository } from 'indexer-utils';
 
 export const getLastQueuedEndBlock = async (
   indexer: string
 ): Promise<number | null> => {
-  const currentValue = await LastIndexedBlockModel.findOne({
+  const currentValue = await repository.lastQueuedBlock.Model.findOne({
     id: indexer,
   }).exec();
   if (!currentValue) {
@@ -16,11 +16,11 @@ export const saveLastQueuedEndBlock = async (
   indexer: string,
   lastQueuedEndBlock: number
 ): Promise<void> => {
-  const currentValue = await LastIndexedBlockModel.findOne({
+  const currentValue = await repository.lastQueuedBlock.Model.findOne({
     id: indexer,
   }).exec();
   if (!currentValue) {
-    await LastIndexedBlockModel.create({
+    await repository.lastQueuedBlock.Model.create({
       id: indexer,
       number: lastQueuedEndBlock,
     });
