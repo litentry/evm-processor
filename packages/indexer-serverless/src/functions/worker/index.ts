@@ -14,6 +14,7 @@ export default (config: Config) =>
     events: [
       {
         sqs: {
+          batchSize: 10,
           arn: {
             'Fn::GetAtt': ['JobQueue', 'Arn'],
           },
