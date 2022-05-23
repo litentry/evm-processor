@@ -59,7 +59,7 @@ export default (stage: string) => {
           envVar: process.env['START_BLOCK']
             ? Number(process.env['START_BLOCK'])
             : 0,
-          local: 14000000,
+          local: 0,
           default: 0,
         },
         false
@@ -72,7 +72,7 @@ export default (stage: string) => {
           envVar: process.env['END_BLOCK']
             ? Number(process.env['END_BLOCK'])
             : undefined,
-          local: 14000100,
+          local: 1000,
           default: undefined,
         },
         false
