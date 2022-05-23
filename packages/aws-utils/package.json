@@ -7,8 +7,5 @@
     "typecheck": "yarn tsc --noEmit",
     "postinstall": "yarn run build",
     "watch": "tsc --watch"
-  },
-  "dependencies": {
-    "evm": "^0.2.0"
   }
 }
