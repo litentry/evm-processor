@@ -27,21 +27,6 @@ export const BlockModel = mongoose.model('Block', BlockSchema);
 
 const BlockTC = composeMongoose(BlockModel);
 
-BlockTC.addResolver({
-  kind: 'query',
-  name: 'latestBlock',
-  type: 'Int',
-  resolve: async () => {
-    const results = await BlockModel.find({})
-      .select({ number: 1 })
-      .sort('-number')
-      .limit(1);
-
-    return results[0]?.number;
-  },
-});
-
 export const blockQuery = {
   blocks: BlockTC.mongooseResolvers.findMany(filter),
-  latestBlock: BlockTC.getResolver('latestBlock'),
 };

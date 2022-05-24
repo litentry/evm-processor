@@ -4,36 +4,16 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "db:reset": "docker-compose down && rm -rf ../../../mongodb/archive && docker-compose up -d && rm last-indexed-block",
-    "db:up": "docker-compose up -d",
-    "db:down": "docker-compose down",
-    "start": "ts-node src/index.ts",
     "build": "rm -rf lib && tsc",
-    "start:prod": "node lib/index",
     "typecheck": "yarn tsc --noEmit",
+    "postinstall": "yarn run build",
     "deploy:local": "serverless deploy --stage local",
     "deploy:aws": "AWS_REGION=eu-west-1 serverless deploy --stage production",
     "start:local": "docker-compose up -d && yarn run deploy:local"
   },
   "dependencies": {
-    "@vendia/serverless-express": "^4.8.0",
-    "aws-utils": "0.0.1",
+    "indexer-serverless": "0.0.1",
     "indexer-utils": "0.0.1",
-    "monitoring": "0.0.1",
-    "mongoose": "^6.3.2",
-    "yargs": "^17.4.1"
-  },
-  "devDependencies": {
-    "@serverless/typescript": "^3.0.0",
-    "@types/aws-lambda": "^8.10.71",
-    "@types/node": "^14.14.25",
-    "esbuild": "^0.14.11",
-    "json-schema-to-ts": "^1.5.0",
-    "serverless": "^3.0.0",
-    "serverless-esbuild": "^1.23.3",
-    "serverless-localstack": "^0.4.35",
-    "ts-node": "^10.4.0",
-    "tsconfig-paths": "^3.9.0",
-    "typescript": "^4.1.3"
+    "aws-utils": "0.0.1"
   }
 }

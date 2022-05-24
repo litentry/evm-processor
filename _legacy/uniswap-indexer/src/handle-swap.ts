@@ -13,7 +13,7 @@ export async function handleSwap(
   deadline: BigInt,
   path: string[],
   token0Amount: BigInt | 'unknown',
-  token1Amount: BigInt | 'unknown'
+  token1Amount: BigInt | 'unknown',
 ): Promise<void> {
   // the token addresses come through checksummed, which is purely for helping identify invalid addresses during transactions
   // it's much easier for indexing/querying to just enfore lowercase everywhere
@@ -28,7 +28,7 @@ export async function handleSwap(
   const transferLogs = tx.logs.filter(
     (log) =>
       log.address === tokenAddressOfMissingAmount &&
-      log.topic0.startsWith(`0x${TRANSFER_CALL.ID}`)
+      log.topic0.startsWith(`0x${TRANSFER_CALL.ID}`),
   );
 
   // todo - delete when confident in the above logic
@@ -40,7 +40,7 @@ export async function handleSwap(
   const missingAmount = transferLogs
     .reduce(
       (prev, curr) => prev.add(BigNumber.from(curr.data)),
-      BigNumber.from(0)
+      BigNumber.from(0),
     )
     .toBigInt();
 

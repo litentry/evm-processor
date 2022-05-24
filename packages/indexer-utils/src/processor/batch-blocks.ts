@@ -5,7 +5,7 @@ export default async function batchBlocks(
   startBlock: number,
   endBlock: number,
   batchSize: number,
-  batchHandler: BatchHandler
+  batchHandler: BatchHandler,
 ) {
   let batchStartBlock = startBlock;
 

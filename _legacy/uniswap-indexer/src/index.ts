@@ -22,7 +22,7 @@ async function run() {
           ...prev,
           [curr.SIGNATURE]: v2SwapMethods[curr.NAME as UniswapLPSwapMethod],
         }),
-        {} as { [method: string]: (tx: TransactionWithLogs) => Promise<void> }
+        {} as { [method: string]: (tx: TransactionWithLogs) => Promise<void> },
       ),
     },
   });

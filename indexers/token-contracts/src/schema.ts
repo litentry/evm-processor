@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { schemaComposer } from 'graphql-compose';
 import { composeMongoose } from 'graphql-compose-mongoose';
-import { Types, filter } from 'indexer-utils';
+import { Types, filter, repository } from 'indexer-utils';
 
 interface ERC20Document
   extends Types.Contract.ERC20Contract,
@@ -18,15 +18,6 @@ interface UniswapV2Document
 interface UniswapV3Document
   extends Types.Contract.UniswapV3Contract,
     mongoose.Document {}
-
-// temp model to allow dependent indexers to track latest block
-// todo update to more sophisticated schema that works with parallel instances
-const BlockSchema = new mongoose.Schema(
-  {
-    number: { type: Number, required: true, index: true },
-  },
-  { capped: { size: 1024, max: 1, autoIndexId: true } }
-);
 
 const ERC20ContractSchema = new mongoose.Schema<ERC20Document>({
   address: { type: String, required: true, index: true },
@@ -76,52 +67,39 @@ const UniswapV3ContractSchema = new mongoose.Schema<UniswapV3Document>({
   erc165: { type: Boolean, required: true, index: true },
 });
 
-export const BlockModel = mongoose.model('Block', BlockSchema);
-
 export const ERC20ContractModel = mongoose.model(
   'ERC20Contract',
-  ERC20ContractSchema
+  ERC20ContractSchema,
 );
 
 export const ERC721ContractModel = mongoose.model(
   'ERC721Contract',
-  ERC721ContractSchema
+  ERC721ContractSchema,
 );
 
 export const ERC1155ContractModel = mongoose.model(
   'ERC1155Contract',
-  ERC1155ContractSchema
+  ERC1155ContractSchema,
 );
 
 export const UniswapV2ContractModel = mongoose.model(
   'UniswapV2Contract',
-  UniswapV2ContractSchema
+  UniswapV2ContractSchema,
 );
 
 export const UniswapV3ContractModel = mongoose.model(
   'UniswapV3Contract',
-  UniswapV3ContractSchema
+  UniswapV3ContractSchema,
 );
 
-const BlockTC = composeMongoose(BlockModel);
 const ERC20ContractTC = composeMongoose(ERC20ContractModel);
 const ERC721ContractTC = composeMongoose(ERC721ContractModel);
 const ERC1155ContractTC = composeMongoose(ERC1155ContractModel);
 const UniswapV2ContractTC = composeMongoose(UniswapV2ContractModel);
 const UniswapV3ContractTC = composeMongoose(UniswapV3ContractModel);
 
-BlockTC.addResolver({
-  kind: 'query',
-  name: 'tokenContractsLatestBlock',
-  type: 'Int',
-  resolve: async () => {
-    const results = await BlockModel.find({});
-    return results[0]?.number || 0;
-  },
-});
-
 schemaComposer.Query.addFields({
-  tokenContractsLatestBlock: BlockTC.getResolver('tokenContractsLatestBlock'),
+  tokenContractsLatestBlock: repository.lastIndexedBlock.query.latestBlock,
   erc20Contracts: ERC20ContractTC.mongooseResolvers.findMany(filter),
   erc721Contracts: ERC721ContractTC.mongooseResolvers.findMany(filter),
   erc1155Contracts: ERC1155ContractTC.mongooseResolvers.findMany(filter),
