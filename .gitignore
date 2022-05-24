@@ -12,3 +12,4 @@ uniswap-indexer/src/model
 uniswap-indexer/db/migrations/*.js
 .serverless
 .esbuild
+.husky
