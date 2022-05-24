@@ -13,6 +13,7 @@
     "@vendia/serverless-express": "^4.8.0",
     "aws-utils": "0.0.1",
     "esbuild": "^0.14.11",
+    "indexer-monitoring": "0.0.1",
     "indexer-utils": "0.0.1",
     "serverless": "^3.0.0",
     "serverless-esbuild": "^1.23.3",

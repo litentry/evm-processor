@@ -1,7 +1,7 @@
-import { pushMetrics } from 'monitoring';
-import mongoose from 'mongoose';
-import { awsUtils } from 'aws-utils';
 import { SQSEvent } from 'aws-lambda';
+import { awsUtils } from 'aws-utils';
+import { pushMetrics } from 'indexer-monitoring';
+import mongoose from 'mongoose';
 
 export default async function worker(
   event: SQSEvent,
