@@ -1,5 +1,4 @@
 import { AWS } from '@serverless/typescript';
-import { handlerPath } from '../../libs/handler-resolver';
 import { getContext } from '../../util/context';
 import stageConfigFactory from '../../config/stage-config';
 
@@ -7,7 +6,7 @@ const context = getContext();
 const stageConfig = stageConfigFactory(context.options.stage);
 
 export default {
-  handler: `${handlerPath(__dirname)}/handler.default`,
+  handler: './src/lambda/last-indexed-block.default',
   reservedConcurrency: 1,
   events: [
     {

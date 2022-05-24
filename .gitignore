@@ -11,3 +11,4 @@ indexers/*/db
 uniswap-indexer/src/model
 uniswap-indexer/db/migrations/*.js
 .serverless
+.esbuild

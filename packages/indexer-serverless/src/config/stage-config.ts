@@ -23,7 +23,9 @@ const getParameterForStage = (
 
   if (required) {
     // The stack trace will show which parameter
-    throw new Error(`Required parameter missing`);
+    throw new Error(
+      `Required parameter missing: ${JSON.stringify(configParameter)}`
+    );
   }
 };
 
@@ -34,7 +36,7 @@ export default (stage: string) => {
         stage,
         {
           envVar: process.env['MONGO_URI'],
-          local: 'mongodb://mongodb:27017/evm-archive',
+          local: 'mongodb://mongodb:27017/evm-archive', // todo service name
         },
         true
       ) as string,
@@ -51,19 +53,6 @@ export default (stage: string) => {
         },
         true
       ) as number,
-
-    getProducerStartBlock: () =>
-      getParameterForStage(
-        stage,
-        {
-          envVar: process.env['START_BLOCK']
-            ? Number(process.env['START_BLOCK'])
-            : 0,
-          local: 0,
-          default: 0,
-        },
-        false
-      ) as number | undefined,
 
     getProducerEndBlock: () =>
       getParameterForStage(

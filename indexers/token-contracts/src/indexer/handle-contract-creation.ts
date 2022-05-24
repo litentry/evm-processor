@@ -3,7 +3,7 @@ import {
   ERC1155ContractModel,
   ERC20ContractModel,
   ERC721ContractModel,
-} from './schema';
+} from '../schema';
 import fetchTokenData from './fetch-token-data';
 
 export default async function handleContractCreation({

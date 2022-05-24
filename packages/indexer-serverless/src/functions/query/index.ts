@@ -1,4 +1,3 @@
-import { handlerPath } from '../../libs/handler-resolver';
 import { getContext } from '../../util/context';
 import stageConfigFactory from '../../config/stage-config';
 
@@ -6,7 +5,7 @@ const context = getContext();
 const stageConfig = stageConfigFactory(context.options.stage);
 
 export default {
-  handler: './lib/lambda/query.default',
+  handler: './src/lambda/query.default',
   events: [
     {
       http: {

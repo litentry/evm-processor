@@ -14,16 +14,25 @@ interface BatchSQSMessage {
   MessageBody: string;
 }
 
-export default async () => {
+export default async function producer() {
+  console.log(process.env);
   await mongoose.connect(process.env.MONGO_URI!);
 
-  let lastQueuedEndBlock =
-    (await getLastQueuedEndBlock('archive')) ?? parseInt(process.env.START!);
+  // put back in condition
+  const latestBlockHeight = await getLatestBlock(
+    process.env.LATEST_BLOCK_DEPENDENCY!
+  )();
+
+  const existingLastQueuedEndBlock = await getLastQueuedEndBlock();
+  console.log('existingLastQueuedEndBlock', existingLastQueuedEndBlock);
+  console.log('latestBlockHeight', latestBlockHeight);
+
+  let lastQueuedEndBlock = existingLastQueuedEndBlock || 0;
 
   const targetBlockHeight =
     typeof process.env.END_BLOCK !== 'undefined'
       ? parseInt(process.env.END_BLOCK)
-      : await getLatestBlock(process.env.LATEST_BLOCK_DEPENDENCY!)();
+      : latestBlockHeight;
 
   console.log({ lastQueuedEndBlock, targetBlockHeight });
 
@@ -48,7 +57,7 @@ export default async () => {
 
     lastQueuedEndBlock = Number(jobs[jobs.length - 1].Id);
 
-    await saveLastQueuedEndBlock('archive', lastQueuedEndBlock);
+    await saveLastQueuedEndBlock(lastQueuedEndBlock);
   };
 
   let pendingJobs = [];
@@ -75,4 +84,4 @@ export default async () => {
   console.log(
     `Queued ${targetJobCount} jobs. Last job end block: ${targetLastQueuedEndBlock}`
   );
-};
+}

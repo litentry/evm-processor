@@ -2,7 +2,6 @@ import { pushMetrics } from 'monitoring';
 import mongoose from 'mongoose';
 import { awsUtils } from 'aws-utils';
 import { SQSEvent } from 'aws-lambda';
-import { Config } from 'aws-utils/lib/utils/sqs';
 
 export default async function worker(
   event: SQSEvent,
@@ -14,7 +13,7 @@ export default async function worker(
   try {
     await awsUtils.lambdaHandler(
       event,
-      JSON.parse(process.env.QUEUE_URL!) as Config,
+      { queueUrl: process.env.QUEUE_URL! },
       handler
     );
 

@@ -1,8 +1,8 @@
 import { query } from 'indexer-utils';
 import handleContractCreation from './handle-contract-creation';
-import { BlockModel } from './schema';
+import { BlockModel } from '../schema';
 
-export default async function handler(startBlock: number, endBlock: number) {
+export default async function indexer(startBlock: number, endBlock: number) {
   const txs = await query.archive.contractCreationTransactions({
     startBlock,
     endBlock,

@@ -1,5 +1,4 @@
 import { AWS } from '@serverless/typescript';
-import { handlerPath } from '../../libs/handler-resolver';
 import stageConfigFactory from '../../config/stage-config';
 import { getContext } from '../../util/context';
 import { Config } from '../../types';
@@ -9,7 +8,7 @@ const stageConfig = stageConfigFactory(context.options.stage);
 
 export default (config: Config) =>
   ({
-    handler: './lib/lambda/worker.default',
+    handler: './src/lambda/worker.default',
     reservedConcurrency: stageConfig.getWorkerConcurrency(),
     events: [
       {
@@ -24,6 +23,9 @@ export default (config: Config) =>
     environment: {
       QUEUE_URL: { Ref: 'JobQueue' },
       RPC_ENDPOINT: config.rpcEndpoint,
+      ARCHIVE_GRAPH: config.archiveGraph,
+      TOKEN_ACTIVITY_GRAPH: config.tokenActivityGraph,
+      CONTRACT_GRAPH: config.contractGraph,
       MONGO_URI: stageConfig.getMongoURI(),
       PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
     },
