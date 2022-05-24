@@ -1,9 +1,7 @@
 import { Handler } from 'aws-lambda';
-// import { query } from 'indexer-serverless';
-// import schema from '../schema';
 
 const lambda: Handler = async (event, context) => {
-  // await query(event, context, schema);
+  // web3go indexer is the only one without a graph, but our serverless build requires a lambda here
 };
 
 export default lambda;
