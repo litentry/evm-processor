@@ -1,6 +1,6 @@
 {
-  "name": "token-contracts",
-  "description": "Indexes ERC20, ERC721 & ERC1155 contracts",
+  "name": "contracts",
+  "description": "Indexes contracts",
   "version": "0.0.1",
   "scripts": {
     "build": "rm -rf lib && tsc",

@@ -99,7 +99,7 @@ const UniswapV2ContractTC = composeMongoose(UniswapV2ContractModel);
 const UniswapV3ContractTC = composeMongoose(UniswapV3ContractModel);
 
 schemaComposer.Query.addFields({
-  tokenContractsLatestBlock: repository.lastIndexedBlock.query.latestBlock,
+  contractsLatestBlock: repository.lastIndexedBlock.query.latestBlock,
   erc20Contracts: ERC20ContractTC.mongooseResolvers.findMany(filter),
   erc721Contracts: ERC721ContractTC.mongooseResolvers.findMany(filter),
   erc1155Contracts: ERC1155ContractTC.mongooseResolvers.findMany(filter),

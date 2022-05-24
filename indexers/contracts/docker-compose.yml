@@ -6,9 +6,9 @@ volumes:
 services:
   mongodb:
     image: mongo:latest
-    container_name: mongo-token-contracts
+    container_name: mongo-contracts
     volumes:
-      - ../../../mongodb/token-contracts/:/data/db/
+      - ../../../mongodb/contracts/:/data/db/
     ports:
       - '27017:27017'
 
