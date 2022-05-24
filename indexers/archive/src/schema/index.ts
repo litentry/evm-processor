@@ -16,15 +16,12 @@ schemaComposer.Query.addFields({
   ...repository.lastIndexedBlock.query,
 });
 
-const LastIndexedBlockModel = repository.lastIndexedBlock.Model;
-
 export {
   BlockModel,
   LogModel,
   ContractCreationTransactionModel,
   ContractTransactionModel,
   NativeTokenTransactionModel,
-  LastIndexedBlockModel,
 };
 
 export default schemaComposer.buildSchema();

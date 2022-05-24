@@ -4,7 +4,7 @@ import {
   ERC1155EventDecodedModel,
   ERC20EventDecodedModel,
   ERC721EventDecodedModel,
-} from './schema';
+} from '../schema';
 
 const CONFLICTING_SIGNATURES = [
   'Transfer(address,address,uint256)',

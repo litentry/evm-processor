@@ -4,7 +4,7 @@ import {
   ERC1155TransactionDecodedModel,
   ERC20TransactionDecodedModel,
   ERC721TransactionDecodedModel,
-} from './schema';
+} from '../schema';
 
 const CONFLICTING_SIGNATURES = [
   'approve(address,uint256)',

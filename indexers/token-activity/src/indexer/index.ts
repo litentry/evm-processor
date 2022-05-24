@@ -9,7 +9,7 @@ import {
   ERC1155TransactionDecodedModel,
   ERC1155EventDecodedModel,
   BlockModel,
-} from './schema';
+} from '../schema';
 
 const standards = [
   {
