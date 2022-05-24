@@ -15,54 +15,58 @@ import {
   ERC721Contract,
 } from 'indexer-utils/lib/types/contract';
 import { isString } from 'lodash';
+import createSchema from './create-schema';
 
-export default function getHandler(client: Client) {
-  // function toInsertRow(data: any, fields: string[]) {
-  //   return Object
-  //     .entries(data)
-  //     .filter(([key, value]) => {
-  //       if (fields.indexOf(key) !== -1) {
-  //         return true;
-  //       }
-  //     })
-  //     .map(([key, value]) => value);
-  // }
+const host = process.env.DB_HOST;
+const port = process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432;
+const user = process.env.DB_USER;
+const password = process.env.DB_PASSWORD;
+const database = process.env.DB_DATABASE;
 
-  async function q(sql: string) {
+export default async function indexer(startBlock: number, endBlock: number) {
+  const client = new Client({
+    host,
+    port,
+    user,
+    password,
+    database,
+  });
+  await client.connect();
+  await createSchema(client);
+
+  const q = async (sql: string) => {
     try {
       await client.query(sql);
     } catch (e) {
       console.log(`Error in sql: ${sql}`);
       throw e;
     }
-  }
+  };
 
-  function wrap(data: any): any {
+  const wrap = (data: any): any => {
     if (isString(data)) {
       return client.escapeLiteral(data);
     }
     return data;
+  };
+  // required to match the allowed ERC contract types
+  const ercTypes = <(20 | 721 | 1155)[]>[20, 721, 1155];
+
+  async function inTransaction(fn: () => Promise<void>) {
+    await client.query('START TRANSACTION');
+    await fn();
+    await client.query('COMMIT');
   }
 
-  return async function handler(startBlock: number, endBlock: number) {
-    // required to match the allowed ERC contract types
-    const ercTypes = <(20 | 721 | 1155)[]>[20, 721, 1155];
+  async function blocks() {
+    const blocks = await query.archive.blocks({
+      startBlock,
+      endBlock,
+    });
 
-    async function inTransaction(fn: () => Promise<void>) {
-      await client.query('START TRANSACTION');
-      await fn();
-      await client.query('COMMIT');
-    }
-
-    async function blocks() {
-      const blocks = await query.archive.blocks({
-        startBlock,
-        endBlock,
-      });
-
-      const querySql = blocks
-        .map(
-          (block: Block) => `(
+    const querySql = blocks
+      .map(
+        (block: Block) => `(
           ${wrap(block.number)},
           ${wrap(block.hash)},
           ${wrap(block.parentHash)},
@@ -80,10 +84,10 @@ export default function getHandler(client: Client) {
           ${wrap(block.totalDifficulty)},
           ${wrap(block.uncles)}
         )`,
-        )
-        .join(', ');
+      )
+      .join(', ');
 
-      const sql = `INSERT INTO evm_blocks (
+    const sql = `INSERT INTO evm_blocks (
           number,
           hash,
           parentHash,
@@ -103,22 +107,22 @@ export default function getHandler(client: Client) {
         )
         VALUES ${querySql}`;
 
-      await q(sql);
+    await q(sql);
+  }
+
+  async function logs() {
+    const logs = await query.archive.logs({
+      startBlock,
+      endBlock,
+    });
+
+    if (!logs.length) {
+      return;
     }
 
-    async function logs() {
-      const logs = await query.archive.logs({
-        startBlock,
-        endBlock,
-      });
-
-      if (!logs.length) {
-        return;
-      }
-
-      const querySql = logs
-        .map(
-          (log: Log) => `(
+    const querySql = logs
+      .map(
+        (log: Log) => `(
           ${wrap(`${log.blockNumber}-${log.logIndex}`)},
           ${wrap(log.blockNumber)},
           to_timestamp(${wrap(log.blockTimestamp)}),
@@ -132,10 +136,10 @@ export default function getHandler(client: Client) {
           ${wrap(log.data)},
           ${wrap(log.logIndex)}
         )`,
-        )
-        .join(',');
+      )
+      .join(',');
 
-      const sql = `INSERT INTO evm_logs (
+    const sql = `INSERT INTO evm_logs (
           id,
           blockNumber,
           blockTimestamp,
@@ -151,22 +155,22 @@ export default function getHandler(client: Client) {
         )
         VALUES ${querySql}`;
 
-      await q(sql);
+    await q(sql);
+  }
+
+  async function contractCreationTransactions() {
+    const transaactions = await query.archive.contractCreationTransactions({
+      startBlock,
+      endBlock,
+    });
+
+    if (!transaactions.length) {
+      return;
     }
 
-    async function contractCreationTransactions() {
-      const transaactions = await query.archive.contractCreationTransactions({
-        startBlock,
-        endBlock,
-      });
-
-      if (!transaactions.length) {
-        return;
-      }
-
-      const querySql = transaactions
-        .map(
-          (tx: ContractCreationTransaction) => `(
+    const querySql = transaactions
+      .map(
+        (tx: ContractCreationTransaction) => `(
           ${wrap(`${tx.blockNumber}-${tx.transactionIndex}`)},
           ${wrap(tx.hash)},
           ${wrap(tx.nonce)},
@@ -185,10 +189,10 @@ export default function getHandler(client: Client) {
           ${wrap(tx.methodId)},
           ${wrap(tx.receiptContractAddress)}
         )`,
-        )
-        .join(',');
+      )
+      .join(',');
 
-      const sql = `INSERT INTO evm_contract_creation_transactions (
+    const sql = `INSERT INTO evm_contract_creation_transactions (
           id,
           hash,
           nonce,
@@ -209,22 +213,22 @@ export default function getHandler(client: Client) {
         )
         VALUES ${querySql}`;
 
-      await q(sql);
+    await q(sql);
+  }
+
+  async function contractTransactions() {
+    const transactions = await query.archive.contractTransactions({
+      startBlock,
+      endBlock,
+    });
+
+    if (!transactions.length) {
+      return;
     }
 
-    async function contractTransactions() {
-      const transactions = await query.archive.contractTransactions({
-        startBlock,
-        endBlock,
-      });
-
-      if (!transactions.length) {
-        return;
-      }
-
-      const querySql = transactions
-        .map(
-          (tx: ContractTransaction) => `(
+    const querySql = transactions
+      .map(
+        (tx: ContractTransaction) => `(
           ${wrap(`${tx.blockNumber}-${tx.transactionIndex}`)},
           ${wrap(tx.hash)},
           ${wrap(tx.nonce)},
@@ -243,10 +247,10 @@ export default function getHandler(client: Client) {
           ${wrap(tx.input)},
           ${wrap(tx.methodId)}
         )`,
-        )
-        .join(',');
+      )
+      .join(',');
 
-      const sql = `INSERT INTO evm_contract_transactions (
+    const sql = `INSERT INTO evm_contract_transactions (
           id,
           hash,
           nonce,
@@ -267,38 +271,38 @@ export default function getHandler(client: Client) {
         )
         VALUES ${querySql}`;
 
-      await q(sql);
+    await q(sql);
+  }
+
+  async function nativeTokenTransactions() {
+    const transactions = await query.archive.nativeTokenTransactions({
+      startBlock,
+      endBlock,
+      properties: [
+        'hash',
+        'nonce',
+        'blockHash',
+        'blockNumber',
+        'blockTimestamp',
+        'transactionIndex',
+        'from',
+        'value',
+        'gasPrice',
+        'gas',
+        'receiptStatus',
+        'receiptCumulativeGasUsed',
+        'receiptGasUsed',
+        'to',
+      ],
+    });
+
+    if (!transactions.length) {
+      return;
     }
 
-    async function nativeTokenTransactions() {
-      const transactions = await query.archive.nativeTokenTransactions({
-        startBlock,
-        endBlock,
-        properties: [
-          'hash',
-          'nonce',
-          'blockHash',
-          'blockNumber',
-          'blockTimestamp',
-          'transactionIndex',
-          'from',
-          'value',
-          'gasPrice',
-          'gas',
-          'receiptStatus',
-          'receiptCumulativeGasUsed',
-          'receiptGasUsed',
-          'to',
-        ],
-      });
-
-      if (!transactions.length) {
-        return;
-      }
-
-      const querySql = transactions
-        .map(
-          (tx: NativeTokenTransaction) => `(
+    const querySql = transactions
+      .map(
+        (tx: NativeTokenTransaction) => `(
           ${wrap(`${tx.blockNumber}-${tx.transactionIndex}`)},
           ${wrap(tx.hash)},
           ${wrap(tx.nonce)},
@@ -315,10 +319,10 @@ export default function getHandler(client: Client) {
           ${wrap(tx.receiptGasUsed)},
           ${wrap(tx.to)}
         )`,
-        )
-        .join(',');
+      )
+      .join(',');
 
-      const sql = `INSERT INTO evm_native_token_transactions (
+    const sql = `INSERT INTO evm_native_token_transactions (
           id,
           hash,
           nonce,
@@ -337,34 +341,34 @@ export default function getHandler(client: Client) {
         )
         VALUES ${querySql}`;
 
-      await q(sql);
+    await q(sql);
+  }
+
+  async function erc20Contracts() {
+    const transactions = await query.tokenContracts.erc20Contracts({
+      blockRange: {
+        start: startBlock,
+        end: endBlock,
+      },
+      properties: [
+        'address',
+        'creator',
+        'blockNumber',
+        'timestamp',
+        'symbol',
+        'name',
+        'decimals',
+        'erc165',
+      ],
+    });
+
+    if (!transactions.length) {
+      return;
     }
 
-    async function erc20Contracts() {
-      const transactions = await query.tokenContracts.erc20Contracts({
-        blockRange: {
-          start: startBlock,
-          end: endBlock,
-        },
-        properties: [
-          'address',
-          'creator',
-          'blockNumber',
-          'timestamp',
-          'symbol',
-          'name',
-          'decimals',
-          'erc165',
-        ],
-      });
-
-      if (!transactions.length) {
-        return;
-      }
-
-      const querySql = transactions
-        .map(
-          (tx: ERC20Contract) => `(
+    const querySql = transactions
+      .map(
+        (tx: ERC20Contract) => `(
           ${wrap(tx.address)},
           ${wrap(tx.creator)},
           ${wrap(tx.blockNumber)},
@@ -374,10 +378,10 @@ export default function getHandler(client: Client) {
           ${wrap(tx.decimals)},
           ${wrap(tx.erc165)}
         )`,
-        )
-        .join(',');
+      )
+      .join(',');
 
-      const sql = `INSERT INTO evm_contracts_erc20 (
+    const sql = `INSERT INTO evm_contracts_erc20 (
           address,
           creator,
           blockNumber,
@@ -389,35 +393,35 @@ export default function getHandler(client: Client) {
         )
         VALUES ${querySql}`;
 
-      await q(sql);
+    await q(sql);
+  }
+
+  async function erc721Contracts() {
+    const transactions = await query.tokenContracts.erc721Contracts({
+      blockRange: {
+        start: startBlock,
+        end: endBlock,
+      },
+      properties: [
+        'address',
+        'creator',
+        'blockNumber',
+        'timestamp',
+        'name',
+        'erc165',
+        'erc721TokenReceiver',
+        'erc721Metadata',
+        'erc721Enumerable',
+      ],
+    });
+
+    if (!transactions.length) {
+      return;
     }
 
-    async function erc721Contracts() {
-      const transactions = await query.tokenContracts.erc721Contracts({
-        blockRange: {
-          start: startBlock,
-          end: endBlock,
-        },
-        properties: [
-          'address',
-          'creator',
-          'blockNumber',
-          'timestamp',
-          'name',
-          'erc165',
-          'erc721TokenReceiver',
-          'erc721Metadata',
-          'erc721Enumerable',
-        ],
-      });
-
-      if (!transactions.length) {
-        return;
-      }
-
-      const querySql = transactions
-        .map(
-          (tx: ERC721Contract) => `(
+    const querySql = transactions
+      .map(
+        (tx: ERC721Contract) => `(
           ${wrap(tx.address)},
           ${wrap(tx.creator)},
           ${wrap(tx.blockNumber)},
@@ -428,10 +432,10 @@ export default function getHandler(client: Client) {
           ${wrap(tx.erc721Metadata)},
           ${wrap(tx.erc721Enumerable)}
         )`,
-        )
-        .join(',');
+      )
+      .join(',');
 
-      const sql = `INSERT INTO evm_contracts_erc721 (
+    const sql = `INSERT INTO evm_contracts_erc721 (
           address,
           creator,
           blockNumber,
@@ -444,34 +448,34 @@ export default function getHandler(client: Client) {
         )
         VALUES ${querySql}`;
 
-      await q(sql);
+    await q(sql);
+  }
+
+  async function erc1155Contracts() {
+    const transactions = await query.tokenContracts.erc1155Contracts({
+      blockRange: {
+        start: startBlock,
+        end: endBlock,
+      },
+      properties: [
+        'address',
+        'creator',
+        'blockNumber',
+        'timestamp',
+        'name',
+        'erc165',
+        'erc1155TokenReceiver',
+        'erc1155MetadataURI',
+      ],
+    });
+
+    if (!transactions.length) {
+      return;
     }
 
-    async function erc1155Contracts() {
-      const transactions = await query.tokenContracts.erc1155Contracts({
-        blockRange: {
-          start: startBlock,
-          end: endBlock,
-        },
-        properties: [
-          'address',
-          'creator',
-          'blockNumber',
-          'timestamp',
-          'name',
-          'erc165',
-          'erc1155TokenReceiver',
-          'erc1155MetadataURI',
-        ],
-      });
-
-      if (!transactions.length) {
-        return;
-      }
-
-      const querySql = transactions
-        .map(
-          (tx: ERC1155Contract) => `(
+    const querySql = transactions
+      .map(
+        (tx: ERC1155Contract) => `(
           ${wrap(tx.address)},
           ${wrap(tx.creator)},
           ${wrap(tx.blockNumber)},
@@ -481,10 +485,10 @@ export default function getHandler(client: Client) {
           ${wrap(tx.erc1155TokenReceiver)},
           ${wrap(tx.erc1155MetadataURI)}
         )`,
-        )
-        .join(',');
+      )
+      .join(',');
 
-      const sql = `INSERT INTO evm_contracts_erc1155 (
+    const sql = `INSERT INTO evm_contracts_erc1155 (
           address,
           creator,
           blockNumber,
@@ -496,28 +500,26 @@ export default function getHandler(client: Client) {
         )
         VALUES ${querySql}`;
 
-      await q(sql);
-    }
+    await q(sql);
+  }
 
-    async function allTokenActivityEvents() {
-      for (const ercType of ercTypes) {
-        const events: DecodedContractEvent[] = await query.tokenActivity.events(
-          {
-            blockRange: {
-              start: startBlock,
-              end: endBlock,
-            },
-            ercType,
-          },
-        );
+  async function allTokenActivityEvents() {
+    for (const ercType of ercTypes) {
+      const events: DecodedContractEvent[] = await query.tokenActivity.events({
+        blockRange: {
+          start: startBlock,
+          end: endBlock,
+        },
+        ercType,
+      });
 
-        if (!events.length) {
-          return;
-        }
+      if (!events.length) {
+        return;
+      }
 
-        const querySql = events
-          .map(
-            (event: DecodedContractEvent) => `(
+      const querySql = events
+        .map(
+          (event: DecodedContractEvent) => `(
           ${wrap(event.contract)},
           ${wrap(event.transactionHash)},
           ${wrap(event.signature)},
@@ -532,10 +534,10 @@ export default function getHandler(client: Client) {
           ${wrap(event.type3)},
           ${wrap(event.type4)}
         )`,
-          )
-          .join(',');
+        )
+        .join(',');
 
-        const sql = `INSERT INTO evm_token_activity_event_erc${ercType} (
+      const sql = `INSERT INTO evm_token_activity_event_erc${ercType} (
             contract,
             transactionHash,
             signature,
@@ -552,28 +554,28 @@ export default function getHandler(client: Client) {
           )
           VALUES ${querySql}`;
 
-        await q(sql);
-      }
+      await q(sql);
     }
+  }
 
-    async function allTokenActivityTransactions() {
-      for (const ercType of ercTypes) {
-        const transactions: DecodedContractTransaction[] =
-          await query.tokenActivity.transactions({
-            blockRange: {
-              start: startBlock,
-              end: endBlock,
-            },
-            ercType,
-          });
+  async function allTokenActivityTransactions() {
+    for (const ercType of ercTypes) {
+      const transactions: DecodedContractTransaction[] =
+        await query.tokenActivity.transactions({
+          blockRange: {
+            start: startBlock,
+            end: endBlock,
+          },
+          ercType,
+        });
 
-        if (!transactions.length) {
-          return;
-        }
+      if (!transactions.length) {
+        return;
+      }
 
-        const querySql = transactions
-          .map(
-            (tx: DecodedContractTransaction) => `(
+      const querySql = transactions
+        .map(
+          (tx: DecodedContractTransaction) => `(
             ${wrap(tx.hash)},
             ${wrap(tx.contract)},
             ${wrap(tx.signer)},
@@ -593,10 +595,10 @@ export default function getHandler(client: Client) {
             ${wrap(tx.type5)},
             ${wrap(tx.type6)}
           )`,
-          )
-          .join(',');
+        )
+        .join(',');
 
-        const sql = `INSERT INTO evm_token_activity_transaction_erc${ercType} (
+      const sql = `INSERT INTO evm_token_activity_transaction_erc${ercType} (
             hash,
             contract,
             signer,
@@ -618,23 +620,22 @@ export default function getHandler(client: Client) {
           )
           VALUES ${querySql}`;
 
-        await q(sql);
-      }
+      await q(sql);
     }
+  }
 
-    await inTransaction(async () => {
-      await blocks();
-      await logs();
-      await contractCreationTransactions();
-      await contractTransactions();
-      await nativeTokenTransactions();
+  await inTransaction(async () => {
+    await blocks();
+    await logs();
+    await contractCreationTransactions();
+    await contractTransactions();
+    await nativeTokenTransactions();
 
-      await erc20Contracts();
-      await erc721Contracts();
-      await erc1155Contracts();
+    await erc20Contracts();
+    await erc721Contracts();
+    await erc1155Contracts();
 
-      await allTokenActivityEvents();
-      await allTokenActivityTransactions();
-    });
-  };
+    await allTokenActivityEvents();
+    await allTokenActivityTransactions();
+  });
 }

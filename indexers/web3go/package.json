@@ -2,16 +2,18 @@
   "name": "web3go",
   "description": "Creates Postgres tables for web3go use",
   "version": "0.0.1",
-  "main": "lib/index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
     "build": "rm -rf lib && tsc",
-    "start:prod": "node lib/index",
     "typecheck": "yarn tsc --noEmit",
-    "postinstall": "yarn run build"
+    "postinstall": "yarn run build",
+    "deploy:local": "serverless deploy --stage local",
+    "deploy:aws": "AWS_REGION=eu-west-1 serverless deploy --stage production",
+    "start:local": "docker-compose up -d && yarn run deploy:local"
   },
   "dependencies": {
+    "indexer-serverless": "0.0.1",
     "indexer-utils": "0.0.1",
+    "aws-utils": "0.0.1",
     "pg": "^8.7.3"
   },
   "devDependencies": {
