@@ -9,12 +9,12 @@ export default async function latestBlock() {
       data: {
         query: `
           query LatestBlock {
-            tokenContractsLatestBlock
+            contractsLatestBlock
           }
         `,
       },
     });
-    return response.data.data.tokenContractsLatestBlock as number;
+    return response.data.data.contractsLatestBlock as number;
   } catch (e: any) {
     console.log(JSON.stringify(e.response.data.errors, null, 2));
     throw new Error(e.message);

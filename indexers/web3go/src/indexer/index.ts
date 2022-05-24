@@ -345,7 +345,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
   }
 
   async function erc20Contracts() {
-    const transactions = await query.tokenContracts.erc20Contracts({
+    const transactions = await query.contracts.erc20Contracts({
       blockRange: {
         start: startBlock,
         end: endBlock,
@@ -397,7 +397,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
   }
 
   async function erc721Contracts() {
-    const transactions = await query.tokenContracts.erc721Contracts({
+    const transactions = await query.contracts.erc721Contracts({
       blockRange: {
         start: startBlock,
         end: endBlock,
@@ -452,7 +452,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
   }
 
   async function erc1155Contracts() {
-    const transactions = await query.tokenContracts.erc1155Contracts({
+    const transactions = await query.contracts.erc1155Contracts({
       blockRange: {
         start: startBlock,
         end: endBlock,
