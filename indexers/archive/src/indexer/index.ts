@@ -5,7 +5,7 @@ import extractBlock from './extract-block';
 import loadBlock from './load-block';
 import transformBlock from './transform-block';
 
-export default async function processBatch(start: number, end: number) {
+export default async function indexer(start: number, end: number) {
   console.log(`Processing block batch ${start}-${end}`);
 
   const blocks: number[] = [];

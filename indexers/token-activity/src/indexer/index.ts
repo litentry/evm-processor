@@ -31,7 +31,7 @@ const standards = [
   },
 ];
 
-export default async function handler(startBlock: number, endBlock: number) {
+export default async function indexer(startBlock: number, endBlock: number) {
   const results = await Promise.allSettled(
     standards.map(async (standard) => {
       // todo -> pull the queries up here so we don't duplicate the isERCN checks
