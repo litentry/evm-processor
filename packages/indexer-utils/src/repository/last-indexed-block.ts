@@ -1,3 +1,4 @@
+import { composeMongoose } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
 import {
   remove as removeIndexedBlockRanges,
@@ -53,4 +54,17 @@ export const calculate = async () => {
     await save(lastIndexedBlock);
     await removeIndexedBlockRanges(processedIndexedBlockRanges);
   }
+};
+
+const LastIndexedBlockTC = composeMongoose(Model);
+
+LastIndexedBlockTC.addResolver({
+  kind: 'query',
+  name: 'latestBlock',
+  type: 'Int',
+  resolve: get,
+});
+
+export const query = {
+  latestBlock: LastIndexedBlockTC.getResolver('latestBlock'),
 };

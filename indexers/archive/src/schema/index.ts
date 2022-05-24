@@ -1,6 +1,6 @@
 import { schemaComposer } from 'graphql-compose';
+import { repository } from 'indexer-utils';
 import { blockQuery, BlockModel } from './block';
-import { LastIndexedBlockModel } from './last-indexed-block';
 import { logQuery, LogModel } from './log';
 import {
   transactionQuery,
@@ -13,7 +13,10 @@ schemaComposer.Query.addFields({
   ...blockQuery,
   ...logQuery,
   ...transactionQuery,
+  ...repository.lastIndexedBlock.query,
 });
+
+const LastIndexedBlockModel = repository.lastIndexedBlock.Model;
 
 export {
   BlockModel,

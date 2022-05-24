@@ -5,7 +5,7 @@ import {
   ContractCreationTransactionModel,
   ContractTransactionModel,
   BlockModel,
-} from './schema';
+} from '../schema';
 import { LoadBlock } from './types';
 
 /**
