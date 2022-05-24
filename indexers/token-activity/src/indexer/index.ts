@@ -1,4 +1,4 @@
-import { utils } from 'indexer-utils';
+import { repository, utils } from 'indexer-utils';
 import eventsHandler from './events-handler';
 import extrinsicsHandler from './extrinsics-handler';
 import {
@@ -8,7 +8,6 @@ import {
   ERC721EventDecodedModel,
   ERC1155TransactionDecodedModel,
   ERC1155EventDecodedModel,
-  BlockModel,
 } from '../schema';
 
 const standards = [
@@ -58,6 +57,5 @@ export default async function handler(startBlock: number, endBlock: number) {
     throw rejected;
   }
 
-  // todo this will only work in streaming mode, multiple instances need a more sophisticated progress schema
-  await BlockModel.create({ number: endBlock });
+  await repository.indexedBlockRange.save(startBlock, endBlock);
 }
