@@ -1,4 +1,5 @@
 export * as Types from './types';
+export * as repository from './repository';
 export { default as filter } from './filter';
 export { default as graphqlServer } from './graphql-server';
 export { default as query } from './query';

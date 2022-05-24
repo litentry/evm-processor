@@ -1,0 +1,26 @@
+{
+  "name": "indexer-serverless",
+  "version": "0.0.1",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "rm -rf lib && tsc",
+    "typecheck": "yarn tsc --noEmit",
+    "postinstall": "yarn run build",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "@serverless/typescript": "^3.0.0",
+    "@vendia/serverless-express": "^4.8.0",
+    "aws-utils": "0.0.1",
+    "esbuild": "^0.14.11",
+    "indexer-utils": "0.0.1",
+    "serverless": "^3.0.0",
+    "serverless-esbuild": "^1.23.3",
+    "serverless-localstack": "^0.4.35",
+    "yargs": "^17.4.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.71",
+    "@types/yargs": "^17.0.10"
+  }
+}

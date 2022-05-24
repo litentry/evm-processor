@@ -1,7 +1,7 @@
 import { schemaComposer } from 'graphql-compose';
 import { composeMongoose } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
-import { filter, Types } from 'indexer-utils';
+import { filter, repository, Types } from 'indexer-utils';
 
 interface DecodedContractEventDocument
   extends Types.Contract.DecodedContractEvent,
@@ -9,15 +9,6 @@ interface DecodedContractEventDocument
 interface DecodedContractTransactionDocument
   extends Types.Contract.DecodedContractTransaction,
     mongoose.Document {}
-
-// temp model to allow dependent indexers to track latest block
-// todo update to more sophisticated schema that works with parallel instances
-const BlockSchema = new mongoose.Schema(
-  {
-    number: { type: Number, required: true, index: true },
-  },
-  { capped: { size: 1024, max: 1, autoIndexId: true } }
-);
 
 export const DecodedEventSchema =
   new mongoose.Schema<DecodedContractEventDocument>({
@@ -58,8 +49,6 @@ export const DecodedTransactionSchema =
     type6: String,
   });
 
-export const BlockModel = mongoose.model('Block', BlockSchema);
-
 export const ERC20EventDecodedModel = mongoose.model(
   'ERC20EventDecoded',
   DecodedEventSchema
@@ -90,7 +79,6 @@ export const ERC1155TransactionDecodedModel = mongoose.model(
   DecodedTransactionSchema
 );
 
-const BlockTC = composeMongoose(BlockModel);
 const ERC20EventDecodedTC = composeMongoose(ERC20EventDecodedModel);
 const ERC721EventDecodedTC = composeMongoose(ERC721EventDecodedModel);
 const ERC1155EventDecodedTC = composeMongoose(ERC1155EventDecodedModel);
@@ -102,18 +90,8 @@ const ERC1155TransactionDecodedTC = composeMongoose(
   ERC1155TransactionDecodedModel
 );
 
-BlockTC.addResolver({
-  kind: 'query',
-  name: 'tokenActivityLatestBlock',
-  type: 'Int',
-  resolve: async () => {
-    const results = await BlockModel.find({});
-    return results[0]?.number || 0;
-  },
-});
-
 schemaComposer.Query.addFields({
-  tokenActivityLatestBlock: BlockTC.getResolver('tokenActivityLatestBlock'),
+  tokenActivityLatestBlock: repository.lastIndexedBlock.query.latestBlock,
   erc20Events: ERC20EventDecodedTC.mongooseResolvers.findMany(filter),
   erc721Events: ERC721EventDecodedTC.mongooseResolvers.findMany(filter),
   erc1155Events: ERC1155EventDecodedTC.mongooseResolvers.findMany(filter),
