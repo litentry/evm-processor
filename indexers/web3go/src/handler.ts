@@ -79,7 +79,7 @@ export default function getHandler(client: Client) {
           ${wrap(block.difficulty)},
           ${wrap(block.totalDifficulty)},
           ${wrap(block.uncles)}
-        )`
+        )`,
         )
         .join(', ');
 
@@ -131,7 +131,7 @@ export default function getHandler(client: Client) {
           ${wrap(log.topic4)},
           ${wrap(log.data)},
           ${wrap(log.logIndex)}
-        )`
+        )`,
         )
         .join(',');
 
@@ -184,7 +184,7 @@ export default function getHandler(client: Client) {
           ${wrap(tx.input)},
           ${wrap(tx.methodId)},
           ${wrap(tx.receiptContractAddress)}
-        )`
+        )`,
         )
         .join(',');
 
@@ -242,7 +242,7 @@ export default function getHandler(client: Client) {
           ${wrap(tx.to)},
           ${wrap(tx.input)},
           ${wrap(tx.methodId)}
-        )`
+        )`,
         )
         .join(',');
 
@@ -314,7 +314,7 @@ export default function getHandler(client: Client) {
           ${wrap(tx.receiptCumulativeGasUsed)},
           ${wrap(tx.receiptGasUsed)},
           ${wrap(tx.to)}
-        )`
+        )`,
         )
         .join(',');
 
@@ -373,7 +373,7 @@ export default function getHandler(client: Client) {
           ${wrap(tx.name)},
           ${wrap(tx.decimals)},
           ${wrap(tx.erc165)}
-        )`
+        )`,
         )
         .join(',');
 
@@ -427,7 +427,7 @@ export default function getHandler(client: Client) {
           ${wrap(tx.erc721TokenReceiver)},
           ${wrap(tx.erc721Metadata)},
           ${wrap(tx.erc721Enumerable)}
-        )`
+        )`,
         )
         .join(',');
 
@@ -480,7 +480,7 @@ export default function getHandler(client: Client) {
           ${wrap(tx.erc165)},
           ${wrap(tx.erc1155TokenReceiver)},
           ${wrap(tx.erc1155MetadataURI)}
-        )`
+        )`,
         )
         .join(',');
 
@@ -508,7 +508,7 @@ export default function getHandler(client: Client) {
               end: endBlock,
             },
             ercType,
-          }
+          },
         );
 
         if (!events.length) {
@@ -531,7 +531,7 @@ export default function getHandler(client: Client) {
           ${wrap(event.type2)},
           ${wrap(event.type3)},
           ${wrap(event.type4)}
-        )`
+        )`,
           )
           .join(',');
 
@@ -592,7 +592,7 @@ export default function getHandler(client: Client) {
             ${wrap(tx.type4)},
             ${wrap(tx.type5)},
             ${wrap(tx.type6)}
-          )`
+          )`,
           )
           .join(',');
 

@@ -6,7 +6,7 @@ export default async function processor(
   start: number,
   end: number | (() => Promise<number>),
   batchSize: number,
-  batchHandler: (start: number, end: number) => Promise<void>
+  batchHandler: (start: number, end: number) => Promise<void>,
 ) {
   const stream = typeof end !== 'number';
 
@@ -23,7 +23,7 @@ export default async function processor(
     startBlock,
     endBlock,
     batchSize,
-    batchHandler
+    batchHandler,
   );
 
   console.log(colors.green(`Caught up to block: ${endBlock}`));
@@ -42,7 +42,7 @@ export default async function processor(
       lastBlockIndexed + 1,
       endBlock,
       batchSize,
-      batchHandler
+      batchHandler,
     );
     endBlock = await end();
   }
@@ -63,7 +63,7 @@ export default async function processor(
         lastBlockIndexed + 1,
         endBlock,
         batchSize,
-        batchHandler
+        batchHandler,
       );
     }
 

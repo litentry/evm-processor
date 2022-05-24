@@ -20,7 +20,7 @@ export default async function eventsHandler(
   model:
     | typeof ERC20EventDecodedModel
     | typeof ERC721EventDecodedModel
-    | typeof ERC1155EventDecodedModel
+    | typeof ERC1155EventDecodedModel,
 ) {
   // get the events
   const logs = await Promise.all(
@@ -36,7 +36,7 @@ export default async function eventsHandler(
         eventId: `0x${sig._ID}`,
       });
       return [...logs, ..._logs];
-    })
+    }),
   );
 
   // filter non-erc standard logs
@@ -56,7 +56,7 @@ export default async function eventsHandler(
     ercLogs
       .map((log) => {
         const sig = sigs.find((sig) =>
-          [`0x${sig.ID}`, `0x${sig._ID}`].includes(log.topic0)
+          [`0x${sig.ID}`, `0x${sig._ID}`].includes(log.topic0),
         )!;
 
         let decoded: DecodedEvent;
@@ -66,8 +66,8 @@ export default async function eventsHandler(
             sig,
             log.data,
             [log.topic0, log.topic1, log.topic2, log.topic3, log.topic4].filter(
-              (t) => t
-            ) as string[]
+              (t) => t,
+            ) as string[],
           );
         } catch (e) {
           // contracts can be more than 1 standard, when the same methods are found on both we know this will blow up for 1 of the contract types as the log data won't match up (e.g. unit256 on transfer is indexed in 721 but not 20)
@@ -85,6 +85,6 @@ export default async function eventsHandler(
           ...decoded,
         } as Types.Contract.DecodedContractEvent;
       })
-      .filter((log) => log)
+      .filter((log) => log),
   );
 }

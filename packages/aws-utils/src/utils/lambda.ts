@@ -10,7 +10,7 @@ type ProcessorMessage = {
 export const lambdaHandler = async (
   event: SQSEvent,
   config: Config,
-  innerHandler: (startBlock: number, endBlock: number) => Promise<void>
+  innerHandler: (startBlock: number, endBlock: number) => Promise<void>,
 ) => {
   const successfulMessages: DeleteMessageBatchRequestEntry[] = (
     await Promise.all(
@@ -27,7 +27,7 @@ export const lambdaHandler = async (
           Id: record.messageId,
           ReceiptHandle: record.receiptHandle,
         };
-      })
+      }),
     )
   ).filter((elem) => elem !== undefined) as DeleteMessageBatchRequestEntry[];
 

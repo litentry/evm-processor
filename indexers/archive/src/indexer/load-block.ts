@@ -28,12 +28,12 @@ const mongo: LoadBlock = async ({
       utils.upsertMongoModels(
         NativeTokenTransactionModel,
         nativeTokenTransactions,
-        ['hash']
+        ['hash'],
       ),
       utils.upsertMongoModels(
         ContractCreationTransactionModel,
         contractCreationTransactions,
-        ['hash']
+        ['hash'],
       ),
       utils.upsertMongoModels(ContractTransactionModel, contractTransactions, [
         'hash',

@@ -19,7 +19,7 @@ export async function createSchema(client: Client) {
       difficulty varchar(100),
       totalDifficulty varchar(100),
       uncles varchar(100)
-    )`
+    )`,
   );
 
   await client.query(
@@ -36,7 +36,7 @@ export async function createSchema(client: Client) {
       topic3 varchar(100),
       topic4 varchar(100),
       data text
-    ) `
+    ) `,
   );
 
   await client.query(
@@ -58,7 +58,7 @@ export async function createSchema(client: Client) {
       input text,
       methodId varchar(100),
       receiptContractAddress varchar(100)
-    )`
+    )`,
   );
 
   await client.query(
@@ -78,7 +78,7 @@ export async function createSchema(client: Client) {
       receiptCumulativeGasUsed bigint,
       receiptGasUsed bigint,
       "to" varchar(100)
-    )`
+    )`,
   );
 
   await client.query(
@@ -100,7 +100,7 @@ export async function createSchema(client: Client) {
       "to" varchar(100),
       input text,
       methodId varchar(100)
-    )`
+    )`,
   );
 
   await client.query(
@@ -113,7 +113,7 @@ export async function createSchema(client: Client) {
       name varchar(100),
       decimals varchar(100),
       erc165 boolean
-    )`
+    )`,
   );
 
   await client.query(
@@ -129,7 +129,7 @@ export async function createSchema(client: Client) {
       erc721TokenReceiver boolean,
       erc721Metadata boolean,
       erc721Enumerable boolean
-    )`
+    )`,
   );
 
   await client.query(
@@ -144,7 +144,7 @@ export async function createSchema(client: Client) {
       erc165 boolean,
       erc1155TokenReceiver boolean,
       erc1155MetadataURI boolean
-    )`
+    )`,
   );
 
   for (const ercType of [20, 721, 1155]) {
@@ -164,7 +164,7 @@ export async function createSchema(client: Client) {
         type2 varchar(100),
         type3 varchar(100),
         type4 varchar(100)
-      )`
+      )`,
     );
 
     await client.query(
@@ -188,7 +188,7 @@ export async function createSchema(client: Client) {
         type4 varchar(100),
         type5 varchar(100),
         type6 varchar(100)
-      )`
+      )`,
     );
   }
 }

@@ -43,12 +43,12 @@ export function decodeEvent(
   type: 20 | 721 | 1155,
   item: Types.Contract.ContractSignatureItem,
   data: string,
-  topics: string[]
+  topics: string[],
 ): DecodedEvent {
   const decoded = contractInterface[`ERC${type}`].decodeEventLog(
     item.SIGNATURE,
     data,
-    topics
+    topics,
   );
 
   return decoded.reduce((data, value, i) => {
@@ -66,11 +66,11 @@ export function decodeEvent(
 
 export function decodeParams(
   params: Types.Contract.ContractSignatureItem['PARAMS'],
-  input: string
+  input: string,
 ): DecodedExtrinsic {
   const decoded = ethers.utils.defaultAbiCoder.decode(
     params,
-    ethers.utils.hexDataSlice(input, 4)
+    ethers.utils.hexDataSlice(input, 4),
   );
   return decoded.reduce((data, value, i) => {
     let val: string = value.toString();

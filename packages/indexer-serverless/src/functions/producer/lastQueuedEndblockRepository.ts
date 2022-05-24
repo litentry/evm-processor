@@ -9,7 +9,7 @@ export const getLastQueuedEndBlock = async (): Promise<number | null> => {
 };
 
 export const saveLastQueuedEndBlock = async (
-  lastQueuedEndBlock: number
+  lastQueuedEndBlock: number,
 ): Promise<void> => {
   await repository.lastQueuedBlock.Model.create({
     number: lastQueuedEndBlock,

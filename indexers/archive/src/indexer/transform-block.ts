@@ -34,7 +34,7 @@ const transformBlock: TransformBlock = ({
 
   blockWithTransactions.transactions.forEach((tx) => {
     const receipt = receipts.find(
-      (receipt) => receipt.transactionHash === tx.hash
+      (receipt) => receipt.transactionHash === tx.hash,
     );
 
     // check the node we're using isn't missing data
@@ -58,7 +58,7 @@ const transformBlock: TransformBlock = ({
       block.number,
       block.timestamp,
       tx,
-      receipt
+      receipt,
     );
 
     switch (txType) {
@@ -125,7 +125,7 @@ const mapTransactionBase = (
   blockNumber: number,
   blockTimestamp: number,
   tx: RpcTx,
-  receipt: TransactionReceipt
+  receipt: TransactionReceipt,
 ): Types.Archive.TransactionBase => ({
   hash: tx.hash,
   nonce: tx.nonce,

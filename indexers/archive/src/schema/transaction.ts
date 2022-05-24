@@ -68,22 +68,22 @@ contractCreationTransactionSchema.index({ receiptContractAddress: 1 });
 // MODELS
 export const NativeTokenTransactionModel = mongoose.model(
   'NativeTokenTransaction',
-  nativeTokenTransactionSchema
+  nativeTokenTransactionSchema,
 );
 export const ContractTransactionModel = mongoose.model(
   'ContractTransaction',
-  contractTransactionSchema
+  contractTransactionSchema,
 );
 export const ContractCreationTransactionModel = mongoose.model(
   'ContractCreationTransaction',
-  contractCreationTransactionSchema
+  contractCreationTransactionSchema,
 );
 
 // GRAPH
 const NativeTokenTransactionTC = composeMongoose(NativeTokenTransactionModel);
 const ContractTransactionTC = composeMongoose(ContractTransactionModel);
 const ContractCreationTransactionTC = composeMongoose(
-  ContractCreationTransactionModel
+  ContractCreationTransactionModel,
 );
 
 ContractTransactionTC.addFields({

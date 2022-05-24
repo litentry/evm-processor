@@ -5,7 +5,7 @@ import { SQSEvent } from 'aws-lambda';
 
 export default async function worker(
   event: SQSEvent,
-  handler: (start: number, end: number) => Promise<void>
+  handler: (start: number, end: number) => Promise<void>,
 ) {
   console.log('Connecting to mongo');
   await mongoose.connect(process.env.MONGO_URI!);
@@ -14,7 +14,7 @@ export default async function worker(
     await awsUtils.lambdaHandler(
       event,
       { queueUrl: process.env.QUEUE_URL! },
-      handler
+      handler,
     );
 
     await pushMetrics();

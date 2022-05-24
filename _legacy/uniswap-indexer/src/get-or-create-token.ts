@@ -3,7 +3,7 @@ import { UniswapLPToken } from './model';
 import fetchTokenData from './fetchTokenData';
 
 export default async function getOrCreateToken(
-  address: string
+  address: string,
 ): Promise<UniswapLPToken> {
   const tokenRepository = dataSource.getRepository(UniswapLPToken);
   let token = await tokenRepository.findOneBy({ id: address });

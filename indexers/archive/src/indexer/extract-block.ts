@@ -9,11 +9,11 @@ async function getReceipts(transactionHashes: string[]) {
       if (!receipt) {
         // some providers fail to provide receipts
         throw new Error(
-          `Failed to fetch receipt for tx: ${hash}. You must provide an RPC_ENDPOINT for a full archive node.`
+          `Failed to fetch receipt for tx: ${hash}. You must provide an RPC_ENDPOINT for a full archive node.`,
         );
       }
       return receipt;
-    })
+    }),
   );
   return receipts;
 }
@@ -21,7 +21,7 @@ async function getReceipts(transactionHashes: string[]) {
 const rpc: ExtractBlock = async (blockNumber) => {
   const blockWithTransactions = await web3.eth.getBlock(blockNumber, true);
   const receipts = await getReceipts(
-    blockWithTransactions.transactions.map((tx) => tx.hash)
+    blockWithTransactions.transactions.map((tx) => tx.hash),
   );
 
   return {

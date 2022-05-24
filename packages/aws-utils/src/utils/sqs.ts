@@ -7,7 +7,7 @@ export type Config = {
 
 export const deleteBatchMessages = async (
   config: Config,
-  entries: DeleteMessageBatchRequestEntry[]
+  entries: DeleteMessageBatchRequestEntry[],
 ) => {
   const client = new SQS();
 

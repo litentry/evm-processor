@@ -3,7 +3,7 @@ import { CloudFormation } from 'aws-sdk';
 const cachedStacks: { [stackId: string]: any } = {};
 
 export async function getInfraStack(
-  stackName: string
+  stackName: string,
 ): Promise<CloudFormation.Stack> {
   if (!cachedStacks[stackName]) {
     const cfn = new CloudFormation();

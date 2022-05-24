@@ -51,32 +51,32 @@ export const DecodedTransactionSchema =
 
 export const ERC20EventDecodedModel = mongoose.model(
   'ERC20EventDecoded',
-  DecodedEventSchema
+  DecodedEventSchema,
 );
 
 export const ERC721EventDecodedModel = mongoose.model(
   'ERC721EventDecoded',
-  DecodedEventSchema
+  DecodedEventSchema,
 );
 
 export const ERC1155EventDecodedModel = mongoose.model(
   'ERC1155EventDecoded',
-  DecodedEventSchema
+  DecodedEventSchema,
 );
 
 export const ERC20TransactionDecodedModel = mongoose.model(
   'ERC20TransactionDecoded',
-  DecodedTransactionSchema
+  DecodedTransactionSchema,
 );
 
 export const ERC721TransactionDecodedModel = mongoose.model(
   'ERC721TransactionDecoded',
-  DecodedTransactionSchema
+  DecodedTransactionSchema,
 );
 
 export const ERC1155TransactionDecodedModel = mongoose.model(
   'ERC1155TransactionDecoded',
-  DecodedTransactionSchema
+  DecodedTransactionSchema,
 );
 
 const ERC20EventDecodedTC = composeMongoose(ERC20EventDecodedModel);
@@ -84,10 +84,10 @@ const ERC721EventDecodedTC = composeMongoose(ERC721EventDecodedModel);
 const ERC1155EventDecodedTC = composeMongoose(ERC1155EventDecodedModel);
 const ERC20TransactionDecodedTC = composeMongoose(ERC20TransactionDecodedModel);
 const ERC721TransactionDecodedTC = composeMongoose(
-  ERC721TransactionDecodedModel
+  ERC721TransactionDecodedModel,
 );
 const ERC1155TransactionDecodedTC = composeMongoose(
-  ERC1155TransactionDecodedModel
+  ERC1155TransactionDecodedModel,
 );
 
 schemaComposer.Query.addFields({

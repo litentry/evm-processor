@@ -12,7 +12,7 @@ const IndexedBlockRangeSchema = new mongoose.Schema<IndexedBlockRangeDocument>({
 
 export const Model = mongoose.model(
   'IndexedBlockRange',
-  IndexedBlockRangeSchema
+  IndexedBlockRangeSchema,
 );
 
 export const save = (startBlock: number, endBlock: number) =>
@@ -23,5 +23,5 @@ export const get = (): Promise<IndexedBlockRangeDocument[]> =>
 
 export const remove = (indexedBlockRanges: IndexedBlockRangeDocument[]) =>
   Promise.all(
-    indexedBlockRanges.map((indexedBlockRange) => indexedBlockRange.delete())
+    indexedBlockRanges.map((indexedBlockRange) => indexedBlockRange.delete()),
   );
