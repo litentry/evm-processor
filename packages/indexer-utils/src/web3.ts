@@ -5,8 +5,8 @@ import { HttpProvider, WebsocketProvider } from 'web3-core';
 if (!process.env.RPC_ENDPOINT) {
   console.log(
     `\n${colors.bgMagenta(
-      'process.env.RPC_ENDPOINT must be an RPC provider, ignore this if you are not making chain node calls in your indexer'
-    )}\n`
+      'process.env.RPC_ENDPOINT must be an RPC provider, ignore this if you are not making chain node calls in your indexer',
+    )}\n`,
   );
 }
 

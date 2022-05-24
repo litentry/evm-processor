@@ -19,7 +19,7 @@ export default async function handleContractCreation({
 
   const erc165 = utils.contract.isType(
     Types.Contract.ContractType.ERC165,
-    input
+    input,
   );
   const common = {
     address,

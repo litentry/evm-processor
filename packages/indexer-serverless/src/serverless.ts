@@ -14,8 +14,8 @@ const vpcOptions = async (stage: string, clusterStackName: string) => {
     const securityGroupIds = infraStack
       .Outputs!.filter((output) =>
         ['SecurityGroupUniversal', 'SecurityGroupOutboundUniversal'].includes(
-          output.OutputKey!
-        )
+          output.OutputKey!,
+        ),
       )
       .map((output) => {
         return output.OutputValue!;
@@ -40,7 +40,7 @@ const augmentEnvVars = async (stage: string, params: Params): Promise<void> => {
     const infraStack = await getInfraStack(params.clusterStackName);
     if (!process.env.MONGO_URI) {
       const serviceDiscoveryDomain = infraStack.Outputs!.find(
-        (output) => output.OutputKey === 'RealmDNSZone'
+        (output) => output.OutputKey === 'RealmDNSZone',
       )!.OutputValue!;
 
       process.env.MONGO_URI = `mongodb://${params.mongoDnsName}.${serviceDiscoveryDomain}:27017/evm-archive`;

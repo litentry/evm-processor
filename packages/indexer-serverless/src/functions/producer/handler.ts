@@ -20,7 +20,7 @@ export default async function producer() {
 
   // put back in condition
   const latestBlockHeight = await getLatestBlock(
-    process.env.LATEST_BLOCK_DEPENDENCY!
+    process.env.LATEST_BLOCK_DEPENDENCY!,
   )();
 
   const existingLastQueuedEndBlock = await getLastQueuedEndBlock();
@@ -43,7 +43,7 @@ export default async function producer() {
 
   const targetJobCount = Math.min(
     maxBlocksToQueuePerExecution,
-    targetBlockHeight - lastQueuedEndBlock
+    targetBlockHeight - lastQueuedEndBlock,
   );
   const targetLastQueuedEndBlock = lastQueuedEndBlock + targetJobCount;
 
@@ -65,7 +65,7 @@ export default async function producer() {
     const startBlock = i;
     const endBlock = Math.min(
       i + parseInt(process.env.BATCH_SIZE!),
-      targetLastQueuedEndBlock
+      targetLastQueuedEndBlock,
     );
     pendingJobs.push({
       Id: `${endBlock}`,
@@ -82,6 +82,6 @@ export default async function producer() {
   await mongoose.disconnect();
 
   console.log(
-    `Queued ${targetJobCount} jobs. Last job end block: ${targetLastQueuedEndBlock}`
+    `Queued ${targetJobCount} jobs. Last job end block: ${targetLastQueuedEndBlock}`,
   );
 }

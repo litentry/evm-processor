@@ -7,7 +7,7 @@ export default function isType(type: ContractType, input: string) {
       if (!REQUIRED) return true;
 
       return input.includes(ID) || input.includes(_ID);
-    }
+    },
   );
 
   if (!hasEvents) return false;
@@ -17,7 +17,7 @@ export default function isType(type: ContractType, input: string) {
       if (!REQUIRED) return true;
 
       return input.includes(ID) || input.includes(_ID);
-    }
+    },
   );
 
   return hasExtrinsics;

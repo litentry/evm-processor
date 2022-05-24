@@ -3,7 +3,7 @@ import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
 
 export default async function fetchTokenData(address: string) {
   const provider = new ethers.providers.JsonRpcProvider(
-    process.env.RPC_ENDPOINT
+    process.env.RPC_ENDPOINT,
   );
   const contract = new ethers.Contract(address, ERC20.abi, provider);
   let decimals: bigint | null;
@@ -28,7 +28,7 @@ async function getTokenProperty(
   property: 'name' | 'symbol',
   address: string,
   contract: ethers.Contract,
-  provider: ethers.providers.JsonRpcProvider
+  provider: ethers.providers.JsonRpcProvider,
 ) {
   // hard coded override
   if (
@@ -50,7 +50,7 @@ async function getTokenProperty(
       const contractBytes = new ethers.Contract(
         address,
         abiBytesMethod(property),
-        provider
+        provider,
       );
       const bytesValue = await contractBytes[property]();
       if (

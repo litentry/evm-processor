@@ -23,7 +23,7 @@ export function incCounter(data: PrometheusTrackingData) {
 }
 
 export function startTimer(
-  data: PrometheusTrackingData
+  data: PrometheusTrackingData,
 ): (labels?: LabelValues<any>) => number {
   const metric = getOrCreateHistogram(data);
 
@@ -37,14 +37,14 @@ export async function pushMetrics() {
   const gateway = new Pushgateway(
     process.env.PUSHGATEWAY_URL!,
     {},
-    globalRegistry
+    globalRegistry,
   );
 
   return gateway.pushAdd({ jobName: 'pushgateway' });
 }
 
 const getOrCreateHistogram = (
-  opts: PrometheusTrackingData
+  opts: PrometheusTrackingData,
 ): Histogram<string> => {
   const name = getNameFromOpts(opts);
 

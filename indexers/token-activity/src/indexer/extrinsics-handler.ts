@@ -20,7 +20,7 @@ export default async function extrinsicsHandler(
   model:
     | typeof ERC20TransactionDecodedModel
     | typeof ERC721TransactionDecodedModel
-    | typeof ERC1155TransactionDecodedModel
+    | typeof ERC1155TransactionDecodedModel,
 ) {
   // get the extrinsics
   const txs = await Promise.all(
@@ -58,7 +58,7 @@ export default async function extrinsicsHandler(
         ],
       });
       return [...txs, ..._txs];
-    })
+    }),
   );
   // filter non-erc standard txs
   const uniqueContractAddresses = [...new Set(txs.flat().map((tx) => tx.to))];
@@ -75,7 +75,7 @@ export default async function extrinsicsHandler(
     ercTxs
       .map((tx) => {
         const ex = extrinsics.find((ex) =>
-          [ex.ID, ex._ID].includes(tx.methodId)
+          [ex.ID, ex._ID].includes(tx.methodId),
         )!;
         let decoded: DecodedExtrinsic;
 
@@ -99,6 +99,6 @@ export default async function extrinsicsHandler(
         };
         return transaction;
       })
-      .filter((tx) => tx)
+      .filter((tx) => tx),
   );
 }

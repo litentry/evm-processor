@@ -9,7 +9,7 @@ let serverlessExpressInstance: any;
 export default async function query(
   event: any,
   context: Context,
-  schema: GraphQLSchema
+  schema: GraphQLSchema,
 ) {
   if (!serverlessExpressInstance) {
     await mongoose.connect(process.env.MONGO_URI!);

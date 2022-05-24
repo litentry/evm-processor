@@ -2,7 +2,7 @@ import web3 from 'web3';
 
 export default function getMethodIdFromSignature(
   signature: string,
-  event: boolean
+  event: boolean,
 ) {
   if (event) {
     return web3.utils.keccak256(signature).substring(2);

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 export default async function upsertMongoModels(
   model: mongoose.Model<any>,
   documents: any[],
-  primaryKey: string[]
+  primaryKey: string[],
 ): Promise<void> {
   if (documents.length > 0) {
     await model.bulkWrite(
@@ -14,14 +14,14 @@ export default async function upsertMongoModels(
               ...filter,
               [field]: document[field],
             }),
-            {}
+            {},
           ),
           update: {
             ...document,
           },
           upsert: true,
         },
-      }))
+      })),
     );
   }
 }

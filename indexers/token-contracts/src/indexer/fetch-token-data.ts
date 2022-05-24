@@ -37,7 +37,7 @@ export default async function fetchTokenData(address: string, nft = false) {
 async function getTokenProperty(
   property: 'name' | 'symbol',
   address: string,
-  contract: Contract
+  contract: Contract,
 ) {
   // hard coded override
   if (
@@ -57,7 +57,7 @@ async function getTokenProperty(
       // try as bytes
       const contractBytes = new web3.eth.Contract(
         abiBytesMethod(property),
-        address
+        address,
       );
       const bytesValue = await contractBytes.methods[property]().call();
       if (

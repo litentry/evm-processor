@@ -49,17 +49,17 @@ const ERC1155ContractSchema = new mongoose.Schema<ERC1155Document>({
 
 export const ERC20ContractModel = mongoose.model(
   'ERC20Contract',
-  ERC20ContractSchema
+  ERC20ContractSchema,
 );
 
 export const ERC721ContractModel = mongoose.model(
   'ERC721Contract',
-  ERC721ContractSchema
+  ERC721ContractSchema,
 );
 
 export const ERC1155ContractModel = mongoose.model(
   'ERC1155Contract',
-  ERC1155ContractSchema
+  ERC1155ContractSchema,
 );
 
 const ERC20ContractTC = composeMongoose(ERC20ContractModel);

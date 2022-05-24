@@ -9,7 +9,7 @@ type StageConfigParameter = {
 const getParameterForStage = (
   stage: string,
   configParameter: StageConfigParameter,
-  required = false
+  required = false,
 ) => {
   if (configParameter.envVar) {
     return configParameter.envVar;
@@ -24,7 +24,7 @@ const getParameterForStage = (
   if (required) {
     // The stack trace will show which parameter
     throw new Error(
-      `Required parameter missing: ${JSON.stringify(configParameter)}`
+      `Required parameter missing: ${JSON.stringify(configParameter)}`,
     );
   }
 };
@@ -38,7 +38,7 @@ export default (stage: string) => {
           envVar: process.env['MONGO_URI'],
           local: 'mongodb://mongodb:27017/evm-archive', // todo service name
         },
-        true
+        true,
       ) as string,
 
     getWorkerConcurrency: () =>
@@ -51,7 +51,7 @@ export default (stage: string) => {
           local: 1,
           default: 1,
         },
-        true
+        true,
       ) as number,
 
     getProducerEndBlock: () =>
@@ -64,7 +64,7 @@ export default (stage: string) => {
           local: 1000,
           default: undefined,
         },
-        false
+        false,
       ) as number | undefined,
 
     getProducerBatchSize: () =>
@@ -77,7 +77,7 @@ export default (stage: string) => {
           local: 1,
           default: 20,
         },
-        false
+        false,
       ) as number | undefined,
 
     getProducerBucketName: () =>

@@ -6,7 +6,7 @@ import { UNISWAP } from './constants';
 import { handleSwap } from './handle-swap';
 
 const swapMethodIds = UNISWAP.V3_MULTICALL_SWAP_METHODS.map(
-  (method) => method.ID
+  (method) => method.ID,
 );
 
 export default async function handleMulticall(tx: TransactionWithLogs) {
@@ -17,7 +17,7 @@ export default async function handleMulticall(tx: TransactionWithLogs) {
 
   const [deadline, calls] = utils.decodeCall(
     tx.input,
-    UNISWAP.V3_MULTICALL.PARAMS
+    UNISWAP.V3_MULTICALL.PARAMS,
   );
   const relevantCalls = utils.filterCalls(calls, swapMethodsCalled);
 
@@ -30,7 +30,7 @@ export default async function handleMulticall(tx: TransactionWithLogs) {
     const methodId = utils.getMethodIdFromCall(call);
 
     const CONSTS = UNISWAP.V3_MULTICALL_SWAP_METHODS.find(
-      (method) => method.ID === methodId
+      (method) => method.ID === methodId,
     )!;
 
     decodedCalls.push({
@@ -44,42 +44,42 @@ export default async function handleMulticall(tx: TransactionWithLogs) {
       case UniswapLPSwapMethod.swapTokensForExactETH: {
         await swapTokensForExactETH(
           tx,
-          deadline.toBigInt()
+          deadline.toBigInt(),
         )(decodedCalls[i].decoded as [BigNumber, BigNumber, string[], string]);
         break;
       }
       case UniswapLPSwapMethod.swapExactETHForTokens: {
         await swapExactETHForTokens(
           tx,
-          deadline.toBigInt()
+          deadline.toBigInt(),
         )(decodedCalls[i].decoded as [BigNumber, string[], string]);
         break;
       }
       case UniswapLPSwapMethod.swapTokensForExactTokens: {
         await swapTokensForExactTokens(
           tx,
-          deadline.toBigInt()
+          deadline.toBigInt(),
         )(decodedCalls[i].decoded as [BigNumber, BigNumber, string[], string]);
         break;
       }
       case UniswapLPSwapMethod.swapExactTokensForTokens: {
         await swapExactTokensForTokens(
           tx,
-          deadline.toBigInt()
+          deadline.toBigInt(),
         )(decodedCalls[i].decoded as [BigNumber, BigNumber, string[], string]);
         break;
       }
       case UniswapLPSwapMethod.swapExactTokensForETH: {
         await swapExactTokensForETH(
           tx,
-          deadline.toBigInt()
+          deadline.toBigInt(),
         )(decodedCalls[i].decoded as [BigNumber, BigNumber, string[], string]);
         break;
       }
       case UniswapLPSwapMethod.swapETHForExactTokens: {
         await swapETHForExactTokens(
           tx,
-          deadline.toBigInt()
+          deadline.toBigInt(),
         )(decodedCalls[i].decoded as [BigNumber, string[], string]);
         break;
       }
@@ -95,7 +95,7 @@ const swapTokensForExactETH = (tx: TransactionWithLogs, deadline: BigInt) => {
     BigNumber,
     BigNumber,
     string[],
-    string
+    string,
   ]) => {
     await handleSwap(
       UniswapLPSwapMethod.swapTokensForExactETH,
@@ -103,7 +103,7 @@ const swapTokensForExactETH = (tx: TransactionWithLogs, deadline: BigInt) => {
       deadline,
       path,
       'unknown',
-      amountOut.toBigInt()
+      amountOut.toBigInt(),
     );
   };
 };
@@ -116,20 +116,20 @@ const swapExactETHForTokens = (tx: TransactionWithLogs, deadline: BigInt) => {
       deadline,
       path,
       tx.value,
-      'unknown'
+      'unknown',
     );
   };
 };
 
 const swapTokensForExactTokens = (
   tx: TransactionWithLogs,
-  deadline: BigInt
+  deadline: BigInt,
 ) => {
   return async ([amountOut, amountInMax, path, to]: [
     BigNumber,
     BigNumber,
     string[],
-    string
+    string,
   ]) => {
     await handleSwap(
       UniswapLPSwapMethod.swapTokensForExactTokens,
@@ -137,20 +137,20 @@ const swapTokensForExactTokens = (
       deadline,
       path,
       'unknown',
-      amountOut.toBigInt()
+      amountOut.toBigInt(),
     );
   };
 };
 
 const swapExactTokensForTokens = (
   tx: TransactionWithLogs,
-  deadline: BigInt
+  deadline: BigInt,
 ) => {
   return async ([amountIn, amountOutMin, path, to]: [
     BigNumber,
     BigNumber,
     string[],
-    string
+    string,
   ]) => {
     await handleSwap(
       UniswapLPSwapMethod.swapExactTokensForTokens,
@@ -158,7 +158,7 @@ const swapExactTokensForTokens = (
       deadline,
       path,
       amountIn.toBigInt(),
-      'unknown'
+      'unknown',
     );
   };
 };
@@ -168,7 +168,7 @@ const swapExactTokensForETH = (tx: TransactionWithLogs, deadline: BigInt) => {
     BigNumber,
     BigNumber,
     string[],
-    string
+    string,
   ]) => {
     await handleSwap(
       UniswapLPSwapMethod.swapExactTokensForETH,
@@ -176,7 +176,7 @@ const swapExactTokensForETH = (tx: TransactionWithLogs, deadline: BigInt) => {
       deadline,
       path,
       amountIn.toBigInt(),
-      'unknown'
+      'unknown',
     );
   };
 };
@@ -189,7 +189,7 @@ const swapETHForExactTokens = (tx: TransactionWithLogs, deadline: BigInt) => {
       deadline,
       path,
       'unknown',
-      amountOut.toBigInt()
+      amountOut.toBigInt(),
     );
   };
 };

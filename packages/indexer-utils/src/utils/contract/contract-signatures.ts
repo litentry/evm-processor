@@ -139,7 +139,7 @@ const SIMPLE_CONTRACT_SIGNATURES: SimpleContractSignatures = {
 };
 
 export const CONTRACT_SIGNATURES = Object.keys(
-  SIMPLE_CONTRACT_SIGNATURES
+  SIMPLE_CONTRACT_SIGNATURES,
 ).reduce(
   (result, key) => ({
     ...result,
@@ -148,19 +148,19 @@ export const CONTRACT_SIGNATURES = Object.keys(
       EXTRINSICS: createSignatureItemArray(key as ContractType, 'EXTRINSICS'),
     },
   }),
-  {} as ContractSignatures
+  {} as ContractSignatures,
 );
 
 function createSignatureItemArray(
   contract: ContractType,
-  type: 'EVENTS' | 'EXTRINSICS'
+  type: 'EVENTS' | 'EXTRINSICS',
 ): ContractSignatureItem[] {
   return [
     ...SIMPLE_CONTRACT_SIGNATURES[contract][type].REQUIRED.map((signature) =>
-      createSignatureItem(signature, true, type === 'EVENTS')
+      createSignatureItem(signature, true, type === 'EVENTS'),
     ),
     ...SIMPLE_CONTRACT_SIGNATURES[contract][type].OPTIONAL.map((signature) =>
-      createSignatureItem(signature, false, type === 'EVENTS')
+      createSignatureItem(signature, false, type === 'EVENTS'),
     ),
   ];
 }
@@ -168,7 +168,7 @@ function createSignatureItemArray(
 function createSignatureItem(
   signature: string,
   required: boolean,
-  events: boolean
+  events: boolean,
 ): ContractSignatureItem {
   return {
     REQUIRED: required,

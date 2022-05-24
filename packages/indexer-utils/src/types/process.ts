@@ -1,4 +1,4 @@
 export type BatchHandler = (
   batchStartBlock: number,
-  batchEndBlock: number
+  batchEndBlock: number,
 ) => Promise<void>;

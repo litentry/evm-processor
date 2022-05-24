@@ -36,15 +36,15 @@ export default async function indexer(start: number, end: number) {
         await loadBlock(transformedData);
 
         console.log(
-          `Contract creations: ${transformedData.contractCreationTransactions.length}`
+          `Contract creations: ${transformedData.contractCreationTransactions.length}`,
         );
         console.log(
-          `Contract interactions: ${transformedData.contractTransactions.length}`
+          `Contract interactions: ${transformedData.contractTransactions.length}`,
         );
         console.log(
-          `Native token transfers: ${transformedData.nativeTokenTransactions.length}`
+          `Native token transfers: ${transformedData.nativeTokenTransactions.length}`,
         );
-      })
+      }),
     );
     console.log(colors.blue(`Processed batch ${start} to ${end}`));
     console.timeEnd(`Batch time ${start}-${end}`);

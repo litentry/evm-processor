@@ -18,7 +18,7 @@ export function getContext(): Context {
           ...all,
           [key]: value,
         }),
-        {}
+        {},
       ),
     env: process.env,
   };

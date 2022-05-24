@@ -40,16 +40,16 @@ export default async function indexer(startBlock: number, endBlock: number) {
         endBlock,
         standard.type as 20 | 721 | 1155,
         standard.sigs.EXTRINSICS,
-        standard.txModel
+        standard.txModel,
       );
       await eventsHandler(
         startBlock,
         endBlock,
         standard.type as 20 | 721 | 1155,
         standard.sigs.EVENTS,
-        standard.evModel
+        standard.evModel,
       );
-    })
+    }),
   );
 
   const rejected = results.filter((result) => result.status === 'rejected');

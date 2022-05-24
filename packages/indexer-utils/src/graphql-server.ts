@@ -12,7 +12,7 @@ export default function graphqlServer(schema: GraphQLSchema, port?: number) {
     graphqlHTTP(() => ({
       schema,
       graphiql: { headerEditorEnabled: true },
-    }))
+    })),
   );
 
   if (port) {
