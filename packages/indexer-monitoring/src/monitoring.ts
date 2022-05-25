@@ -7,11 +7,7 @@ import {
 } from 'prom-client';
 
 interface PrometheusTrackingData {
-  functionId?: string;
   functionName: string;
-  chain?: string;
-  metricName: string;
-  description: string;
 }
 
 const monitoring = () => {
@@ -21,23 +17,26 @@ const monitoring = () => {
 
   let marks: MarkedTimestamp = {};
 
-  const getNameFromOpts = (opts: PrometheusTrackingData) => {
-    return `${opts.functionName}_${opts.metricName}`.toLocaleLowerCase();
+  const getNameFromOpts = (opts: PrometheusTrackingData, suffix: string) => {
+    // return `${process.env.CHAIN}_${opts.serviceName}_${opts.functionName}_${opts.metricName}`.toLocaleLowerCase();
+    return (
+      opts.functionName + (suffix ? '_' + suffix : '')
+    ).toLocaleLowerCase();
   };
 
   const getOrCreateHistogram = (
     opts: PrometheusTrackingData,
   ): Histogram<string> => {
-    const name = getNameFromOpts(opts);
+    const name = getNameFromOpts(opts, 'timer');
 
-    const metric = globalRegistry.getSingleMetric(getNameFromOpts(opts));
+    const metric = globalRegistry.getSingleMetric(name);
     if (metric) {
       return metric as Histogram<string>;
     }
 
     return new Histogram({
       name,
-      help: opts.description,
+      help: `Elapsed time for the ${opts.functionName} function`,
       labelNames: ['functionId'],
       registers: [globalRegistry],
     });
@@ -46,7 +45,7 @@ const monitoring = () => {
   const getOrCreateCounter = (
     opts: PrometheusTrackingData,
   ): Counter<string> => {
-    const name = getNameFromOpts(opts);
+    const name = getNameFromOpts(opts, 'counter');
 
     const metric = globalRegistry.getSingleMetric(name);
     if (metric) {
@@ -55,7 +54,7 @@ const monitoring = () => {
 
     return new Counter({
       name,
-      help: opts.description || '',
+      help: `Counter for the ${opts.functionName} function`,
       labelNames: ['functionId'],
       registers: [globalRegistry],
     });
@@ -73,7 +72,6 @@ const monitoring = () => {
     ) => {
       const histogram = getOrCreateHistogram(data);
       const timer = Math.abs((marks[endMark] ?? 0) - (marks[startMark] ?? 0));
-      console.log(timer);
 
       histogram.observe(timer / 1000); // observe takes time in seconds
     },

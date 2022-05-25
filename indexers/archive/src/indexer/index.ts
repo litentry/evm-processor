@@ -50,18 +50,15 @@ export default async function indexer(start: number, end: number) {
   } finally {
     monitoring.measure('start-extract-block', 'end-extract-block', {
       functionName: 'extractBlock',
-      metricName: 'timer',
-      description: 'Elapsed time for the extractBlock function',
     });
     monitoring.measure('start-transform-block', 'end-transform-block', {
       functionName: 'transformBlock',
-      metricName: 'timer',
-      description: 'Elapsed time for the transformBlock function',
     });
     monitoring.measure('start-load-block', 'end-load-block', {
       functionName: 'loadBlock',
-      metricName: 'timer',
-      description: 'Elapsed time for the loadBlock function',
+    });
+    monitoring.measure('start-extract-block', 'end-load-block', {
+      functionName: 'fullProcess',
     });
   }
 }
