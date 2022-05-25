@@ -61,10 +61,10 @@ export default async function producer() {
   };
 
   let pendingJobs = [];
-  for (let i = lastQueuedEndBlock + 1; i <= targetLastQueuedEndBlock; i++) {
+  for (let i = lastQueuedEndBlock; i <= targetLastQueuedEndBlock; i++) {
     const startBlock = i;
     const endBlock = Math.min(
-      i + parseInt(process.env.BATCH_SIZE!),
+      i + parseInt(process.env.BATCH_SIZE!) - 1, // since we are doing inclusive, we need to remove 1 from this (i.e 0-19 will process 20 blocks with a batch size of 20)
       targetLastQueuedEndBlock,
     );
     pendingJobs.push({
