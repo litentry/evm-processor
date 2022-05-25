@@ -5,10 +5,14 @@ import {
   getLastQueuedEndBlock,
   saveLastQueuedEndBlock,
 } from './lastQueuedEndblockRepository';
-import { SendMessageBatchRequestEntry } from 'aws-sdk/clients/sqs';
 
 const sqs = new SQS();
 const maxBlocksToQueuePerExecution = 50000;
+
+type BlockBatch = {
+  startBlock: number;
+  endBlock: number;
+};
 
 interface BatchSQSMessage {
   Id: string;
@@ -51,29 +55,30 @@ export default async function producer() {
         Entries: jobs,
       })
       .promise();
-
-    lastQueuedEndBlock = Number(jobs[jobs.length - 1].Id);
-
-    await saveLastQueuedEndBlock(lastQueuedEndBlock);
   };
 
-  let pendingJobs: SendMessageBatchRequestEntry[] = [];
-  for (let i = lastQueuedEndBlock + 1; i <= targetLastQueuedEndBlock; i++) {
-    const startBlock = i;
-    const endBlock = Math.min(
-      i + parseInt(process.env.BATCH_SIZE!),
+  while (true) {
+    let batches = batchBlocks(
+      lastQueuedEndBlock === 0 ? 0 : lastQueuedEndBlock + 1,
       targetLastQueuedEndBlock,
+      parseInt(process.env.BATCH_SIZE!),
+      10,
     );
-    pendingJobs.push({
-      Id: `${endBlock}`,
-      MessageBody: JSON.stringify({ startBlock, endBlock }),
-      MessageGroupId: '0',
-    });
-    i = endBlock;
 
-    if (pendingJobs.length === 10 || i === targetLastQueuedEndBlock) {
-      await dispatch(pendingJobs);
-      pendingJobs = [];
+    await dispatch(
+      batches.batches.map((b) => ({
+        Id: `${b.endBlock}`,
+        MessageBody: JSON.stringify(b),
+        MessageGroupId: '0',
+      })),
+    );
+
+    lastQueuedEndBlock = batches.lastBlock;
+
+    await saveLastQueuedEndBlock(lastQueuedEndBlock);
+
+    if (lastQueuedEndBlock >= targetLastQueuedEndBlock) {
+      break;
     }
   }
 
@@ -82,4 +87,37 @@ export default async function producer() {
   console.log(
     `Queued ${targetJobCount} jobs. Last job end block: ${targetLastQueuedEndBlock}`,
   );
+}
+
+function batchBlocks(
+  startBlock: number,
+  endBlock: number,
+  batchSize: number,
+  numberOfBatches: number = 10,
+): {
+  lastBlock: number;
+  batches: BlockBatch[];
+} {
+  let batches: BlockBatch[] = [];
+  let batchStartBlock = startBlock;
+
+  while (batchStartBlock <= endBlock && batches.length < numberOfBatches) {
+    let batchEndBlock = batchStartBlock + batchSize - 1;
+
+    if (batchEndBlock > endBlock) {
+      batchEndBlock = endBlock;
+    }
+
+    batches.push({
+      startBlock: batchStartBlock,
+      endBlock: batchEndBlock,
+    });
+
+    batchStartBlock = batchEndBlock + 1;
+  }
+
+  return {
+    batches,
+    lastBlock: batchStartBlock - 1,
+  };
 }
