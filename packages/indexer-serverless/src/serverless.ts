@@ -107,8 +107,25 @@ const getConfig = async (config: Config) => {
         JobQueue: {
           Type: 'AWS::SQS::Queue',
           Properties: {
-            QueueName: params.jobQueueName,
-            VisibilityTimeout: 60,
+            QueueName: `${params.jobQueueName}.fifo`,
+            VisibilityTimeout: 120,
+            FifoQueue: true,
+            FifoThroughputLimit: 'perMessageGroupId',
+            DeduplicationScope: 'messageGroup',
+            MessageRetentionPeriod: 1209600,
+            RedrivePolicy: {
+              deadLetterTargetArn: {
+                'Fn::GetAtt': ['JobQueueDLQ', 'Arn'],
+              },
+              maxReceiveCount: 3,
+            },
+          },
+        },
+        JobQueueDLQ: {
+          Type: 'AWS::SQS::Queue',
+          Properties: {
+            QueueName: `${params.jobQueueName}-dlq.fifo`,
+            FifoQueue: true,
           },
         },
         ...containerResources(context.options.stage, params).Resources,

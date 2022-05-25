@@ -5,6 +5,7 @@ import {
   getLastQueuedEndBlock,
   saveLastQueuedEndBlock,
 } from './lastQueuedEndblockRepository';
+import { SendMessageBatchRequestEntry } from 'aws-sdk/clients/sqs';
 
 const sqs = new SQS();
 const maxBlocksToQueuePerExecution = 50000;
@@ -56,7 +57,7 @@ export default async function producer() {
     await saveLastQueuedEndBlock(lastQueuedEndBlock);
   };
 
-  let pendingJobs = [];
+  let pendingJobs: SendMessageBatchRequestEntry[] = [];
   for (let i = lastQueuedEndBlock + 1; i <= targetLastQueuedEndBlock; i++) {
     const startBlock = i;
     const endBlock = Math.min(
@@ -66,6 +67,7 @@ export default async function producer() {
     pendingJobs.push({
       Id: `${endBlock}`,
       MessageBody: JSON.stringify({ startBlock, endBlock }),
+      MessageGroupId: '0',
     });
     i = endBlock;
 
