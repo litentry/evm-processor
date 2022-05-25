@@ -1,1 +1,1 @@
-export * from './monitoring';
+export { default as monitoring } from './monitoring';

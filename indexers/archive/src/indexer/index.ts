@@ -1,5 +1,5 @@
 import colors from 'colors';
-import { startTimer } from 'indexer-monitoring';
+import { monitoring } from 'indexer-monitoring';
 import { repository } from 'indexer-utils';
 import extractBlock from './extract-block';
 import loadBlock from './load-block';
@@ -17,23 +17,17 @@ export default async function indexer(start: number, end: number) {
     console.time(`Batch time ${start}-${end}`);
     await Promise.all(
       blocks.map(async (number) => {
-        const extractBlockEndTimer = startTimer({
-          functionName: 'extractBlock',
-          metricName: 'timer',
-          description: 'Elapsed time for the extractBlock function',
-        });
+        monitoring.mark('start-extract-block');
         const data = await extractBlock(number);
-        extractBlockEndTimer();
+        monitoring.mark('end-extract-block');
 
-        const transformBlockEndTimer = startTimer({
-          functionName: 'transformBlock',
-          metricName: 'timer',
-          description: 'Elapsed time for the transformBlock function',
-        });
+        monitoring.mark('start-transform-block');
         const transformedData = transformBlock(data);
-        transformBlockEndTimer();
+        monitoring.mark('end-extract-block');
 
+        monitoring.mark('start-load-block');
         await loadBlock(transformedData);
+        monitoring.mark('end-load-block');
 
         console.log(
           `Contract creations: ${transformedData.contractCreationTransactions.length}`,
@@ -53,5 +47,21 @@ export default async function indexer(start: number, end: number) {
   } catch (e) {
     console.error(e);
     throw new Error(`Failed to process batch ${start}-${end}`);
+  } finally {
+    monitoring.measure('start-extract-block', 'end-extract-block', {
+      functionName: 'extractBlock',
+      metricName: 'timer',
+      description: 'Elapsed time for the extractBlock function',
+    });
+    monitoring.measure('start-transform-block', 'end-transform-block', {
+      functionName: 'transformBlock',
+      metricName: 'timer',
+      description: 'Elapsed time for the transformBlock function',
+    });
+    monitoring.measure('start-load-block', 'end-load-block', {
+      functionName: 'loadBlock',
+      metricName: 'timer',
+      description: 'Elapsed time for the loadBlock function',
+    });
   }
 }

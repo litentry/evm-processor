@@ -1,12 +1,12 @@
+import { performance } from 'perf_hooks';
 import {
   Counter,
   Histogram,
-  LabelValues,
   Pushgateway,
   register as globalRegistry,
 } from 'prom-client';
 
-export interface PrometheusTrackingData {
+interface PrometheusTrackingData {
   functionId?: string;
   functionName: string;
   chain?: string;
@@ -14,69 +14,80 @@ export interface PrometheusTrackingData {
   description: string;
 }
 
-export function incCounter(data: PrometheusTrackingData) {
-  const metric = getOrCreateCounter(data);
+const monitoring = () => {
+  type MarkedTimestamp = {
+    [mark: string]: number;
+  };
 
-  metric.inc({
-    functionId: data.functionId ?? '',
-  });
-}
+  let marks: MarkedTimestamp = {};
 
-export function startTimer(
-  data: PrometheusTrackingData,
-): (labels?: LabelValues<any>) => number {
-  const metric = getOrCreateHistogram(data);
+  const getNameFromOpts = (opts: PrometheusTrackingData) => {
+    return `${opts.functionName}_${opts.metricName}`.toLocaleLowerCase();
+  };
 
-  return metric.startTimer({
-    functionId: data.functionId ?? '',
-  });
-}
+  const getOrCreateHistogram = (
+    opts: PrometheusTrackingData,
+  ): Histogram<string> => {
+    const name = getNameFromOpts(opts);
 
-export async function pushMetrics() {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const gateway = new Pushgateway(
-    process.env.PUSHGATEWAY_URL!,
-    {},
-    globalRegistry,
-  );
+    const metric = globalRegistry.getSingleMetric(getNameFromOpts(opts));
+    if (metric) {
+      return metric as Histogram<string>;
+    }
 
-  return gateway.pushAdd({ jobName: 'pushgateway' });
-}
+    return new Histogram({
+      name,
+      help: opts.description,
+      labelNames: ['functionId'],
+      registers: [globalRegistry],
+    });
+  };
 
-const getOrCreateHistogram = (
-  opts: PrometheusTrackingData,
-): Histogram<string> => {
-  const name = getNameFromOpts(opts);
+  const getOrCreateCounter = (
+    opts: PrometheusTrackingData,
+  ): Counter<string> => {
+    const name = getNameFromOpts(opts);
 
-  const metric = globalRegistry.getSingleMetric(getNameFromOpts(opts));
-  if (metric) {
-    return metric as Histogram<string>;
-  }
+    const metric = globalRegistry.getSingleMetric(name);
+    if (metric) {
+      return metric as Counter<string>;
+    }
 
-  return new Histogram({
-    name,
-    help: opts.description,
-    labelNames: ['functionId'],
-    registers: [globalRegistry],
-  });
+    return new Counter({
+      name,
+      help: opts.description || '',
+      labelNames: ['functionId'],
+      registers: [globalRegistry],
+    });
+  };
+
+  return {
+    mark: (markName: string) => {
+      marks[markName] = performance.now();
+    },
+
+    measure: (
+      startMark: string,
+      endMark: string,
+      data: PrometheusTrackingData,
+    ) => {
+      const histogram = getOrCreateHistogram(data);
+      const timer = Math.abs((marks[endMark] ?? 0) - (marks[startMark] ?? 0));
+      console.log(timer);
+
+      histogram.observe(timer / 1000); // observe takes time in seconds
+    },
+
+    pushMetrics: async () => {
+      const gateway = new Pushgateway(
+        process.env.PUSHGATEWAY_URL!,
+        {},
+        globalRegistry,
+      );
+
+      return gateway.pushAdd({ jobName: 'pushgateway' });
+    },
+  };
 };
 
-const getOrCreateCounter = (opts: PrometheusTrackingData): Counter<string> => {
-  const name = getNameFromOpts(opts);
-
-  const metric = globalRegistry.getSingleMetric(name);
-  if (metric) {
-    return metric as Counter<string>;
-  }
-
-  return new Counter({
-    name,
-    help: opts.description || '',
-    labelNames: ['functionId'],
-    registers: [globalRegistry],
-  });
-};
-
-function getNameFromOpts(opts: PrometheusTrackingData) {
-  return `${opts.functionName}_${opts.metricName}`.toLocaleLowerCase();
-}
+export default monitoring();

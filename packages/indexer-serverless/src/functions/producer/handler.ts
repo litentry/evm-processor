@@ -1,4 +1,5 @@
 import { SQS } from 'aws-sdk';
+import { monitoring } from 'indexer-monitoring';
 import mongoose from 'mongoose';
 import getLatestBlock from '../../util/get-latest-block';
 import {
@@ -15,8 +16,18 @@ interface BatchSQSMessage {
 }
 
 export default async function producer() {
+  monitoring.mark('start-connect-mongo');
   console.log(process.env);
   await mongoose.connect(process.env.MONGO_URI!);
+  monitoring.mark('end-connect-mongo');
+
+  monitoring.measure('start-connect-mongo', 'end-connect-mongo', {
+    functionName: 'connectMongo',
+    metricName: 'timer',
+    description: 'Elapsed time for the connectMongo function',
+  });
+
+  await monitoring.pushMetrics();
 
   // put back in condition
   const latestBlockHeight = await getLatestBlock(

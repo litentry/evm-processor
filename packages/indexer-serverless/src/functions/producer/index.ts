@@ -1,7 +1,7 @@
 import { AWS } from '@serverless/typescript';
-import { getContext } from '../../util/context';
 import stageConfigFactory from '../../config/stage-config';
 import { Config } from '../../types';
+import { getContext } from '../../util/context';
 
 const context = getContext();
 const stageConfig = stageConfigFactory(context.options.stage);
@@ -26,5 +26,6 @@ export default (config: Config) =>
       END_BLOCK: String(stageConfig.getProducerEndBlock()),
       BUCKET_NAME: stageConfig.getProducerBucketName(),
       MONGO_URI: stageConfig.getMongoURI(),
+      PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
     },
   } as keyof AWS['functions']);
