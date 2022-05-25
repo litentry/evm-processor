@@ -7,7 +7,7 @@ export default function getLatestBlock(source: string): () => Promise<number> {
     case 'archive-graph':
       return query.archive.latestBlock;
     case 'contract-graph':
-      return query.tokenContracts.latestBlock;
+      return query.contracts.latestBlock;
     case 'token-actvity-graph':
       return query.tokenActivity.latestBlock;
   }

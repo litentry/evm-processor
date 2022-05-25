@@ -136,6 +136,44 @@ const SIMPLE_CONTRACT_SIGNATURES: SimpleContractSignatures = {
       ],
     },
   },
+  // this is not a string standard, only the methods we care about are here
+  // if we ever need to build on this the contract is here: https://etherscan.io/address/0x7a250d5630b4cf539739df2c5dacb4c659f2488d#code
+  UNISWAPV2: {
+    EVENTS: {
+      REQUIRED: [],
+      OPTIONAL: [],
+    },
+    EXTRINSICS: {
+      REQUIRED: [
+        'swapTokensForExactETH(uint256,uint256,address[],address,uint256)',
+        'swapExactETHForTokens(uint256,address[],address,uint256)',
+        'swapTokensForExactTokens(uint256,uint256,address[],address,uint256)',
+        'swapExactTokensForTokens(uint256,uint256,address[],address,uint256)',
+        'swapExactTokensForETH(uint256,uint256,address[],address,uint256)',
+        'swapETHForExactTokens(uint256,address[],address,uint256)',
+      ],
+      OPTIONAL: [],
+    },
+  },
+  // Original https://etherscan.io/address/0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45
+  UNISWAPV3: {
+    EVENTS: {
+      REQUIRED: [],
+      OPTIONAL: [],
+    },
+    EXTRINSICS: {
+      REQUIRED: [
+        'multicall(uint256,bytes[])',
+        'swapTokensForExactETH(uint256,uint256,address[],address)',
+        'swapExactETHForTokens(uint256,address[],address)',
+        'swapTokensForExactTokens(uint256,uint256,address[],address)',
+        'swapExactTokensForTokens(uint256,uint256,address[],address)',
+        'swapExactTokensForETH(uint256,uint256,address[],address)',
+        'swapETHForExactTokens(uint256,address[],address)',
+      ],
+      OPTIONAL: [],
+    },
+  },
 };
 
 export const CONTRACT_SIGNATURES = Object.keys(

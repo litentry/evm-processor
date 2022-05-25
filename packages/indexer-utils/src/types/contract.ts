@@ -3,6 +3,8 @@ export enum ContractType {
   ERC20 = 'ERC20',
   ERC721 = 'ERC721',
   ERC1155 = 'ERC1155',
+  UNISWAPV2 = 'UNISWAPV2',
+  UNISWAPV3 = 'UNISWAPV3',
 }
 
 export type ContractSignatureItem = {
@@ -14,7 +16,7 @@ export type ContractSignatureItem = {
 };
 
 export interface ERC20Contract {
-  address: string; // address
+  address: string;
   creator: string;
   blockNumber: number;
   timestamp: number;
@@ -27,7 +29,7 @@ export interface ERC20Contract {
 }
 
 export interface ERC721Contract {
-  address: string; // address
+  address: string;
   creator: string;
   blockNumber: number;
   timestamp: number;
@@ -41,7 +43,7 @@ export interface ERC721Contract {
 }
 
 export interface ERC1155Contract {
-  address: string; // address
+  address: string;
   creator: string;
   blockNumber: number;
   timestamp: number;
@@ -53,8 +55,24 @@ export interface ERC1155Contract {
   erc1155MetadataURI: boolean;
 }
 
+export interface UniswapV2Contract {
+  address: string;
+  creator: string;
+  blockNumber: number;
+  timestamp: number;
+  erc165: boolean;
+}
+
+export interface UniswapV3Contract {
+  address: string;
+  creator: string;
+  blockNumber: number;
+  timestamp: number;
+  erc165: boolean;
+}
+
 export interface DecodedContractTransaction {
-  hash: string; // hash
+  hash: string;
   contract: string;
   signer: string;
   signature: string;
