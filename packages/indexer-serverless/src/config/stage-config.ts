@@ -1,3 +1,5 @@
+import { Config, Params } from '../types';
+
 type StageConfigParameter = {
   envVar?: string | number;
   local?: string | number;
@@ -29,14 +31,15 @@ const getParameterForStage = (
   }
 };
 
-export default (stage: string) => {
+export default (stage: string, params: Params) => {
   return {
     getMongoURI: () =>
       getParameterForStage(
         stage,
         {
           envVar: process.env['MONGO_URI'],
-          local: 'mongodb://mongodb:27017/evm-archive', // todo service name
+          local: 'mongodb://mongodb:27017/db',
+          production: `mongodb://${params.mongoDnsName}:27017/db`,
         },
         true,
       ) as string,
@@ -79,16 +82,11 @@ export default (stage: string) => {
         },
         false,
       ) as number | undefined,
-
-    getProducerBucketName: () =>
-      getParameterForStage(stage, {
-        envVar: process.env['PRODUCER_BUCKET_NAME'],
-        default: `${stage}-producer-bucket`,
-      }),
     getJobQueueName: () =>
       getParameterForStage(stage, {
         envVar: process.env['JOB_QUEUE_NAME'],
         default: `${stage}-producer-bucket`,
+        production: params.jobQueueName,
       }),
     getPushGatewayURL: () =>
       getParameterForStage(stage, {

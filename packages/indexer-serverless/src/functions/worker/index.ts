@@ -1,13 +1,13 @@
 import { AWS } from '@serverless/typescript';
 import stageConfigFactory from '../../config/stage-config';
 import { getContext } from '../../util/context';
-import { Config } from '../../types';
+import { Config, Params } from '../../types';
 
 const context = getContext();
-const stageConfig = stageConfigFactory(context.options.stage);
 
-export default (config: Config) =>
-  ({
+export default function (config: Config, params: Params) {
+  const stageConfig = stageConfigFactory(context.options.stage, params);
+  return {
     handler: './src/lambda/worker.default',
     reservedConcurrency: stageConfig.getWorkerConcurrency(),
     events: [
@@ -30,4 +30,5 @@ export default (config: Config) =>
       PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
     },
     timeout: 60,
-  } as keyof AWS['functions']);
+  } as keyof AWS['functions'];
+}

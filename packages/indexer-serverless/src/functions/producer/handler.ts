@@ -15,26 +15,22 @@ interface BatchSQSMessage {
 }
 
 export default async function producer() {
-  console.log(process.env);
   await mongoose.connect(process.env.MONGO_URI!);
 
-  // put back in condition
-  const latestBlockHeight = await getLatestBlock(
-    process.env.LATEST_BLOCK_DEPENDENCY!,
-  )();
-
   const existingLastQueuedEndBlock = await getLastQueuedEndBlock();
-  console.log('existingLastQueuedEndBlock', existingLastQueuedEndBlock);
-  console.log('latestBlockHeight', latestBlockHeight);
 
   let lastQueuedEndBlock = existingLastQueuedEndBlock || 0;
 
   const targetBlockHeight =
-    typeof process.env.END_BLOCK !== 'undefined'
-      ? parseInt(process.env.END_BLOCK)
-      : latestBlockHeight;
+    process.env.END_BLOCK !== 'undefined'
+      ? parseInt(process.env.END_BLOCK!)
+      : await getLatestBlock(process.env.LATEST_BLOCK_DEPENDENCY!)();
 
-  console.log({ lastQueuedEndBlock, targetBlockHeight });
+  console.log({
+    lastQueuedEndBlock,
+    targetBlockHeight,
+    existingLastQueuedEndBlock,
+  });
 
   if (targetBlockHeight < lastQueuedEndBlock) {
     console.log(`Last queued message is up to the target block height`);
