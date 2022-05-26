@@ -46,19 +46,40 @@ export default async function producer() {
   const maxWorkers = parseInt(process.env.MAX_WORKERS!) || 1;
   const batchSize = parseInt(process.env.BATCH_SIZE!);
 
+  const sqsQueueAttributes = await sqs
+    .getQueueAttributes({
+      QueueUrl: process.env.QUEUE_URL!,
+      AttributeNames: [
+        'ApproximateNumberOfMessagesNotVisible',
+        'ApproximateNumberOfMessages',
+      ],
+    })
+    .promise();
+
+  const currentBlocksInQueue =
+    (parseInt(
+      sqsQueueAttributes.Attributes!.ApproximateNumberOfMessagesNotVisible,
+    ) +
+      parseInt(sqsQueueAttributes.Attributes!.ApproximateNumberOfMessages)) *
+    batchSize;
+
+  const targetJobCount =
+    Math.floor(maxBlocksToQueuePerExecution / batchSize) -
+    Math.floor(currentBlocksInQueue / batchSize);
+
   console.log({
     batchSize,
     lastQueuedEndBlock,
     targetBlockHeight,
     existingLastQueuedEndBlock,
+    currentBlocksInQueue,
+    targetJobCount,
   });
 
   if (targetBlockHeight <= lastQueuedEndBlock) {
     console.log(`Last queued message is up to the chain height`);
     return;
   }
-
-  const targetJobCount = Math.floor(maxBlocksToQueuePerExecution / batchSize);
 
   const batches = [];
   for (let i = 0; i < targetJobCount; i++) {
