@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import getLatestBlock from '../../util/get-latest-block';
 import {
   getLastQueuedEndBlock,
-  saveLastQueuedEndBlock
+  saveLastQueuedEndBlock,
 } from './lastQueuedEndblockRepository';
 
 const sqs = new SQS();
@@ -92,7 +92,7 @@ export default async function producer() {
     });
 
     await dispatch(dispatches);
-    monitoring.markEnd(metrics.batchLlocksB;
+    monitoring.markEnd(metrics.batchBlocks);
 
     lastQueuedEndBlock = batches.lastBlock;
 
