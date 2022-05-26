@@ -1,5 +1,5 @@
 import colors from 'colors';
-import { monitoring } from 'indexer-monitoring';
+import { metrics, monitoring } from 'indexer-monitoring';
 import { repository } from 'indexer-utils';
 import extractBlock from './extract-block';
 import loadBlock from './load-block';
@@ -17,17 +17,17 @@ export default async function indexer(start: number, end: number) {
     console.time(`Batch time ${start}-${end}`);
     await Promise.all(
       blocks.map(async (number) => {
-        monitoring.mark('start-extract-block');
+        monitoring.markStart(metrics.extractBlock);
         const data = await extractBlock(number);
-        monitoring.mark('end-extract-block');
+        monitoring.markEnd(metrics.extractBlock);
 
-        monitoring.mark('start-transform-block');
+        monitoring.markStart(metrics.transformBlock);
         const transformedData = transformBlock(data);
-        monitoring.mark('end-extract-block');
+        monitoring.markEnd(metrics.transformBlock);
 
-        monitoring.mark('start-load-block');
+        monitoring.markStart(metrics.loadBlock);
         await loadBlock(transformedData);
-        monitoring.mark('end-load-block');
+        monitoring.markEnd(metrics.loadBlock);
 
         console.log(
           `Contract creations: ${transformedData.contractCreationTransactions.length}`,
@@ -48,17 +48,13 @@ export default async function indexer(start: number, end: number) {
     console.error(e);
     throw new Error(`Failed to process batch ${start}-${end}`);
   } finally {
-    monitoring.measure('start-extract-block', 'end-extract-block', {
-      functionName: 'extractBlock',
-    });
-    monitoring.measure('start-transform-block', 'end-transform-block', {
-      functionName: 'transformBlock',
-    });
-    monitoring.measure('start-load-block', 'end-load-block', {
-      functionName: 'loadBlock',
-    });
-    monitoring.measure('start-extract-block', 'end-load-block', {
-      functionName: 'fullProcess',
-    });
+    monitoring.measure(metrics.extractBlock);
+    monitoring.measure(metrics.transformBlock);
+    monitoring.measure(metrics.loadBlock);
+    monitoring.measure(
+      metrics.fullWorkerProcess,
+      metrics.extractBlock,
+      metrics.loadBlock,
+    );
   }
 }

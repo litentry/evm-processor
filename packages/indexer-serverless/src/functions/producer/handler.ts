@@ -1,10 +1,10 @@
 import { SQS } from 'aws-sdk';
-import { monitoring } from 'indexer-monitoring';
+import { metrics, monitoring } from 'indexer-monitoring';
 import mongoose from 'mongoose';
 import getLatestBlock from '../../util/get-latest-block';
 import {
   getLastQueuedEndBlock,
-  saveLastQueuedEndBlock,
+  saveLastQueuedEndBlock
 } from './lastQueuedEndblockRepository';
 
 const sqs = new SQS();
@@ -23,9 +23,9 @@ interface BatchSQSMessage {
 export default async function producer() {
   await mongoose.connect(process.env.MONGO_URI!);
 
-  monitoring.mark('start-get-lastqueued-block');
+  monitoring.markStart(metrics.getLastQueuedBlock);
   const existingLastQueuedEndBlock = await getLastQueuedEndBlock();
-  monitoring.mark('end-get-lastqueued-block');
+  monitoring.markEnd(metrics.getLastQueuedBlock);
 
   let lastQueuedEndBlock = existingLastQueuedEndBlock || 0;
 
@@ -65,7 +65,7 @@ export default async function producer() {
     }
   };
 
-  monitoring.mark('start-batch-blocks');
+  monitoring.markStart(metrics.batchBlocks);
   while (true) {
     let batches = batchBlocks(
       lastQueuedEndBlock === 0 ? 0 : lastQueuedEndBlock + 1,
@@ -92,34 +92,22 @@ export default async function producer() {
     });
 
     await dispatch(dispatches);
-    monitoring.mark('end-batch-blocks');
+    monitoring.markEnd(metrics.batchLlocksB;
 
     lastQueuedEndBlock = batches.lastBlock;
 
-    monitoring.mark('start-save-lastqueued-block');
+    monitoring.markStart(metrics.saveLastQueuedBlock);
     await saveLastQueuedEndBlock(lastQueuedEndBlock);
-    monitoring.mark('end-save-lastqueued-block');
+    monitoring.markEnd(metrics.saveLastQueuedBlock);
 
     if (lastQueuedEndBlock >= targetLastQueuedEndBlock) {
       break;
     }
   }
 
-  monitoring.measure('start-get-lastqueued-block', 'end-get-lastqueued-block', {
-    functionName: 'getLastQueuedBlock',
-  });
-
-  monitoring.measure('start-batch-blocks', 'end-batch-blocks', {
-    functionName: 'batchBlocks',
-  });
-
-  monitoring.measure(
-    'start-save-lastqueued-block',
-    'end-save-lastqueued-block',
-    {
-      functionName: 'saveLastQueuedBlock',
-    },
-  );
+  monitoring.measure(metrics.getLastQueuedBlock);
+  monitoring.measure(metrics.batchBlocks);
+  monitoring.measure(metrics.saveLastQueuedBlock);
 
   await monitoring.pushMetrics();
 

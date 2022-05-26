@@ -6,10 +6,7 @@ import {
   Pushgateway,
   register as globalRegistry,
 } from 'prom-client';
-
-interface PrometheusTrackingData {
-  functionName: string;
-}
+import { Metric } from './metrics';
 
 const monitoring = () => {
   type MarkedTimestamp = {
@@ -18,83 +15,83 @@ const monitoring = () => {
 
   let marks: MarkedTimestamp = {};
 
-  const getNameFromOpts = (opts: PrometheusTrackingData, suffix: string) => {
-    // return `${process.env.CHAIN}_${opts.serviceName}_${opts.functionName}_${opts.metricName}`.toLocaleLowerCase();
+  const getNameFromMetric = (metric: Metric, suffix: string) => {
+    // return `${process.env.CHAIN}_${metric.serviceName}_${metric.functionName}_${metric.metricName}`.toLocaleLowerCase();
     return (
-      opts.functionName + (suffix ? '_' + suffix : '')
+      metric.functionName + (suffix ? '_' + suffix : '')
     ).toLocaleLowerCase();
   };
 
-  const getOrCreateHistogram = (
-    opts: PrometheusTrackingData,
-  ): Histogram<string> => {
-    const name = getNameFromOpts(opts, 'timer');
+  const getOrCreateHistogram = (metric: Metric): Histogram<string> => {
+    const name = getNameFromMetric(metric, 'timer');
 
-    const metric = globalRegistry.getSingleMetric(name);
-    if (metric) {
-      return metric as Histogram<string>;
+    const promMetric = globalRegistry.getSingleMetric(name);
+    if (promMetric) {
+      return promMetric as Histogram<string>;
     }
 
     return new Histogram({
       name,
-      help: `Elapsed time for the ${opts.functionName} function`,
+      help: `Elapsed time for the ${metric.functionName} function`,
       labelNames: ['functionId'],
       registers: [globalRegistry],
     });
   };
 
-  const getOrCreateCounter = (
-    opts: PrometheusTrackingData,
-  ): Counter<string> => {
-    const name = getNameFromOpts(opts, 'counter');
+  const getOrCreateCounter = (metric: Metric): Counter<string> => {
+    const name = getNameFromMetric(metric, 'counter');
 
-    const metric = globalRegistry.getSingleMetric(name);
-    if (metric) {
-      return metric as Counter<string>;
+    const promMetric = globalRegistry.getSingleMetric(name);
+    if (promMetric) {
+      return promMetric as Counter<string>;
     }
 
     return new Counter({
       name,
-      help: `Counter for the ${opts.functionName} function`,
+      help: `Counter for the ${metric.functionName} function`,
       labelNames: ['functionId'],
       registers: [globalRegistry],
     });
   };
 
-  const getOrCreateGauge = (opts: PrometheusTrackingData): Gauge<string> => {
-    const name = getNameFromOpts(opts, 'gauge');
+  const getOrCreateGauge = (metric: Metric): Gauge<string> => {
+    const name = getNameFromMetric(metric, 'gauge');
 
-    const metric = globalRegistry.getSingleMetric(name);
-    if (metric) {
-      return metric as Gauge<string>;
+    const promMetric = globalRegistry.getSingleMetric(name);
+    if (promMetric) {
+      return promMetric as Gauge<string>;
     }
 
     return new Gauge({
       name,
-      help: `Gauge for ${opts.functionName}`,
+      help: `Gauge for ${metric.functionName}`,
       labelNames: ['functionId'],
       registers: [globalRegistry],
     });
   };
 
   return {
-    mark: (markName: string) => {
-      marks[markName] = performance.now();
+    markStart: (metric: Metric) => {
+      marks[`start-${metric.functionName}`] = performance.now();
     },
 
-    measure: (
-      startMark: string,
-      endMark: string,
-      data: PrometheusTrackingData,
-    ) => {
-      const histogram = getOrCreateHistogram(data);
-      const timer = Math.abs((marks[endMark] ?? 0) - (marks[startMark] ?? 0));
+    markEnd: (metric: Metric) => {
+      marks[`end-${metric.functionName}`] = performance.now();
+    },
+
+    measure: (metric: Metric, startMetric?: Metric, endMetric?: Metric) => {
+      const histogram = getOrCreateHistogram(metric);
+      const timer = Math.abs(
+        (marks[`end-${endMetric?.functionName || metric.functionName}`] ?? 0) -
+          (marks[`start-${startMetric?.functionName || metric.functionName}`] ??
+            0),
+      );
 
       histogram.observe(timer / 1000); // observe takes time in seconds
     },
 
-    gauge: (value: number, data: PrometheusTrackingData) => {
-      const gauge = getOrCreateGauge(data);
+    gauge: (value: number, metric: Metric) => {
+      const gauge = getOrCreateGauge(metric);
 
       gauge.set(value);
     },
