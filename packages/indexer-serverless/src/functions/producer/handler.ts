@@ -23,7 +23,9 @@ interface BatchSQSMessage {
 export default async function producer() {
   await mongoose.connect(process.env.MONGO_URI!);
 
+  monitoring.mark('start-get-lastqueued-block');
   const existingLastQueuedEndBlock = await getLastQueuedEndBlock();
+  monitoring.mark('end-get-lastqueued-block');
 
   let lastQueuedEndBlock = existingLastQueuedEndBlock || 0;
 
@@ -63,6 +65,7 @@ export default async function producer() {
     }
   };
 
+  monitoring.mark('start-batch-blocks');
   while (true) {
     let batches = batchBlocks(
       lastQueuedEndBlock === 0 ? 0 : lastQueuedEndBlock + 1,
@@ -89,15 +92,34 @@ export default async function producer() {
     });
 
     await dispatch(dispatches);
+    monitoring.mark('end-batch-blocks');
 
     lastQueuedEndBlock = batches.lastBlock;
 
+    monitoring.mark('start-save-lastqueued-block');
     await saveLastQueuedEndBlock(lastQueuedEndBlock);
+    monitoring.mark('end-save-lastqueued-block');
 
     if (lastQueuedEndBlock >= targetLastQueuedEndBlock) {
       break;
     }
   }
+
+  monitoring.measure('start-get-lastqueued-block', 'end-get-lastqueued-block', {
+    functionName: 'getLastQueuedBlock',
+  });
+
+  monitoring.measure('start-batch-blocks', 'end-batch-blocks', {
+    functionName: 'batchBlocks',
+  });
+
+  monitoring.measure(
+    'start-save-lastqueued-block',
+    'end-save-lastqueued-block',
+    {
+      functionName: 'saveLastQueuedBlock',
+    },
+  );
 
   await monitoring.pushMetrics();
 
