@@ -1,7 +1,7 @@
 import { AWS } from '@serverless/typescript';
 import stageConfigFactory from '../../config/stage-config';
-import { getContext } from '../../util/context';
 import { Config, Params } from '../../types';
+import { getContext } from '../../util/context';
 
 const context = getContext();
 
@@ -9,7 +9,8 @@ export default function (config: Config, params: Params) {
   const stageConfig = stageConfigFactory(context.options.stage, params);
   return {
     handler: './src/lambda/worker.default',
-    reservedConcurrency: stageConfig.getWorkerConcurrency(),
+    reservedConcurrency:
+      config.maxWorkers || stageConfig.getWorkerConcurrency(),
     events: [
       {
         sqs: {

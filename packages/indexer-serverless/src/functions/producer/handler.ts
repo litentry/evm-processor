@@ -31,6 +31,9 @@ export default async function producer() {
       ? parseInt(process.env.END_BLOCK!)
       : await getLatestBlock(process.env.LATEST_BLOCK_DEPENDENCY!)();
 
+  const maxWorkers = parseInt(process.env.MAX_WORKERS!) || 1;
+  const batchSize = parseInt(process.env.BATCH_SIZE!);
+
   console.log({
     lastQueuedEndBlock,
     targetBlockHeight,
@@ -49,29 +52,42 @@ export default async function producer() {
   const targetLastQueuedEndBlock = lastQueuedEndBlock + targetJobCount;
 
   const dispatch = async (jobs: BatchSQSMessage[]) => {
-    await sqs
-      .sendMessageBatch({
-        QueueUrl: process.env.QUEUE_URL!,
-        Entries: jobs,
-      })
-      .promise();
+    if (jobs.length) {
+      await sqs
+        .sendMessageBatch({
+          QueueUrl: process.env.QUEUE_URL!,
+          Entries: jobs,
+        })
+        .promise();
+    }
   };
 
   while (true) {
     let batches = batchBlocks(
       lastQueuedEndBlock === 0 ? 0 : lastQueuedEndBlock + 1,
       targetLastQueuedEndBlock,
-      parseInt(process.env.BATCH_SIZE!),
+      batchSize,
       10,
     );
 
-    await dispatch(
-      batches.batches.map((b) => ({
+    const dispatches = batches.batches.map((b) => {
+      let workerGroup = 0;
+      const blocksInBatch = b.endBlock + 1 - b.startBlock;
+      // For sanity only set a different worker group if the block range in
+      // this batch is the same length as the configured batch size,
+      // otherwise use group 0
+      if (blocksInBatch === batchSize) {
+        const batchGroup = b.startBlock % (maxWorkers * batchSize);
+        workerGroup = batchGroup / maxWorkers;
+      }
+      return {
         Id: `${b.endBlock}`,
         MessageBody: JSON.stringify(b),
-        MessageGroupId: '0',
-      })),
-    );
+        MessageGroupId: `${workerGroup}`,
+      };
+    });
+
+    await dispatch(dispatches);
 
     lastQueuedEndBlock = batches.lastBlock;
 
@@ -115,7 +131,10 @@ function batchBlocks(
 
     batchStartBlock = batchEndBlock + 1;
   }
-
+  console.log('batchBlocks', {
+    batches,
+    lastBlock: batchStartBlock - 1,
+  });
   return {
     batches,
     lastBlock: batchStartBlock - 1,

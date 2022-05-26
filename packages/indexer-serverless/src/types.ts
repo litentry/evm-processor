@@ -8,6 +8,7 @@ export type Params = {
   mongoDnsName: string;
   ebsVolumeName: string;
   jobQueueName: string;
+  maxWorkers: number;
 };
 
 export type ProducerConfig = {
@@ -30,4 +31,5 @@ export type Config = {
   archiveGraph?: string;
   contractGraph?: string;
   tokenActivityGraph?: string;
+  maxWorkers: number;
 };

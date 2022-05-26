@@ -10,4 +10,5 @@ module.exports = serverless({
   archiveGraph: process.env.ARCHIVE_GRAPH,
   contractGraph: process.env.CONTRACT_GRAPH,
   tokenActivityGraph: process.env.TOKEN_ACTIVITY_GRAPH,
+  maxWorkers: parseInt(process.env.MAX_WORKERS!) || 1,
 });

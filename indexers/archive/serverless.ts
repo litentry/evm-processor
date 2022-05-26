@@ -7,4 +7,5 @@ module.exports = serverless({
   version: process.env.DEPLOY_VERSION!,
   latestBlockDependency: 'archive-node',
   rpcEndpoint: process.env.RPC_ENDPOINT,
+  maxWorkers: parseInt(process.env.MAX_WORKERS!) || 1,
 });

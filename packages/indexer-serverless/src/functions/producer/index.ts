@@ -25,6 +25,7 @@ export default function (config: Config, params: Params) {
       BATCH_SIZE: String(stageConfig.getProducerBatchSize()),
       END_BLOCK: String(stageConfig.getProducerEndBlock()),
       MONGO_URI: stageConfig.getMongoURI(),
+      MAX_WORKERS: config.maxWorkers,
     },
   } as keyof AWS['functions'];
 }

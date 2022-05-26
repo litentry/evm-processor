@@ -9,4 +9,5 @@ module.exports = serverless({
   rpcEndpoint: process.env.RPC_ENDPOINT,
   archiveGraph: process.env.ARCHIVE_GRAPH,
   contractGraph: process.env.CONTRACT_GRAPH,
+  maxWorkers: parseInt(process.env.MAX_WORKERS!) || 1,
 });

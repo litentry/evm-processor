@@ -57,6 +57,7 @@ const getConfig = async (config: Config) => {
     mongoDnsName: `${config.chain}-${config.serviceName}-mongo-${config.version}`,
     ebsVolumeName: `${config.chain}-${config.serviceName}-mongo-ebs-${config.version}`,
     jobQueueName: `${config.chain}-${config.serviceName}-JobQueue-${config.version}`,
+    maxWorkers: config.maxWorkers,
   };
 
   const context = getContext();
@@ -113,6 +114,7 @@ const getConfig = async (config: Config) => {
             FifoThroughputLimit: 'perMessageGroupId',
             DeduplicationScope: 'messageGroup',
             MessageRetentionPeriod: 1209600,
+            ContentBasedDeduplication: true,
             RedrivePolicy: {
               deadLetterTargetArn: {
                 'Fn::GetAtt': ['JobQueueDLQ', 'Arn'],
