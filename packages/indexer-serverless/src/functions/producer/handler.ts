@@ -10,110 +10,127 @@ import {
 const sqs = new SQS();
 const maxBlocksToQueuePerExecution = 50000;
 
+type BlockBatch = {
+  startBlock: number;
+  endBlock: number;
+};
+
 interface BatchSQSMessage {
   Id: string;
   MessageBody: string;
 }
 
 export default async function producer() {
-  try {
-    monitoring.mark('start-connect-mongo');
-    console.log(process.env);
-    await mongoose.connect(process.env.MONGO_URI!);
-    monitoring.mark('end-connect-mongo');
+  await mongoose.connect(process.env.MONGO_URI!);
 
-    // put back in condition
-    monitoring.mark('start-get-latest-block');
-    const latestBlockHeight = await getLatestBlock(
-      process.env.LATEST_BLOCK_DEPENDENCY!,
-    )();
-    monitoring.mark('end-get-latest-block');
+  const existingLastQueuedEndBlock = await getLastQueuedEndBlock();
 
-    monitoring.mark('start-last-queued-end-block');
-    const existingLastQueuedEndBlock = await getLastQueuedEndBlock();
-    monitoring.mark('end-last-queued-end-block');
-    console.log('existingLastQueuedEndBlock', existingLastQueuedEndBlock);
-    console.log('latestBlockHeight', latestBlockHeight);
+  let lastQueuedEndBlock = existingLastQueuedEndBlock || 0;
 
-    let lastQueuedEndBlock = existingLastQueuedEndBlock || 0;
+  const targetBlockHeight =
+    process.env.END_BLOCK !== 'undefined'
+      ? parseInt(process.env.END_BLOCK!)
+      : await getLatestBlock(process.env.LATEST_BLOCK_DEPENDENCY!)();
 
-    const targetBlockHeight =
-      typeof process.env.END_BLOCK !== 'undefined'
-        ? parseInt(process.env.END_BLOCK)
-        : latestBlockHeight;
+  const maxWorkers = parseInt(process.env.MAX_WORKERS!) || 1;
+  const batchSize = parseInt(process.env.BATCH_SIZE!);
 
-    console.log({ lastQueuedEndBlock, targetBlockHeight });
+  console.log({
+    lastQueuedEndBlock,
+    targetBlockHeight,
+    existingLastQueuedEndBlock,
+  });
 
-    if (targetBlockHeight < lastQueuedEndBlock) {
-      console.log(`Last queued message is up to the target block height`);
-      return;
-    }
+  const targetJobCount = Math.min(
+    maxBlocksToQueuePerExecution,
+    targetBlockHeight - lastQueuedEndBlock,
+  );
+  const targetLastQueuedEndBlock = lastQueuedEndBlock + targetJobCount;
 
-    const targetJobCount = Math.min(
-      maxBlocksToQueuePerExecution,
-      targetBlockHeight - lastQueuedEndBlock,
-    );
-    const targetLastQueuedEndBlock = lastQueuedEndBlock + targetJobCount;
-
-    const dispatch = async (jobs: BatchSQSMessage[]) => {
+  const dispatch = async (jobs: BatchSQSMessage[]) => {
+    if (jobs.length) {
       await sqs
         .sendMessageBatch({
           QueueUrl: process.env.QUEUE_URL!,
           Entries: jobs,
         })
         .promise();
-
-      lastQueuedEndBlock = Number(jobs[jobs.length - 1].Id);
-
-      await saveLastQueuedEndBlock(lastQueuedEndBlock);
-    };
-
-    let pendingJobs = [];
-
-    monitoring.mark('start-enqueue-batches');
-    for (let i = lastQueuedEndBlock + 1; i <= targetLastQueuedEndBlock; i++) {
-      const startBlock = i;
-      const endBlock = Math.min(
-        i + parseInt(process.env.BATCH_SIZE!),
-        targetLastQueuedEndBlock,
-      );
-      pendingJobs.push({
-        Id: `${endBlock}`,
-        MessageBody: JSON.stringify({ startBlock, endBlock }),
-      });
-      i = endBlock;
-
-      if (pendingJobs.length === 10 || i === targetLastQueuedEndBlock) {
-        await dispatch(pendingJobs);
-        pendingJobs = [];
-      }
     }
-    monitoring.mark('end-enqueue-batches');
+  };
 
-    console.log(
-      `Queued ${targetJobCount} jobs. Last job end block: ${targetLastQueuedEndBlock}`,
+  while (true) {
+    let batches = batchBlocks(
+      lastQueuedEndBlock === 0 ? 0 : lastQueuedEndBlock + 1,
+      targetLastQueuedEndBlock,
+      batchSize,
+      10,
     );
-  } catch (error) {
-  } finally {
-    await mongoose.disconnect();
 
-    monitoring.measure('start-connect-mongo', 'end-connect-mongo', {
-      functionName: 'connectMongo',
-    });
-    monitoring.measure('start-get-latest-block', 'end-get-latest-block', {
-      functionName: 'latestBlock',
-    });
-    monitoring.measure(
-      'start-last-queued-end-block',
-      'end-last-queued-end-block',
-      {
-        functionName: 'getLastQueuedEndBlock',
-      },
-    );
-    monitoring.measure('start-enqueue-batches', 'end-enqueue-batches', {
-      functionName: 'enqueueBatches',
+    const dispatches = batches.batches.map((b) => {
+      let workerGroup = 0;
+      const blocksInBatch = b.endBlock + 1 - b.startBlock;
+      // For sanity only set a different worker group if the block range in
+      // this batch is the same length as the configured batch size,
+      // otherwise use group 0
+      if (blocksInBatch === batchSize) {
+        const batchGroup = b.startBlock % (maxWorkers * batchSize);
+        workerGroup = batchGroup / maxWorkers;
+      }
+      return {
+        Id: `${b.endBlock}`,
+        MessageBody: JSON.stringify(b),
+        MessageGroupId: `${workerGroup}`,
+      };
     });
 
-    await monitoring.pushMetrics();
+    await dispatch(dispatches);
+
+    lastQueuedEndBlock = batches.lastBlock;
+
+    await saveLastQueuedEndBlock(lastQueuedEndBlock);
+
+    if (lastQueuedEndBlock >= targetLastQueuedEndBlock) {
+      break;
+    }
   }
+
+  await monitoring.pushMetrics();
+
+  await mongoose.disconnect();
+}
+
+function batchBlocks(
+  startBlock: number,
+  endBlock: number,
+  batchSize: number,
+  numberOfBatches: number = 10,
+): {
+  lastBlock: number;
+  batches: BlockBatch[];
+} {
+  let batches: BlockBatch[] = [];
+  let batchStartBlock = startBlock;
+
+  while (batchStartBlock <= endBlock && batches.length < numberOfBatches) {
+    let batchEndBlock = batchStartBlock + batchSize - 1;
+
+    if (batchEndBlock > endBlock) {
+      batchEndBlock = endBlock;
+    }
+
+    batches.push({
+      startBlock: batchStartBlock,
+      endBlock: batchEndBlock,
+    });
+
+    batchStartBlock = batchEndBlock + 1;
+  }
+  console.log('batchBlocks', {
+    batches,
+    lastBlock: batchStartBlock - 1,
+  });
+  return {
+    batches,
+    lastBlock: batchStartBlock - 1,
+  };
 }

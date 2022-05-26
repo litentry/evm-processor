@@ -1,19 +1,20 @@
 import { AWS } from '@serverless/typescript';
 import stageConfigFactory from '../../config/stage-config';
+import { Config, Params } from '../../types';
 import { getContext } from '../../util/context';
-import { Config } from '../../types';
 
 const context = getContext();
-const stageConfig = stageConfigFactory(context.options.stage);
 
-export default (config: Config) =>
-  ({
+export default function (config: Config, params: Params) {
+  const stageConfig = stageConfigFactory(context.options.stage, params);
+  return {
     handler: './src/lambda/worker.default',
-    reservedConcurrency: stageConfig.getWorkerConcurrency(),
+    reservedConcurrency:
+      config.maxWorkers || stageConfig.getWorkerConcurrency(),
     events: [
       {
         sqs: {
-          batchSize: 10,
+          batchSize: 1,
           arn: {
             'Fn::GetAtt': ['JobQueue', 'Arn'],
           },
@@ -30,4 +31,5 @@ export default (config: Config) =>
       PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
     },
     timeout: 60,
-  } as keyof AWS['functions']);
+  } as keyof AWS['functions'];
+}

@@ -1,13 +1,17 @@
 import { AWS } from '@serverless/typescript';
 import stageConfigFactory from '../../config/stage-config';
+<<<<<<< HEAD
 import { Config } from '../../types';
 import { getContext } from '../../util/context';
+=======
+import { Config, Params } from '../../types';
+>>>>>>> remotes/origin/main
 
 const context = getContext();
-const stageConfig = stageConfigFactory(context.options.stage);
 
-export default (config: Config) =>
-  ({
+export default function (config: Config, params: Params) {
+  const stageConfig = stageConfigFactory(context.options.stage, params);
+  return {
     handler: './src/lambda/producer.default',
     reservedConcurrency: 1,
     events: [
@@ -24,8 +28,12 @@ export default (config: Config) =>
       LATEST_BLOCK_DEPENDENCY: config.latestBlockDependency,
       BATCH_SIZE: String(stageConfig.getProducerBatchSize()),
       END_BLOCK: String(stageConfig.getProducerEndBlock()),
-      BUCKET_NAME: stageConfig.getProducerBucketName(),
       MONGO_URI: stageConfig.getMongoURI(),
+<<<<<<< HEAD
       PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
+=======
+      MAX_WORKERS: config.maxWorkers,
+>>>>>>> remotes/origin/main
     },
-  } as keyof AWS['functions']);
+  } as keyof AWS['functions'];
+}
