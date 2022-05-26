@@ -35,7 +35,7 @@ export default async function producer() {
 
   const existingLastQueuedEndBlock = await getLastQueuedEndBlock();
 
-  // always start at -1 so we increment at sstart of the loop
+  // always start at -1 so we increment at start of the loop
   let lastQueuedEndBlock = existingLastQueuedEndBlock || -1;
 
   const currentChainHeight =
