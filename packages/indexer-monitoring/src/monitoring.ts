@@ -1,6 +1,7 @@
 import { performance } from 'perf_hooks';
 import {
   Counter,
+  Gauge,
   Histogram,
   Pushgateway,
   register as globalRegistry,
@@ -60,6 +61,22 @@ const monitoring = () => {
     });
   };
 
+  const getOrCreateGauge = (opts: PrometheusTrackingData): Gauge<string> => {
+    const name = getNameFromOpts(opts, 'gauge');
+
+    const metric = globalRegistry.getSingleMetric(name);
+    if (metric) {
+      return metric as Gauge<string>;
+    }
+
+    return new Gauge({
+      name,
+      help: `Gauge for ${opts.functionName}`,
+      labelNames: ['functionId'],
+      registers: [globalRegistry],
+    });
+  };
+
   return {
     mark: (markName: string) => {
       marks[markName] = performance.now();
@@ -74,6 +91,12 @@ const monitoring = () => {
       const timer = Math.abs((marks[endMark] ?? 0) - (marks[startMark] ?? 0));
 
       histogram.observe(timer / 1000); // observe takes time in seconds
+    },
+
+    gauge: (value: number, data: PrometheusTrackingData) => {
+      const gauge = getOrCreateGauge(data);
+
+      gauge.set(value);
     },
 
     pushMetrics: async () => {
