@@ -21,12 +21,20 @@ export const lambdaHandler = async (
           return;
         }
 
-        await innerHandler(message.startBlock, message.endBlock);
+        try {
+          await innerHandler(message.startBlock, message.endBlock);
 
-        return {
-          Id: record.messageId,
-          ReceiptHandle: record.receiptHandle,
-        };
+          return {
+            Id: record.messageId,
+            ReceiptHandle: record.receiptHandle,
+          };
+        } catch (e) {
+          console.log(
+            `Failed to handle the batch ${message.startBlock}-${message.endBlock}`,
+            e,
+          );
+          return; // We return empty here because we won't delete the failing message, just log it and let it retry.
+        }
       }),
     )
   ).filter((elem) => elem !== undefined) as DeleteMessageBatchRequestEntry[];

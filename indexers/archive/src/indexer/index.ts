@@ -1,6 +1,6 @@
 import colors from 'colors';
+import { repository } from 'indexer-i';
 import { startTimer } from 'monitoring';
-import { repository } from 'indexer-utils';
 import extractBlock from './extract-block';
 import loadBlock from './load-block';
 import transformBlock from './transform-block';

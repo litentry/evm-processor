@@ -1,7 +1,7 @@
-import { pushMetrics } from 'monitoring';
-import mongoose from 'mongoose';
-import { awsUtils } from 'aws-utils';
 import { SQSEvent } from 'aws-lambda';
+import { awsUtils } from 'aws-utils';
+import mongoose from 'mongoose';
+import { pushMetrics } from 'monitoring';
 
 export default async function worker(
   event: SQSEvent,
@@ -21,6 +21,7 @@ export default async function worker(
     console.log('Finish Push Metrics');
   } catch (e) {
     console.error('Outer handler error', e);
+    throw e;
   }
   console.log('Disconnecting from mongo');
 
