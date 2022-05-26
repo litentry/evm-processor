@@ -53,12 +53,12 @@ export default async function producer() {
     existingLastQueuedEndBlock,
   });
 
-  if (targetBlockHeight < lastQueuedEndBlock) {
+  if (targetBlockHeight <= lastQueuedEndBlock) {
     console.log(`Last queued message is up to the chain height`);
     return;
   }
 
-  const targetJobCount = maxBlocksToQueuePerExecution / batchSize;
+  const targetJobCount = Math.floor(maxBlocksToQueuePerExecution / batchSize);
 
   const batches = [];
   for (let i = 0; i < targetJobCount; i++) {
@@ -90,7 +90,9 @@ export default async function producer() {
     };
   });
 
-  console.log(dispatches);
+  console.log('Messages sent: ', dispatches.length);
+  console.log('First message:', dispatches[0]);
+  console.log('Last message:', dispatches[dispatches.length - 1]);
 
   await dispatch(dispatches);
 
