@@ -7,7 +7,7 @@ import {
 } from './lastQueuedEndblockRepository';
 
 const sqs = new SQS();
-const maxBlocksToQueuePerExecution = 100;
+const maxBlocksToQueuePerExecution = 50000;
 
 type BlockBatch = {
   startBlock: number;
