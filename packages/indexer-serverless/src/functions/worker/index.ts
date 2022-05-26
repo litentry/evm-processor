@@ -1,7 +1,7 @@
 import { AWS } from '@serverless/typescript';
 import stageConfigFactory from '../../config/stage-config';
-import { getContext } from '../../util/context';
 import { Config } from '../../types';
+import { getContext } from '../../util/context';
 
 const context = getContext();
 const stageConfig = stageConfigFactory(context.options.stage);
@@ -17,6 +17,7 @@ export default (config: Config) =>
           arn: {
             'Fn::GetAtt': ['JobQueue', 'Arn'],
           },
+          functionResponseType: 'ReportBatchItemFailures',
         },
       },
     ],

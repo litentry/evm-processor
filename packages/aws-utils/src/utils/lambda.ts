@@ -1,6 +1,4 @@
-import { SQSEvent } from 'aws-lambda';
-import { DeleteMessageBatchRequestEntry } from 'aws-sdk/clients/sqs';
-import { Config, deleteBatchMessages } from './sqs';
+import { SQSBatchItemFailure, SQSEvent } from 'aws-lambda';
 
 type ProcessorMessage = {
   startBlock: number;
@@ -9,37 +7,31 @@ type ProcessorMessage = {
 
 export const lambdaHandler = async (
   event: SQSEvent,
-  config: Config,
   innerHandler: (startBlock: number, endBlock: number) => Promise<void>,
-) => {
-  const successfulMessages: DeleteMessageBatchRequestEntry[] = (
+): Promise<SQSBatchItemFailure[]> => {
+  const failedMessageIds: SQSBatchItemFailure[] = (
     await Promise.all(
       event.Records.map(async (record) => {
         const message = getMessageFromBody(record.body);
 
         if (!message) {
-          return;
+          return record.messageId;
         }
 
         try {
           await innerHandler(message.startBlock, message.endBlock);
-
-          return {
-            Id: record.messageId,
-            ReceiptHandle: record.receiptHandle,
-          };
         } catch (e) {
           console.log(
             `Failed to handle the batch ${message.startBlock}-${message.endBlock}`,
             e,
           );
-          return; // We return empty here because we won't delete the failing message, just log it and let it retry.
+          return { itemIdentifier: record.messageId };
         }
       }),
     )
-  ).filter((elem) => elem !== undefined) as DeleteMessageBatchRequestEntry[];
+  ).filter((elem) => elem !== undefined) as SQSBatchItemFailure[];
 
-  await deleteBatchMessages(config, successfulMessages);
+  return failedMessageIds;
 };
 
 function getMessageFromBody(body: string): ProcessorMessage | null {
