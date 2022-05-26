@@ -7,6 +7,8 @@ export type Params = {
   region: AWS['provider']['region'];
   mongoDnsName: string;
   ebsVolumeName: string;
+  jobQueueName: string;
+  maxWorkers: number;
 };
 
 export type ProducerConfig = {
@@ -18,6 +20,8 @@ export type ProducerConfig = {
 
 export type Config = {
   serviceName: string;
+  chain: string;
+  version: string;
   latestBlockDependency:
     | 'archive-node'
     | 'archive-graph'
@@ -27,4 +31,5 @@ export type Config = {
   archiveGraph?: string;
   contractGraph?: string;
   tokenActivityGraph?: string;
+  maxWorkers: number;
 };
