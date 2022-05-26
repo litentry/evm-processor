@@ -13,7 +13,15 @@ if (!process.env.RPC_ENDPOINT) {
 let provider: WebsocketProvider | HttpProvider;
 
 if (process.env.RPC_ENDPOINT?.startsWith('ws')) {
-  provider = new Web3.providers.WebsocketProvider(process.env.RPC_ENDPOINT);
+  provider = new Web3.providers.WebsocketProvider(process.env.RPC_ENDPOINT, {
+    reconnect: {
+      auto: true,
+      delay: 1000,
+      maxAttempts: 10,
+    },
+  });
+  provider.on('error', () => console.error('WS Error'));
+  provider.on('end', () => console.error('WS End'));
 } else {
   provider = new Web3.providers.HttpProvider(process.env.RPC_ENDPOINT!);
 }
