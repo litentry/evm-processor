@@ -41,6 +41,11 @@ export default async function producer() {
     existingLastQueuedEndBlock,
   });
 
+  if (targetBlockHeight < lastQueuedEndBlock) {
+    console.log(`Last queued message is up to the target block height`);
+    return;
+  }
+
   const targetJobCount = Math.min(
     maxBlocksToQueuePerExecution,
     targetBlockHeight - lastQueuedEndBlock,
@@ -97,6 +102,10 @@ export default async function producer() {
   await monitoring.pushMetrics();
 
   await mongoose.disconnect();
+
+  console.log(
+    `Queued ${targetJobCount} jobs. Last job end block: ${targetLastQueuedEndBlock}`,
+  );
 }
 
 function batchBlocks(
