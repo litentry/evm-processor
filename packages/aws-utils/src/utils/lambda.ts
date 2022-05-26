@@ -15,7 +15,7 @@ export const lambdaHandler = async (
         const message = getMessageFromBody(record.body);
 
         if (!message) {
-          return record.messageId;
+          return { itemIdentifier: record.messageId };
         }
 
         try {
@@ -29,7 +29,7 @@ export const lambdaHandler = async (
         }
       }),
     )
-  ).filter((elem) => elem !== undefined) as SQSBatchItemFailure[];
+  ).filter((e) => e !== undefined) as SQSBatchItemFailure[];
 
   return failedMessageIds;
 };

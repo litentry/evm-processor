@@ -1,4 +1,4 @@
-import { SQSBatchResponse, SQSEvent } from 'aws-lambda';
+import { SQSBatchItemFailure, SQSBatchResponse, SQSEvent } from 'aws-lambda';
 import { awsUtils } from 'aws-utils';
 import mongoose from 'mongoose';
 import { pushMetrics } from 'monitoring';
@@ -10,21 +10,21 @@ export default async function worker(
   console.log('Connecting to mongo');
   await mongoose.connect(process.env.MONGO_URI!);
 
+  let response: SQSBatchItemFailure[] = [];
+
   try {
-    const failedMessageIds = await awsUtils.lambdaHandler(event, handler);
-
-    await pushMetrics();
-    console.log('Finish Push Metrics');
-
-    return {
-      batchItemFailures: failedMessageIds,
-    };
+    response = await awsUtils.lambdaHandler(event, handler);
   } catch (e) {
     console.error('Outer handler error', e);
     throw e;
-  } finally {
-    console.log('Disconnecting from mongo');
-
-    await mongoose.disconnect();
   }
+
+  await pushMetrics();
+
+  console.log('Disconnecting from mongo');
+  await mongoose.disconnect();
+
+  return {
+    batchItemFailures: response,
+  };
 }
