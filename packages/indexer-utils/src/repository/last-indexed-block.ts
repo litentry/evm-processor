@@ -47,7 +47,11 @@ export const calculate = async () => {
 
     processedIndexedBlockRanges.push(pendingIndexedBlockRange);
 
-    lastIndexedBlock = pendingIndexedBlockRange.endBlock;
+    lastIndexedBlock = Math.max(
+      pendingIndexedBlockRange.endBlock,
+      lastIndexedBlock || 0,
+    );
+    console.log({ lastIndexedBlock });
   });
 
   if (processedIndexedBlockRanges.length > 0 && lastIndexedBlock !== null) {

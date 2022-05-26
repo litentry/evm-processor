@@ -43,7 +43,7 @@ const augmentEnvVars = async (stage: string, params: Params): Promise<void> => {
         (output) => output.OutputKey === 'RealmDNSZone',
       )!.OutputValue!;
 
-      process.env.MONGO_URI = `mongodb://${params.mongoDnsName}.${serviceDiscoveryDomain}:27017/evm-archive`;
+      process.env.MONGO_URI = `mongodb://${params.mongoDnsName}.${serviceDiscoveryDomain}:27017/db`;
     }
   }
 };
@@ -54,15 +54,16 @@ const getConfig = async (config: Config) => {
     clusterStackName: 'graph-aws-infrastructure-dev',
     mongoImageVersion: '5.0.8',
     region: 'eu-west-1',
-    mongoDnsName: `${config.serviceName}-mongo`,
-    ebsVolumeName: `${config.serviceName}-mongo-ebs`,
+    mongoDnsName: `${config.chain}-${config.serviceName}-mongo-${config.version}`,
+    ebsVolumeName: `${config.chain}-${config.serviceName}-mongo-ebs-${config.version}`,
+    jobQueueName: `${config.chain}-${config.serviceName}-JobQueue-${config.version}`,
   };
 
   const context = getContext();
   await augmentEnvVars(context.options.stage, params);
 
   const serverlessConfiguration: AWS = {
-    service: config.serviceName,
+    service: `${config.chain}-${config.serviceName}-${config.version}`,
     frameworkVersion: '3',
     plugins: ['serverless-esbuild', 'serverless-localstack'],
     provider: {
@@ -106,18 +107,35 @@ const getConfig = async (config: Config) => {
         JobQueue: {
           Type: 'AWS::SQS::Queue',
           Properties: {
-            QueueName: 'JobQueue',
-            VisibilityTimeout: 60,
+            QueueName: `${params.jobQueueName}.fifo`,
+            VisibilityTimeout: 120,
+            FifoQueue: true,
+            FifoThroughputLimit: 'perMessageGroupId',
+            DeduplicationScope: 'messageGroup',
+            MessageRetentionPeriod: 1209600,
+            RedrivePolicy: {
+              deadLetterTargetArn: {
+                'Fn::GetAtt': ['JobQueueDLQ', 'Arn'],
+              },
+              maxReceiveCount: 3,
+            },
+          },
+        },
+        JobQueueDLQ: {
+          Type: 'AWS::SQS::Queue',
+          Properties: {
+            QueueName: `${params.jobQueueName}-dlq.fifo`,
+            FifoQueue: true,
           },
         },
         ...containerResources(context.options.stage, params).Resources,
       },
     },
     functions: {
-      producer: producer(config),
-      worker: worker(config),
-      lastIndexedBlock,
-      query,
+      producer: producer(config, params),
+      worker: worker(config, params),
+      lastIndexedBlock: lastIndexedBlock(config, params),
+      query: query(config, params),
     },
     package: { individually: true },
     custom: {

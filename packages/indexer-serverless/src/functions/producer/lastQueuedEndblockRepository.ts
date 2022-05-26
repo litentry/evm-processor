@@ -11,7 +11,9 @@ export const getLastQueuedEndBlock = async (): Promise<number | null> => {
 export const saveLastQueuedEndBlock = async (
   lastQueuedEndBlock: number,
 ): Promise<void> => {
-  await repository.lastQueuedBlock.Model.create({
-    number: lastQueuedEndBlock,
-  });
+  await repository.lastQueuedBlock.Model.findOneAndUpdate(
+    {},
+    { $set: { number: lastQueuedEndBlock } },
+    { upsert: true },
+  );
 };

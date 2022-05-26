@@ -20,9 +20,10 @@ export default async function worker(
     await pushMetrics();
     console.log('Finish Push Metrics');
   } catch (e) {
-    console.error('Outer handler error', e);
+    console.error('Outer handler error');
+    await mongoose.disconnect();
+    throw e;
   }
   console.log('Disconnecting from mongo');
-
   await mongoose.disconnect();
 }
