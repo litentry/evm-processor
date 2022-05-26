@@ -94,7 +94,9 @@ export default async function producer() {
   console.log('First message:', dispatches[0]);
   console.log('Last message:', dispatches[dispatches.length - 1]);
 
-  await dispatch(dispatches);
+  for (let i = 0; i < dispatches.length; i += 10) {
+    await dispatch(dispatches.slice(i, i + 10));
+  }
 
   await saveLastQueuedEndBlock(lastQueuedEndBlock);
 
