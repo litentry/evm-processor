@@ -38,7 +38,7 @@ export default async function producer() {
   // always start at -1 so we increment at start of the loop
   let lastQueuedEndBlock = existingLastQueuedEndBlock || -1;
 
-  const currentChainHeight =
+  const targetBlockHeight =
     process.env.END_BLOCK !== 'undefined'
       ? parseInt(process.env.END_BLOCK!)
       : await getLatestBlock(process.env.LATEST_BLOCK_DEPENDENCY!)();
@@ -49,11 +49,11 @@ export default async function producer() {
   console.log({
     batchSize,
     lastQueuedEndBlock,
-    currentChainHeight,
+    targetBlockHeight,
     existingLastQueuedEndBlock,
   });
 
-  if (currentChainHeight < lastQueuedEndBlock) {
+  if (targetBlockHeight < lastQueuedEndBlock) {
     console.log(`Last queued message is up to the chain height`);
     return;
   }
@@ -64,11 +64,11 @@ export default async function producer() {
   for (let i = 0; i < targetJobCount; i++) {
     const batch: BlockBatch = {
       startBlock: lastQueuedEndBlock + 1,
-      endBlock: Math.min(currentChainHeight, lastQueuedEndBlock + batchSize),
+      endBlock: Math.min(targetBlockHeight, lastQueuedEndBlock + batchSize),
     };
     batches.push(batch);
     lastQueuedEndBlock = batch.endBlock;
-    if (batch.endBlock === currentChainHeight) {
+    if (batch.endBlock === targetBlockHeight) {
       break;
     }
   }
