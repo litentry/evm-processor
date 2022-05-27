@@ -35,7 +35,7 @@ export const save = async (lastIndexedBlock: number): Promise<void> => {
   await currentValue.updateOne({ lastIndexedBlock });
 };
 
-export const calculate = async () => {
+export const calculateAndUpdate = async () => {
   let lastIndexedBlock = await get();
   const processedIndexedBlockRanges: IndexedBlockRangeDocument[] = [];
   const pendingIndexedBlockRanges = await getIndexedBlockRanges();
@@ -56,7 +56,9 @@ export const calculate = async () => {
 
   if (processedIndexedBlockRanges.length > 0 && lastIndexedBlock !== null) {
     await save(lastIndexedBlock);
+    console.log(`Updated last indexed block to ${lastIndexedBlock}`);
     await removeIndexedBlockRanges(processedIndexedBlockRanges);
+    console.log({Removed: processedIndexedBlockRanges});
   }
 };
 
