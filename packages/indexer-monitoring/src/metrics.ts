@@ -22,6 +22,9 @@ const metrics: Metrics = {
   getLastQueuedBlock: {
     functionName: 'get-last-queued-block',
   },
+  lastQueuedBlock: {
+    functionName: 'last-queued-block',
+  },
   batchBlocks: {
     functionName: 'batch-blocks',
   },
