@@ -26,6 +26,8 @@ export default function (config: Config, params: Params) {
       END_BLOCK: String(stageConfig.getProducerEndBlock()),
       MONGO_URI: stageConfig.getMongoURI(),
       PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
+      CHAIN: config.chain,
+      DEPLOY_VERSION: config.version,
       MAX_WORKERS: config.maxWorkers,
     },
   } as keyof AWS['functions'];

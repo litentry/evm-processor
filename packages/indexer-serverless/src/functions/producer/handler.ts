@@ -34,9 +34,9 @@ const dispatch = async (jobs: BatchSQSMessage[]) => {
 export default async function producer() {
   await mongoose.connect(process.env.MONGO_URI!);
 
-  monitoring.markStart(metrics.getLastQueuedBlock);
+  monitoring.markStart(metrics.lastQueuedBlock);
   const existingLastQueuedEndBlock = await getLastQueuedEndBlock();
-  monitoring.markEnd(metrics.getLastQueuedBlock);
+  monitoring.markEnd(metrics.lastQueuedBlock);
 
   // always start at -1 so we increment at start of the loop
   let lastQueuedEndBlock = existingLastQueuedEndBlock || -1;
@@ -124,12 +124,12 @@ export default async function producer() {
   }
   monitoring.markEnd(metrics.batchBlocks);
 
-  monitoring.markStart(metrics.saveLastQueuedEndBlock);
+  monitoring.markStart(metrics.saveLastQueuedBlock);
   await saveLastQueuedEndBlock(lastQueuedEndBlock);
-  monitoring.markEnd(metrics.saveLastQueuedEndBlock);
-  monitoring.gauge(lastQueuedEndBlock, metrics.lastQueuedEndBlock);
+  monitoring.markEnd(metrics.saveLastQueuedBlock);
+  // monitoring.gauge(lastQueuedEndBlock, metrics.lastQueuedEndBlock);
 
-  monitoring.measure(metrics.getLastQueuedBlock);
+  monitoring.measure(metrics.lastQueuedBlock);
   monitoring.measure(metrics.batchBlocks);
   monitoring.measure(metrics.saveLastQueuedBlock);
 
