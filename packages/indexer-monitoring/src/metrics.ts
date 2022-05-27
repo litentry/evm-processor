@@ -8,28 +8,28 @@ export type Metrics = {
 
 const metrics: Metrics = {
   extractBlock: {
-    functionName: 'extract-block',
+    functionName: 'extract_block',
   },
   transformBlock: {
-    functionName: 'transform-block',
+    functionName: 'transform_block',
   },
   loadBlock: {
-    functionName: 'load-block',
+    functionName: 'load_block',
   },
   fullWorkerProcess: {
-    functionName: 'full-worker-process',
+    functionName: 'full_worker_process',
   },
   getLastQueuedBlock: {
-    functionName: 'get-last-queued-block',
+    functionName: 'get_last_queued_block',
   },
   lastQueuedBlock: {
-    functionName: 'last-queued-block',
+    functionName: 'last_queued_block',
   },
   batchBlocks: {
-    functionName: 'batch-blocks',
+    functionName: 'batch_blocks',
   },
   saveLastQueuedBlock: {
-    functionName: 'save-last-queued-block',
+    functionName: 'save_last_queued_block',
   },
 };
 
