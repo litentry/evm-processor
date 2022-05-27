@@ -1,4 +1,3 @@
-import colors from 'colors';
 import { metrics, monitoring } from 'indexer-monitoring';
 import { repository } from 'indexer-utils';
 import extractBlock from './extract-block';
@@ -6,43 +5,28 @@ import loadBlock from './load-block';
 import transformBlock from './transform-block';
 
 export default async function indexer(start: number, end: number) {
-  console.log(`Processing block batch ${start}-${end}`);
-
   const blocks: number[] = [];
   for (let block = start; block <= end; block++) {
     blocks.push(block);
   }
 
   try {
-    console.time(`Batch time ${start}-${end}`);
-    await Promise.all(
-      blocks.map(async (number) => {
-        monitoring.markStart(metrics.extractBlock);
-        const data = await extractBlock(number);
-        monitoring.markEnd(metrics.extractBlock);
+    // Extract batch
+    monitoring.markStart(metrics.extractBlock);
+    const extractedBlocks = await Promise.all(blocks.map(extractBlock));
+    monitoring.markEnd(metrics.extractBlock);
 
-        monitoring.markStart(metrics.transformBlock);
-        const transformedData = transformBlock(data);
-        monitoring.markEnd(metrics.transformBlock);
+    // Transform batch
+    monitoring.markStart(metrics.transformBlock);
+    const transformedBlocks = extractedBlocks.map(transformBlock);
+    monitoring.markEnd(metrics.transformBlock);
 
-        monitoring.markStart(metrics.loadBlock);
-        await loadBlock(transformedData);
-        monitoring.markEnd(metrics.loadBlock);
+    // Load batch
+    monitoring.markStart(metrics.loadBlock);
+    await Promise.all(transformedBlocks.map(loadBlock));
+    monitoring.markEnd(metrics.loadBlock);
 
-        console.log(
-          `Contract creations: ${transformedData.contractCreationTransactions.length}`,
-        );
-        console.log(
-          `Contract interactions: ${transformedData.contractTransactions.length}`,
-        );
-        console.log(
-          `Native token transfers: ${transformedData.nativeTokenTransactions.length}`,
-        );
-      }),
-    );
-    console.log(colors.blue(`Processed batch ${start} to ${end}`));
-    console.timeEnd(`Batch time ${start}-${end}`);
-
+    // Log completion
     await repository.indexedBlockRange.save(start, end);
   } catch (e) {
     console.error(e);
