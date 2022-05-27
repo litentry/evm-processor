@@ -1,4 +1,5 @@
 import { SQS } from 'aws-sdk';
+import { metrics, monitoring } from 'indexer-monitoring';
 import mongoose from 'mongoose';
 import getLatestBlock from '../../util/get-latest-block';
 import {
@@ -33,7 +34,9 @@ const dispatch = async (jobs: BatchSQSMessage[]) => {
 export default async function producer() {
   await mongoose.connect(process.env.MONGO_URI!);
 
+  monitoring.markStart(metrics.getLastQueuedBlock);
   const existingLastQueuedEndBlock = await getLastQueuedEndBlock();
+  monitoring.markEnd(metrics.getLastQueuedBlock);
 
   // always start at -1 so we increment at start of the loop
   let lastQueuedEndBlock = existingLastQueuedEndBlock || -1;
@@ -115,11 +118,22 @@ export default async function producer() {
   console.log('First message:', dispatches[0]);
   console.log('Last message:', dispatches[dispatches.length - 1]);
 
+  monitoring.markStart(metrics.batchBlocks);
   for (let i = 0; i < dispatches.length; i += 10) {
     await dispatch(dispatches.slice(i, i + 10));
   }
+  monitoring.markEnd(metrics.batchBlocks);
 
+  monitoring.markStart(metrics.saveLastQueuedEndBlock);
   await saveLastQueuedEndBlock(lastQueuedEndBlock);
+  monitoring.markEnd(metrics.saveLastQueuedEndBlock);
+  monitoring.gauge(lastQueuedEndBlock, metrics.lastQueuedEndBlock);
+
+  monitoring.measure(metrics.getLastQueuedBlock);
+  monitoring.measure(metrics.batchBlocks);
+  monitoring.measure(metrics.saveLastQueuedBlock);
+
+  await monitoring.pushMetrics();
 
   await mongoose.disconnect();
 

@@ -1,7 +1,7 @@
 import { AWS } from '@serverless/typescript';
-import { getContext } from '../../util/context';
 import stageConfigFactory from '../../config/stage-config';
 import { Config, Params } from '../../types';
+import { getContext } from '../../util/context';
 
 const context = getContext();
 
@@ -25,6 +25,7 @@ export default function (config: Config, params: Params) {
       BATCH_SIZE: String(stageConfig.getProducerBatchSize()),
       END_BLOCK: String(stageConfig.getProducerEndBlock()),
       MONGO_URI: stageConfig.getMongoURI(),
+      PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
       MAX_WORKERS: config.maxWorkers,
     },
   } as keyof AWS['functions'];
