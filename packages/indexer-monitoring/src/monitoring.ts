@@ -33,7 +33,7 @@ const monitoring = () => {
     return new Histogram({
       name,
       help: `Elapsed time for the ${metric.functionName} function`,
-      labelNames: ['chain'],
+      labelNames: ['chain', 'version'],
       registers: [globalRegistry],
     });
   };
@@ -49,7 +49,7 @@ const monitoring = () => {
     return new Counter({
       name,
       help: `Counter for the ${metric.functionName} function`,
-      labelNames: ['chain'],
+      labelNames: ['chain', 'version'],
       registers: [globalRegistry],
     });
   };
@@ -65,7 +65,7 @@ const monitoring = () => {
     return new Gauge({
       name,
       help: `Gauge for ${metric.functionName}`,
-      labelNames: ['chain'],
+      labelNames: ['chain', 'version'],
       registers: [globalRegistry],
     });
   };
@@ -87,13 +87,19 @@ const monitoring = () => {
             0),
       );
 
-      histogram.observe({ chain: process.env.CHAIN }, timer / 1000); // observe takes time in seconds
+      histogram.observe(
+        { chain: process.env.CHAIN, version: process.env.DEPLOY_VERSION },
+        timer / 1000,
+      ); // observe takes time in seconds
     },
 
     gauge: (value: number, metric: Metric) => {
       const gauge = getOrCreateGauge(metric);
 
-      gauge.set({ chain: process.env.CHAIN }, value);
+      gauge.set(
+        { chain: process.env.CHAIN, version: process.env.DEPLOY_VERSION },
+        value,
+      );
     },
 
     pushMetrics: async () => {
