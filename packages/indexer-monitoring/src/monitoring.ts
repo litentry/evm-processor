@@ -104,6 +104,15 @@ const monitoring = () => {
       );
     },
 
+    incCounter: (value: number, metric: Metric) => {
+      const counter = getOrCreateCounter(metric);
+
+      counter.inc(
+        { chain: process.env.CHAIN, version: process.env.DEPLOY_VERSION },
+        value,
+      );
+    },
+
     pushMetrics: async () => {
       const gateway = new Pushgateway(
         process.env.PUSHGATEWAY_URL!,
