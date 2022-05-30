@@ -41,10 +41,16 @@ export default async function producer() {
   // always start at -1 so we increment at start of the loop
   let lastQueuedEndBlock = existingLastQueuedEndBlock || -1;
 
+  const chainHeight = await getLatestBlock(
+    process.env.LATEST_BLOCK_DEPENDENCY!,
+  )();
+
   const targetBlockHeight =
     process.env.END_BLOCK !== 'undefined'
       ? parseInt(process.env.END_BLOCK!)
-      : await getLatestBlock(process.env.LATEST_BLOCK_DEPENDENCY!)();
+      : chainHeight;
+
+  monitoring.gauge(chainHeight, metrics.lastChainBlock);
 
   const maxWorkers = parseInt(process.env.MAX_WORKERS!) || 1;
   const batchSize = parseInt(process.env.BATCH_SIZE!);
