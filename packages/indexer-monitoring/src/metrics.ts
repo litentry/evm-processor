@@ -31,6 +31,9 @@ const metrics: Metrics = {
   saveLastQueuedBlock: {
     functionName: 'save_last_queued_block',
   },
+  rpcCalls: {
+    functionName: 'rpc_calls',
+  },
 };
 
 export default metrics;
