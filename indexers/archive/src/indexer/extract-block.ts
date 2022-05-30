@@ -1,9 +1,12 @@
 import { metrics, monitoring } from 'indexer-monitoring';
 import { web3 } from 'indexer-utils';
 import { ExtractBlock } from './types';
+import throat from 'throat';
+
+const throttle = throat(750);
 
 async function getReceipts(transactionHashes: string[]) {
-  const receipts = transactionHashes.map(async (hash) => {
+  const receipts = transactionHashes.map((hash) => throttle(async () => {
     const receipt = await web3.eth.getTransactionReceipt(hash);
 
     if (!receipt) {
@@ -13,8 +16,8 @@ async function getReceipts(transactionHashes: string[]) {
       );
     }
     return receipt;
-  });
-  return receipts;
+  }));
+  return Promise.all(receipts);
 }
 
 const rpc: ExtractBlock = async (blockNumber) => {
