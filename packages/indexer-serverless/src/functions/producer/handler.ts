@@ -1,4 +1,5 @@
 import { SQS } from 'aws-sdk';
+import { metrics, monitoring } from 'indexer-monitoring';
 import mongoose from 'mongoose';
 import getLatestBlock from '../../util/get-latest-block';
 import {
@@ -19,12 +20,26 @@ interface BatchSQSMessage {
   MessageBody: string;
 }
 
+const dispatch = async (jobs: BatchSQSMessage[]) => {
+  if (jobs.length) {
+    await sqs
+      .sendMessageBatch({
+        QueueUrl: process.env.QUEUE_URL!,
+        Entries: jobs,
+      })
+      .promise();
+  }
+};
+
 export default async function producer() {
   await mongoose.connect(process.env.MONGO_URI!);
 
+  monitoring.markStart(metrics.lastQueuedBlock);
   const existingLastQueuedEndBlock = await getLastQueuedEndBlock();
+  monitoring.markEnd(metrics.lastQueuedBlock);
 
-  let lastQueuedEndBlock = existingLastQueuedEndBlock || 0;
+  // always start at -1 so we increment at start of the loop
+  let lastQueuedEndBlock = existingLastQueuedEndBlock || -1;
 
   const targetBlockHeight =
     process.env.END_BLOCK !== 'undefined'
@@ -34,109 +49,95 @@ export default async function producer() {
   const maxWorkers = parseInt(process.env.MAX_WORKERS!) || 1;
   const batchSize = parseInt(process.env.BATCH_SIZE!);
 
+  const sqsQueueAttributes = await sqs
+    .getQueueAttributes({
+      QueueUrl: process.env.QUEUE_URL!,
+      AttributeNames: [
+        'ApproximateNumberOfMessagesNotVisible',
+        'ApproximateNumberOfMessages',
+      ],
+    })
+    .promise();
+
+  const currentBlocksInQueue =
+    (parseInt(
+      sqsQueueAttributes.Attributes!.ApproximateNumberOfMessagesNotVisible,
+    ) +
+      parseInt(sqsQueueAttributes.Attributes!.ApproximateNumberOfMessages)) *
+    batchSize;
+
+  const targetJobCount =
+    Math.floor(maxBlocksToQueuePerExecution / batchSize) -
+    Math.floor(currentBlocksInQueue / batchSize);
+
   console.log({
+    batchSize,
     lastQueuedEndBlock,
     targetBlockHeight,
     existingLastQueuedEndBlock,
+    currentBlocksInQueue,
+    targetJobCount,
   });
 
-  if (targetBlockHeight < lastQueuedEndBlock) {
-    console.log(`Last queued message is up to the target block height`);
+  if (targetBlockHeight <= lastQueuedEndBlock) {
+    console.log(`Last queued message is up to the chain height`);
     return;
   }
 
-  const targetJobCount = Math.min(
-    maxBlocksToQueuePerExecution,
-    targetBlockHeight - lastQueuedEndBlock,
-  );
-  const targetLastQueuedEndBlock = lastQueuedEndBlock + targetJobCount;
-
-  const dispatch = async (jobs: BatchSQSMessage[]) => {
-    if (jobs.length) {
-      await sqs
-        .sendMessageBatch({
-          QueueUrl: process.env.QUEUE_URL!,
-          Entries: jobs,
-        })
-        .promise();
-    }
-  };
-
-  while (true) {
-    let batches = batchBlocks(
-      lastQueuedEndBlock === 0 ? 0 : lastQueuedEndBlock + 1,
-      targetLastQueuedEndBlock,
-      batchSize,
-      10,
-    );
-
-    const dispatches = batches.batches.map((b) => {
-      let workerGroup = 0;
-      const blocksInBatch = b.endBlock + 1 - b.startBlock;
-      // For sanity only set a different worker group if the block range in
-      // this batch is the same length as the configured batch size,
-      // otherwise use group 0
-      if (blocksInBatch === batchSize) {
-        const batchGroup = b.startBlock % (maxWorkers * batchSize);
-        workerGroup = batchGroup / maxWorkers;
-      }
-      return {
-        Id: `${b.endBlock}`,
-        MessageBody: JSON.stringify(b),
-        MessageGroupId: `${workerGroup}`,
-      };
-    });
-
-    await dispatch(dispatches);
-
-    lastQueuedEndBlock = batches.lastBlock;
-
-    await saveLastQueuedEndBlock(lastQueuedEndBlock);
-
-    if (lastQueuedEndBlock >= targetLastQueuedEndBlock) {
+  const batches = [];
+  for (let i = 0; i < targetJobCount; i++) {
+    const batch: BlockBatch = {
+      startBlock: lastQueuedEndBlock + 1,
+      endBlock: Math.min(targetBlockHeight, lastQueuedEndBlock + batchSize),
+    };
+    batches.push(batch);
+    lastQueuedEndBlock = batch.endBlock;
+    if (batch.endBlock === targetBlockHeight) {
       break;
     }
   }
 
+  const dispatches = batches.map((b) => {
+    let workerGroup = 0;
+    const blocksInBatch = b.endBlock + 1 - b.startBlock;
+    // For sanity only set a different worker group if the block range in
+    // this batch is the same length as the configured batch size,
+    // otherwise use group 0
+    if (blocksInBatch === batchSize) {
+      const batchGroup = b.startBlock % (maxWorkers * batchSize);
+      workerGroup = batchGroup / maxWorkers;
+    }
+    return {
+      Id: `${b.endBlock}`,
+      MessageBody: JSON.stringify(b),
+      MessageGroupId: `${workerGroup}`,
+    };
+  });
+
+  console.log('Messages sent: ', dispatches.length);
+  console.log('First message:', dispatches[0]);
+  console.log('Last message:', dispatches[dispatches.length - 1]);
+
+  monitoring.markStart(metrics.batchBlocks);
+  for (let i = 0; i < dispatches.length; i += 10) {
+    await dispatch(dispatches.slice(i, i + 10));
+  }
+  monitoring.markEnd(metrics.batchBlocks);
+
+  monitoring.markStart(metrics.saveLastQueuedBlock);
+  await saveLastQueuedEndBlock(lastQueuedEndBlock);
+  monitoring.markEnd(metrics.saveLastQueuedBlock);
+  // monitoring.gauge(lastQueuedEndBlock, metrics.lastQueuedEndBlock);
+
+  monitoring.measure(metrics.lastQueuedBlock);
+  monitoring.measure(metrics.batchBlocks);
+  monitoring.measure(metrics.saveLastQueuedBlock);
+
+  await monitoring.pushMetrics();
+
   await mongoose.disconnect();
 
   console.log(
-    `Queued ${targetJobCount} jobs. Last job end block: ${targetLastQueuedEndBlock}`,
+    `Queued ${targetJobCount} jobs. Last job end block: ${lastQueuedEndBlock}`,
   );
-}
-
-function batchBlocks(
-  startBlock: number,
-  endBlock: number,
-  batchSize: number,
-  numberOfBatches: number = 10,
-): {
-  lastBlock: number;
-  batches: BlockBatch[];
-} {
-  let batches: BlockBatch[] = [];
-  let batchStartBlock = startBlock;
-
-  while (batchStartBlock <= endBlock && batches.length < numberOfBatches) {
-    let batchEndBlock = batchStartBlock + batchSize - 1;
-
-    if (batchEndBlock > endBlock) {
-      batchEndBlock = endBlock;
-    }
-
-    batches.push({
-      startBlock: batchStartBlock,
-      endBlock: batchEndBlock,
-    });
-
-    batchStartBlock = batchEndBlock + 1;
-  }
-  console.log('batchBlocks', {
-    batches,
-    lastBlock: batchStartBlock - 1,
-  });
-  return {
-    batches,
-    lastBlock: batchStartBlock - 1,
-  };
 }

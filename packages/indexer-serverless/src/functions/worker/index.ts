@@ -30,6 +30,8 @@ export default function (config: Config, params: Params) {
       CONTRACT_GRAPH: config.contractGraph,
       MONGO_URI: stageConfig.getMongoURI(),
       PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
+      CHAIN: config.chain,
+      DEPLOY_VERSION: config.version,
     },
     timeout: 60,
   } as keyof AWS['functions'];
