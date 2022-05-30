@@ -82,6 +82,7 @@ export default async function eventsHandler(
           blockTimestamp: log.blockTimestamp,
           transactionHash: log.transactionHash,
           signature: sig.SIGNATURE,
+          signatureHash: sig.ID,
           ...decoded,
         } as Types.Contract.DecodedContractEvent;
       })

@@ -76,6 +76,7 @@ export interface DecodedContractTransaction {
   contract: string;
   signer: string;
   signature: string;
+  signatureHash: string;
   blockNumber: number;
   blockTimestamp: number;
   value1?: string;
@@ -96,6 +97,7 @@ export interface DecodedContractEvent {
   contract: string;
   transactionHash: string;
   signature: string;
+  signatureHash: string;
   blockNumber: number;
   blockTimestamp: number;
   value1?: string;
