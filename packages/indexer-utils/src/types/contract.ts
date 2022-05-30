@@ -10,7 +10,6 @@ export enum ContractType {
 export type ContractSignatureItem = {
   SIGNATURE: string;
   ID: string;
-  _ID: string;
   PARAMS: string[];
   REQUIRED: boolean;
 };

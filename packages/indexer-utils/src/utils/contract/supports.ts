@@ -39,7 +39,5 @@ export default {
 };
 
 function supports(interfaceSigs: ContractSignatureItem[], input: string) {
-  return interfaceSigs.every((sig) => {
-    return input.includes(sig.ID) || input.includes(sig._ID);
-  });
+  return interfaceSigs.every((sig) => input.includes(sig.ID));
 }
