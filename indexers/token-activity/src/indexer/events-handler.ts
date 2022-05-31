@@ -24,19 +24,13 @@ export default async function eventsHandler(
 ) {
   // get the events
   const logs = await Promise.all(
-    sigs.map(async (sig) => {
-      const logs = await query.archive.logs({
+    sigs.map((sig) =>
+      query.archive.logs({
         startBlock,
         endBlock,
         eventId: `0x${sig.ID}`,
-      });
-      const _logs = await query.archive.logs({
-        startBlock,
-        endBlock,
-        eventId: `0x${sig._ID}`,
-      });
-      return [...logs, ..._logs];
-    }),
+      }),
+    ),
   );
 
   // filter non-erc standard logs
@@ -55,9 +49,7 @@ export default async function eventsHandler(
   await model.insertMany(
     ercLogs
       .map((log) => {
-        const sig = sigs.find((sig) =>
-          [`0x${sig.ID}`, `0x${sig._ID}`].includes(log.topic0),
-        )!;
+        const sig = sigs.find((sig) => `0x${sig.ID}` === log.topic0)!;
 
         let decoded: DecodedEvent;
         try {
@@ -82,6 +74,7 @@ export default async function eventsHandler(
           blockTimestamp: log.blockTimestamp,
           transactionHash: log.transactionHash,
           signature: sig.SIGNATURE,
+          signatureHash: sig.ID,
           ...decoded,
         } as Types.Contract.DecodedContractEvent;
       })

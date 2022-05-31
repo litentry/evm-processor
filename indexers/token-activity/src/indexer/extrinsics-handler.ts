@@ -24,8 +24,8 @@ export default async function extrinsicsHandler(
 ) {
   // get the extrinsics
   const txs = await Promise.all(
-    extrinsics.map(async (extrinsic) => {
-      const txs = await query.archive.contractTransactions({
+    extrinsics.map((extrinsic) =>
+      query.archive.contractTransactions({
         startBlock,
         endBlock,
         methodId: extrinsic.ID,
@@ -40,25 +40,8 @@ export default async function extrinsicsHandler(
           'input',
           'receiptStatus',
         ],
-      });
-      const _txs = await query.archive.contractTransactions({
-        startBlock,
-        endBlock,
-        methodId: extrinsic._ID,
-        properties: [
-          'hash',
-          'blockNumber',
-          'blockTimestamp',
-          'to',
-          'from',
-          'methodId',
-          'value',
-          'input',
-          'receiptStatus',
-        ],
-      });
-      return [...txs, ..._txs];
-    }),
+      }),
+    ),
   );
   // filter non-erc standard txs
   const uniqueContractAddresses = [...new Set(txs.flat().map((tx) => tx.to))];
@@ -74,9 +57,7 @@ export default async function extrinsicsHandler(
   await model.insertMany(
     ercTxs
       .map((tx) => {
-        const ex = extrinsics.find((ex) =>
-          [ex.ID, ex._ID].includes(tx.methodId),
-        )!;
+        const ex = extrinsics.find((ex) => ex.ID === tx.methodId)!;
         let decoded: DecodedExtrinsic;
 
         try {
@@ -93,6 +74,7 @@ export default async function extrinsicsHandler(
           contract: tx.to,
           signer: tx.from,
           signature: ex.SIGNATURE,
+          signatureHash: ex.ID,
           blockNumber: tx.blockNumber,
           blockTimestamp: tx.blockTimestamp,
           ...decoded,

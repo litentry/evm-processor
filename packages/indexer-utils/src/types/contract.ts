@@ -10,7 +10,6 @@ export enum ContractType {
 export type ContractSignatureItem = {
   SIGNATURE: string;
   ID: string;
-  _ID: string;
   PARAMS: string[];
   REQUIRED: boolean;
 };
@@ -76,6 +75,7 @@ export interface DecodedContractTransaction {
   contract: string;
   signer: string;
   signature: string;
+  signatureHash: string;
   blockNumber: number;
   blockTimestamp: number;
   value1?: string;
@@ -96,6 +96,7 @@ export interface DecodedContractEvent {
   contract: string;
   transactionHash: string;
   signature: string;
+  signatureHash: string;
   blockNumber: number;
   blockTimestamp: number;
   value1?: string;
