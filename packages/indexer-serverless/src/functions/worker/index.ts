@@ -18,6 +18,7 @@ export default function (config: Config, params: Params) {
           arn: {
             'Fn::GetAtt': ['JobQueue', 'Arn'],
           },
+          functionResponseType: 'ReportBatchItemFailures',
         },
       },
     ],
