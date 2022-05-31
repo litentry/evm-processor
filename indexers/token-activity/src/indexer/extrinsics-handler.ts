@@ -74,6 +74,7 @@ export default async function extrinsicsHandler(
           contract: tx.to,
           signer: tx.from,
           signature: ex.SIGNATURE,
+          signatureHash: ex.ID,
           blockNumber: tx.blockNumber,
           blockTimestamp: tx.blockTimestamp,
           ...decoded,
