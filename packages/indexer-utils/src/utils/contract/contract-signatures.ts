@@ -10,10 +10,6 @@ We return the ContractSignatures type and assign it to CONTRACT_SIGNATURES. Each
 2. The ID (first 8 characters of the hash, used to index transaction types in the archive)
 3. The params as an array (for decoding transaction input in indexers)
 4. Required, used along with the ID to identifying contract types in contract creation transactions
-
-The ugly uppercase is because these are constants. Apologies but it's important to keep that clear.
-
-ODD NOTE: some contracts prefix methods with an underscore, we use _ID to allow us to check that hash too
  */
 
 type SimpleContractSignatures = {
@@ -212,7 +208,6 @@ function createSignatureItem(
     REQUIRED: required,
     SIGNATURE: signature,
     ID: getMethodIdFromSignature(signature, events),
-    _ID: getMethodIdFromSignature(`_${signature}`, events),
     PARAMS: getParamsFromSignature(signature),
   };
 }

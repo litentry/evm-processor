@@ -81,10 +81,12 @@ const monitoring = () => {
 
     measure: (metric: Metric, startMetric?: Metric, endMetric?: Metric) => {
       const histogram = getOrCreateHistogram(metric);
+
+      const startMark = startMetric || metric;
+      const endMark = endMetric || metric;
       const timer = Math.abs(
-        (marks[`end-${endMetric?.functionName || metric.functionName}`] ?? 0) -
-          (marks[`start-${startMetric?.functionName || metric.functionName}`] ??
-            0),
+        (marks[`end-${endMark.functionName}`] ?? 0) -
+          (marks[`start-${startMark.functionName}`] ?? 0),
       );
 
       histogram.observe(
@@ -97,6 +99,15 @@ const monitoring = () => {
       const gauge = getOrCreateGauge(metric);
 
       gauge.set(
+        { chain: process.env.CHAIN, version: process.env.DEPLOY_VERSION },
+        value,
+      );
+    },
+
+    incCounter: (value: number, metric: Metric) => {
+      const counter = getOrCreateCounter(metric);
+
+      counter.inc(
         { chain: process.env.CHAIN, version: process.env.DEPLOY_VERSION },
         value,
       );

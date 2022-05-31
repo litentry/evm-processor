@@ -1,3 +1,4 @@
+import { metrics, monitoring } from 'indexer-monitoring';
 import { web3 } from 'indexer-utils';
 import { ExtractBlock } from './types';
 
@@ -22,6 +23,11 @@ const rpc: ExtractBlock = async (blockNumber) => {
   const blockWithTransactions = await web3.eth.getBlock(blockNumber, true);
   const receipts = await getReceipts(
     blockWithTransactions.transactions.map((tx) => tx.hash),
+  );
+
+  monitoring.incCounter(
+    blockWithTransactions.transactions.length + 1,
+    metrics.rpcCalls,
   );
 
   return {
