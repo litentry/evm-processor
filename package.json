@@ -43,6 +43,7 @@
     "indexers/*"
   ],
   "scripts": {
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "build": "yarn workspaces run build"
   }
 }
