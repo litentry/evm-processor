@@ -19,6 +19,7 @@ export default function (config: Config, params: Params) {
       MONGO_URI: stageConfig.getMongoURI(),
       CHAIN: config.chain,
       DEPLOY_VERSION: config.version,
+      PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
     },
   } as keyof AWS['functions'];
 }

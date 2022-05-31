@@ -5,6 +5,7 @@ import {
   IndexedBlockRangeDocument,
   remove as removeIndexedBlockRanges,
 } from './indexed-block-range';
+import { metrics, monitoring } from 'indexer-monitoring';
 
 interface LastIndexedBlockDocument extends mongoose.Document {
   lastIndexedBlock: number;
@@ -56,6 +57,7 @@ export const calculateAndUpdate = async (): Promise<number> => {
 
   if (processedIndexedBlockRanges.length > 0 && lastIndexedBlock !== null) {
     await save(lastIndexedBlock);
+    await monitoring.gauge(lastIndexedBlock, metrics.lastIndexedBlock);
     console.log(`Updated last indexed block to ${lastIndexedBlock}`);
     await removeIndexedBlockRanges(processedIndexedBlockRanges);
     console.log({ Removed: processedIndexedBlockRanges });

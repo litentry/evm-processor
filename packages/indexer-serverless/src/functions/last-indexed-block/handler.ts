@@ -8,7 +8,7 @@ export default async function lastIndexedBlock() {
     const lastIndexedBlock =
       await repository.lastIndexedBlock.calculateAndUpdate();
     monitoring.gauge(lastIndexedBlock, metrics.lastIndexedBlock);
+    await monitoring.pushMetrics();
   });
-  await monitoring.pushMetrics();
   await mongoose.disconnect();
 }
