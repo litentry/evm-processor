@@ -1,9 +1,9 @@
 import { composeMongoose } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
 import {
-  remove as removeIndexedBlockRanges,
   get as getIndexedBlockRanges,
   IndexedBlockRangeDocument,
+  remove as removeIndexedBlockRanges,
 } from './indexed-block-range';
 
 interface LastIndexedBlockDocument extends mongoose.Document {
@@ -35,7 +35,7 @@ export const save = async (lastIndexedBlock: number): Promise<void> => {
   await currentValue.updateOne({ lastIndexedBlock });
 };
 
-export const calculateAndUpdate = async () => {
+export const calculateAndUpdate = async (): Promise<number> => {
   let lastIndexedBlock = await get();
   const processedIndexedBlockRanges: IndexedBlockRangeDocument[] = [];
   const pendingIndexedBlockRanges = await getIndexedBlockRanges();
@@ -58,8 +58,10 @@ export const calculateAndUpdate = async () => {
     await save(lastIndexedBlock);
     console.log(`Updated last indexed block to ${lastIndexedBlock}`);
     await removeIndexedBlockRanges(processedIndexedBlockRanges);
-    console.log({Removed: processedIndexedBlockRanges});
+    console.log({ Removed: processedIndexedBlockRanges });
   }
+
+  return lastIndexedBlock ?? -1;
 };
 
 const LastIndexedBlockTC = composeMongoose(Model);
