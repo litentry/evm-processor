@@ -1,4 +1,5 @@
 import type { Chain, Params } from '../types';
+import { chain } from 'lodash';
 
 function getCpuUnits(chain: Chain): number {
   const multiplier = 1024; // 1 vCPU (core)
@@ -16,6 +17,14 @@ function getMemoryUnits(chain: Chain): number {
       return 12 * multiplier;
     default:
       return 3 * multiplier;
+  }
+}
+function getStorage(chain: Chain): number {
+  switch (chain) {
+    case 'ethereum':
+      return 1000;
+    default:
+      return 100;
   }
 }
 
@@ -93,7 +102,7 @@ export default function (stage: string, params: Params) {
                   Driver: 'rexray/ebs',
                   DriverOpts: {
                     volumetype: 'gp3',
-                    size: 100,
+                    size: getStorage(<Chain>params.chain),
                   },
                   Scope: 'shared',
                 },
