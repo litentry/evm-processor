@@ -70,6 +70,15 @@ const monitoring = () => {
     });
   };
 
+  const observe = (timerMs: number, metric: Metric) => {
+    const histogram = getOrCreateHistogram(metric);
+
+    histogram.observe(
+      { chain: process.env.CHAIN, version: process.env.DEPLOY_VERSION },
+      timerMs / 1000,
+    ); // observe takes time in seconds
+  };
+
   return {
     markStart: (metric: Metric) => {
       marks[`start-${metric.functionName}`] = performance.now();
@@ -80,8 +89,6 @@ const monitoring = () => {
     },
 
     measure: (metric: Metric, startMetric?: Metric, endMetric?: Metric) => {
-      const histogram = getOrCreateHistogram(metric);
-
       const startMark = startMetric || metric;
       const endMark = endMetric || metric;
       const timer = Math.abs(
@@ -89,11 +96,10 @@ const monitoring = () => {
           (marks[`start-${startMark.functionName}`] ?? 0),
       );
 
-      histogram.observe(
-        { chain: process.env.CHAIN, version: process.env.DEPLOY_VERSION },
-        timer / 1000,
-      ); // observe takes time in seconds
+      observe(timer, metric);
     },
+
+    observe,
 
     gauge: (value: number, metric: Metric) => {
       const gauge = getOrCreateGauge(metric);
