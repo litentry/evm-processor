@@ -6,7 +6,6 @@
   "scripts": {
     "build": "rm -rf lib && tsc",
     "typecheck": "yarn tsc --noEmit",
-    "postinstall": "yarn run build",
     "deploy:local": "serverless deploy --stage local",
     "deploy:aws": "AWS_REGION=eu-west-1 serverless deploy --stage production",
     "start:local": "docker-compose up -d && yarn run deploy:local"
