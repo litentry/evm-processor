@@ -26,9 +26,21 @@ async function fetchV2Txs(startBlock: number, endBlock: number) {
         startBlock,
         endBlock,
         methodId: sig.ID,
+        transactionProperties: [
+          'hash',
+          'from',
+          'to',
+          'input',
+          'value',
+          'receiptStatus',
+          'gas',
+          'blockNumber',
+          'blockTimestamp',
+        ],
+        logProperties: ['address', 'topic0'],
       });
 
-      const filtered = await filterByContractType('v2', txs);
+      const filtered = await filterByContractTypeAndStatus('v2', txs);
 
       return {
         method: sig.SIGNATURE.split('(')[0] as SwapMethod,
@@ -45,24 +57,37 @@ async function fetchV3Txs(startBlock: number, endBlock: number) {
     startBlock,
     endBlock,
     methodId: V3_SIG.ID,
+    transactionProperties: [
+      'hash',
+      'from',
+      'to',
+      'input',
+      'value',
+      'receiptStatus',
+      'gas',
+      'blockNumber',
+      'blockTimestamp',
+    ],
+    logProperties: ['address', 'topic0'],
   });
-  const filtered = await filterByContractType('v3', txs);
+  const filtered = await filterByContractTypeAndStatus('v3', txs);
 
   return filtered;
 }
 
-async function filterByContractType(
+async function filterByContractTypeAndStatus(
   type: 'v2' | 'v3',
   txs: Types.Archive.ContractTransactionWithLogs[],
 ): Promise<Types.Archive.ContractTransactionWithLogs[]> {
   const method = type === 'v2' ? 'uniswapV2Contracts' : 'uniswapV3Contracts';
 
+  const successfulTxs = txs.filter((tx) => tx.receiptStatus);
   const validContracts = await query.contracts[method]({
-    contractAddress: txs.map((tx) => tx.to),
+    contractAddress: successfulTxs.map((tx) => tx.to),
     properties: ['address'],
   });
 
   const validAddresses = validContracts.map((c) => c.address);
 
-  return txs.filter((tx) => validAddresses.includes(tx.to));
+  return successfulTxs.filter((tx) => validAddresses.includes(tx.to));
 }
