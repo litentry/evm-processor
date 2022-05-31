@@ -22,18 +22,13 @@ export default async function extractTransactions(
 async function fetchV2Txs(startBlock: number, endBlock: number) {
   const v2 = await Promise.all(
     V2_SIGS.map(async (sig) => {
-      const txs = await Promise.all(
-        [sig.ID, sig._ID].map(async (methodId) => {
-          const data = await query.archive.contractTransactionsWithLogs({
-            startBlock,
-            endBlock,
-            methodId,
-          });
-          return data;
-        }),
-      );
+      const txs = await query.archive.contractTransactionsWithLogs({
+        startBlock,
+        endBlock,
+        methodId: sig.ID,
+      });
 
-      const filtered = await filterByContractType('v2', [...txs[0], ...txs[1]]);
+      const filtered = await filterByContractType('v2', txs);
 
       return {
         method: sig.SIGNATURE.split('(')[0] as SwapMethod,
@@ -46,27 +41,14 @@ async function fetchV2Txs(startBlock: number, endBlock: number) {
 }
 
 async function fetchV3Txs(startBlock: number, endBlock: number) {
-  const v3 = await Promise.all(
-    [V3_SIG.ID, V3_SIG._ID].map(async (methodId) => {
-      const txs = await query.archive.contractTransactionsWithLogs({
-        startBlock,
-        endBlock,
-        methodId,
-      });
-      const _txs = await query.archive.contractTransactionsWithLogs({
-        startBlock,
-        endBlock,
-        methodId,
-      });
-      const filtered = await filterByContractType('v3', [...txs, ..._txs]);
+  const txs = await query.archive.contractTransactionsWithLogs({
+    startBlock,
+    endBlock,
+    methodId: V3_SIG.ID,
+  });
+  const filtered = await filterByContractType('v3', txs);
 
-      return filtered;
-    }),
-  );
-
-  const flattened = v3.reduce((prev, curr) => [...prev, ...curr], []);
-
-  return flattened;
+  return filtered;
 }
 
 async function filterByContractType(

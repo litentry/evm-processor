@@ -9,7 +9,7 @@ const EXTRINSICS = utils.contract.CONTRACT_SIGNATURES.UNISWAPV3.EXTRINSICS;
 
 const swapMethodIds = EXTRINSICS.filter(
   (ex) => ex.SIGNATURE !== 'multicall(uint256,bytes[])',
-).flatMap((method) => [method.ID, method._ID]);
+).map((method) => method.ID);
 
 export default function transformMulticall(
   tx: Types.Archive.ContractTransactionWithLogs,
@@ -34,9 +34,7 @@ export default function transformMulticall(
   relevantCalls.forEach((call) => {
     const methodId = getMethodIdFromCall(call);
 
-    const CONSTS = EXTRINSICS.find(
-      (ex) => ex.ID === methodId || ex._ID === methodId,
-    )!;
+    const CONSTS = EXTRINSICS.find((ex) => ex.ID === methodId)!;
 
     decodedCalls.push({
       methodName: CONSTS.SIGNATURE.split('(')[0],
