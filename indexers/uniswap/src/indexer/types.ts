@@ -1,11 +1,3 @@
-// export type SwapMethod =
-//   | 'swapTokensForExactETH'
-//   | 'swapExactETHForTokens'
-//   | 'swapTokensForExactTokens'
-//   | 'swapExactTokensForTokens'
-//   | 'swapExactTokensForETH'
-//   | 'swapETHForExactTokens';
-
 export enum SwapMethod {
   swapTokensForExactETH = 'swapTokensForExactETH',
   swapExactETHForTokens = 'swapExactETHForTokens',
