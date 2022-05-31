@@ -23,7 +23,13 @@ if (process.env.RPC_ENDPOINT?.startsWith('ws')) {
   provider.on('error', () => console.error('WS Error'));
   provider.on('end', () => console.error('WS End'));
 } else {
-  provider = new Web3.providers.HttpProvider(process.env.RPC_ENDPOINT!);
+  provider = new Web3.providers.HttpProvider(
+    process.env.RPC_ENDPOINT!,
+    {
+      keepAlive: false,
+      timeout: 10000,
+    }
+  );
 }
 
 const web3 = new Web3(provider);
