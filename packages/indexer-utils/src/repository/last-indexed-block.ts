@@ -42,7 +42,7 @@ export const calculateAndUpdate = async (): Promise<number> => {
 
   pendingIndexedBlockRanges.forEach((pendingIndexedBlockRange) => {
     if ((lastIndexedBlock || 0) + 1 < pendingIndexedBlockRange.startBlock) {
-      return lastIndexedBlock ?? -1;
+      return;
     }
 
     processedIndexedBlockRanges.push(pendingIndexedBlockRange);
