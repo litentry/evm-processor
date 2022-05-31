@@ -29,7 +29,7 @@ const metrics: Metrics = {
     functionName: 'last_indexed_block',
   },
   lastChainBlock: {
-    functionName: 'lastChainBlock',
+    functionName: 'last_chain_block',
   },
   batchBlocks: {
     functionName: 'batch_blocks',
