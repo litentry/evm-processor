@@ -39,6 +39,8 @@
     "underscore": "^1.12.1"
   },
   "workspaces": [
+    "packages/indexer-utils",
+    "packages/indexer-monitoring",
     "packages/*",
     "indexers/*"
   ],
