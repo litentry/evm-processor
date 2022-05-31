@@ -58,6 +58,7 @@ const getConfig = async (config: Config) => {
     ebsVolumeName: `${config.chain}-${config.serviceName}-mongo-ebs-${config.version}`,
     jobQueueName: `${config.chain}-${config.serviceName}-JobQueue-${config.version}`,
     maxWorkers: config.maxWorkers,
+    chain: config.chain,
   };
 
   const context = getContext();

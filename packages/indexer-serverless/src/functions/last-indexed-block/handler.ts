@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 
 export default async function lastIndexedBlock() {
   await mongoose.connect(process.env.MONGO_URI!);
-  await utils.callXTimesOverYSeconds(5, 50, async () => {
+  await utils.callXTimesOverYSeconds(3, 25, async () => {
     const lastIndexedBlock =
       await repository.lastIndexedBlock.calculateAndUpdate();
     monitoring.gauge(lastIndexedBlock, metrics.lastIndexedBlock);

@@ -1,6 +1,26 @@
-import type { Params } from '../types';
+import type { Chain, Params } from '../types';
+
+function getCpuUnits(chain: Chain): number {
+  const multiplier = 1024; // 1 vCPU (core)
+  switch (chain) {
+    case 'ethereum':
+      return 6 * multiplier;
+    default:
+      return 2 * multiplier;
+  }
+}
+function getMemoryUnits(chain: Chain): number {
+  const multiplier = 1024; // 1 GiB
+  switch (chain) {
+    case 'ethereum':
+      return 12 * multiplier;
+    default:
+      return 3 * multiplier;
+  }
+}
 
 export default function (stage: string, params: Params) {
+
   if (stage === 'production') {
     return {
       Resources: {
@@ -61,8 +81,8 @@ export default function (stage: string, params: Params) {
                 PseudoTerminal: 'false',
               },
             ],
-            Cpu: 2048,
-            Memory: 3000,
+            Cpu: getCpuUnits(<Chain>params.chain),
+            Memory: getMemoryUnits(<Chain>params.chain),
             NetworkMode: 'awsvpc',
             RequiresCompatibilities: ['EC2'],
             Volumes: [
