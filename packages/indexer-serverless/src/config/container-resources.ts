@@ -1,6 +1,35 @@
-import type { Params } from '../types';
+import type { Chain, Params } from '../types';
+import { chain } from 'lodash';
+
+const ecsMultiplier = 1024; // 1 vCPU or 1 GiB memory
+
+function getCpuUnits(chain: Chain): number {
+  switch (chain) {
+    case 'ethereum':
+      return 6;
+    default:
+      return 2;
+  }
+}
+function getMemoryUnits(chain: Chain): number {
+  switch (chain) {
+    case 'ethereum':
+      return 12 ;
+    default:
+      return 3;
+  }
+}
+function getStorage(chain: Chain): number {
+  switch (chain) {
+    case 'ethereum':
+      return 1000;
+    default:
+      return 100;
+  }
+}
 
 export default function (stage: string, params: Params) {
+
   if (stage === 'production') {
     return {
       Resources: {
@@ -8,6 +37,7 @@ export default function (stage: string, params: Params) {
           Type: 'AWS::Logs::LogGroup',
           Properties: {
             LogGroupName: params.mongoDnsName,
+            RetentionInDays: 5,
           },
         },
         MongoServiceDiscovery: {
@@ -34,6 +64,11 @@ export default function (stage: string, params: Params) {
             ContainerDefinitions: [
               {
                 Name: 'mongo',
+                Command: [
+                  'mongod',
+                  '--wiredTigerCacheSizeGB',
+                  `${getMemoryUnits(params.chain) / 2}`,
+                ],
                 Essential: 'true',
                 Image: `mongo:${params.mongoImageVersion}`,
                 LogConfiguration: {
@@ -59,10 +94,11 @@ export default function (stage: string, params: Params) {
                 ],
                 Privileged: 'false',
                 PseudoTerminal: 'false',
+
               },
             ],
-            Cpu: 2048,
-            Memory: 3000,
+            Cpu: getCpuUnits(<Chain>params.chain) * ecsMultiplier,
+            Memory: getMemoryUnits(<Chain>params.chain) * ecsMultiplier,
             NetworkMode: 'awsvpc',
             RequiresCompatibilities: ['EC2'],
             Volumes: [
@@ -73,7 +109,7 @@ export default function (stage: string, params: Params) {
                   Driver: 'rexray/ebs',
                   DriverOpts: {
                     volumetype: 'gp3',
-                    size: 100,
+                    size: getStorage(<Chain>params.chain),
                   },
                   Scope: 'shared',
                 },
@@ -91,6 +127,10 @@ export default function (stage: string, params: Params) {
             Cluster: `\${cf:${params.clusterStackName}.EcsCluster}`,
             DesiredCount: 1,
             EnableEcsManagedTags: true,
+            PlacementStrategies: [{
+              Type: 'binpack',
+              Field: 'memory'
+            }],
             ServiceRegistries: [
               {
                 RegistryArn: {
