@@ -1,22 +1,22 @@
 import type { Chain, Params } from '../types';
 import { chain } from 'lodash';
 
+const ecsMultiplier = 1024; // 1 vCPU or 1 GiB memory
+
 function getCpuUnits(chain: Chain): number {
-  const multiplier = 1024; // 1 vCPU (core)
   switch (chain) {
     case 'ethereum':
-      return 6 * multiplier;
+      return 6;
     default:
-      return 2 * multiplier;
+      return 2;
   }
 }
 function getMemoryUnits(chain: Chain): number {
-  const multiplier = 1024; // 1 GiB
   switch (chain) {
     case 'ethereum':
-      return 12 * multiplier;
+      return 12 ;
     default:
-      return 3 * multiplier;
+      return 3;
   }
 }
 function getStorage(chain: Chain): number {
@@ -64,6 +64,11 @@ export default function (stage: string, params: Params) {
             ContainerDefinitions: [
               {
                 Name: 'mongo',
+                Command: [
+                  'mongod',
+                  '--wiredTigerCacheSizeGB',
+                  `${getMemoryUnits(params.chain) / 2}`,
+                ],
                 Essential: 'true',
                 Image: `mongo:${params.mongoImageVersion}`,
                 LogConfiguration: {
@@ -89,10 +94,11 @@ export default function (stage: string, params: Params) {
                 ],
                 Privileged: 'false',
                 PseudoTerminal: 'false',
+
               },
             ],
-            Cpu: getCpuUnits(<Chain>params.chain),
-            Memory: getMemoryUnits(<Chain>params.chain),
+            Cpu: getCpuUnits(<Chain>params.chain) * ecsMultiplier,
+            Memory: getMemoryUnits(<Chain>params.chain) * ecsMultiplier,
             NetworkMode: 'awsvpc',
             RequiresCompatibilities: ['EC2'],
             Volumes: [
