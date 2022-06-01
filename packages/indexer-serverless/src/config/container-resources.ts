@@ -37,6 +37,7 @@ export default function (stage: string, params: Params) {
           Type: 'AWS::Logs::LogGroup',
           Properties: {
             LogGroupName: params.mongoDnsName,
+            RetentionInDays: 5,
           },
         },
         MongoServiceDiscovery: {
@@ -120,6 +121,10 @@ export default function (stage: string, params: Params) {
             Cluster: `\${cf:${params.clusterStackName}.EcsCluster}`,
             DesiredCount: 1,
             EnableEcsManagedTags: true,
+            PlacementStrategies: [{
+              Type: 'binpack',
+              Field: 'memory'
+            }],
             ServiceRegistries: [
               {
                 RegistryArn: {

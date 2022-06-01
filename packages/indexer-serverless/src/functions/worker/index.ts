@@ -34,5 +34,6 @@ export default function (config: Config, params: Params) {
       DEPLOY_VERSION: config.version,
     },
     timeout: 60,
+    memorySize: 2048,
   } as keyof AWS['functions'];
 }
