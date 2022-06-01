@@ -4,7 +4,7 @@ import { Types } from 'indexer-utils';
 import { getIntermediatePath } from './utils';
 import { SwapMethod, Swap } from './types';
 
-const TRANSFER_METHOD_ID = '0xddf252ad';
+export const TRANSFER_METHOD_ID = '0xddf252ad';
 
 export default function transformSwap(
   method: SwapMethod,
@@ -26,7 +26,7 @@ export default function transformSwap(
 
   const transferLogs = tx.logs.filter(
     (log) =>
-      log.address === tokenAddressOfMissingAmount &&
+      log.address.toLowerCase() === tokenAddressOfMissingAmount &&
       log.topic0.startsWith(TRANSFER_METHOD_ID),
   );
 
@@ -38,8 +38,8 @@ export default function transformSwap(
 
   return {
     transactionHash: tx.hash,
-    contract: tx.to,
-    address: tx.from,
+    contract: tx.to.toLowerCase(),
+    address: tx.from.toLowerCase(),
     method,
     pair: `${token0}:${token1}`,
     intermediatePath: getIntermediatePath(lowerCasePath),
