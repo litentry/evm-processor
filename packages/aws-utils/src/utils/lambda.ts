@@ -21,7 +21,7 @@ export const lambdaHandler = async (
         try {
           await innerHandler(message.startBlock, message.endBlock);
         } catch (e) {
-          console.log(
+          console.error(
             `Failed to handle the batch ${message.startBlock}-${message.endBlock}`,
             e,
           );

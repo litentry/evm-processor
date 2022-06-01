@@ -12,33 +12,32 @@ export default async function indexer(start: number, end: number) {
 
   try {
     // Extract batch
+    console.time('extract');
     monitoring.markStart(metrics.extractBlock);
     const extractedBlocks = await Promise.all(blocks.map(extractBlock));
     monitoring.markEnd(metrics.extractBlock);
+    console.timeEnd('extract');
 
     // Transform batch
+    console.time('transform');
     monitoring.markStart(metrics.transformBlock);
     const transformedBlocks = extractedBlocks.map(transformBlock);
     monitoring.markEnd(metrics.transformBlock);
+    console.timeEnd('transform');
 
     // Load batch
+    console.time('load');
     monitoring.markStart(metrics.loadBlock);
     await Promise.all(transformedBlocks.map(loadBlock));
     monitoring.markEnd(metrics.loadBlock);
+    console.timeEnd('load');
 
     // Log completion
     await repository.indexedBlockRange.save(start, end);
+    console.log(`Processed batch ${start}-${end}`);
   } catch (e) {
     console.error(e);
     throw new Error(`Failed to process batch ${start}-${end}`);
   } finally {
-    monitoring.measure(metrics.extractBlock);
-    monitoring.measure(metrics.transformBlock);
-    monitoring.measure(metrics.loadBlock);
-    monitoring.measure(
-      metrics.fullWorkerProcess,
-      metrics.extractBlock,
-      metrics.loadBlock,
-    );
   }
 }
