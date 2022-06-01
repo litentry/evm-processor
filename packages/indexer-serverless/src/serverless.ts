@@ -120,7 +120,7 @@ const getConfig = async (config: Config) => {
               deadLetterTargetArn: {
                 'Fn::GetAtt': ['JobQueueDLQ', 'Arn'],
               },
-              maxReceiveCount: 3,
+              maxReceiveCount: 10,
             },
           },
         },

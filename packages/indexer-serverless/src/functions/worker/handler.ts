@@ -9,10 +9,10 @@ export default async function worker(
 ): Promise<SQSBatchResponse> {
   await mongoose.connect(process.env.MONGO_URI!);
 
-  let response: SQSBatchItemFailure[] = [];
+  let failedMessages: SQSBatchItemFailure[] = [];
 
   try {
-    response = await awsUtils.lambdaHandler(event, handler);
+    failedMessages = await awsUtils.lambdaHandler(event, handler);
   } catch (e) {
     console.error('Outer handler error', e);
     console.log('Disconnecting from mongo');
@@ -26,7 +26,10 @@ export default async function worker(
   console.log('Disconnecting from mongo');
   await mongoose.disconnect();
 
+  if (failedMessages.length) {
+    console.error('Failed messages:', {response: failedMessages});
+  }
   return {
-    batchItemFailures: response,
+    batchItemFailures: failedMessages,
   };
 }
