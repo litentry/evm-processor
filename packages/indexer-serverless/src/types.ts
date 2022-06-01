@@ -1,5 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
+export type Chain = 'ethereum' | 'moonbeam' | 'moonriver' | 'bsc';
+
 export type Params = {
   org: string;
   clusterStackName: string;
@@ -9,6 +11,7 @@ export type Params = {
   ebsVolumeName: string;
   jobQueueName: string;
   maxWorkers: number;
+  chain: Chain;
 };
 
 export type ProducerConfig = {
@@ -20,7 +23,7 @@ export type ProducerConfig = {
 
 export type Config = {
   serviceName: string;
-  chain: string;
+  chain: Chain;
   version: string;
   latestBlockDependency:
     | 'archive-node'

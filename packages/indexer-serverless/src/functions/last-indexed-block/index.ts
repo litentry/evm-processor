@@ -21,5 +21,6 @@ export default function (config: Config, params: Params) {
       DEPLOY_VERSION: config.version,
       PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
     },
+    timeout: 30,
   } as keyof AWS['functions'];
 }

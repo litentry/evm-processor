@@ -45,9 +45,10 @@
     "underscore": "^1.12.1"
   },
   "workspaces": [
-    "packages/indexer-utils",
+    "packages/aws-utils",
     "packages/indexer-monitoring",
-    "packages/*",
+    "packages/indexer-utils",
+    "packages/indexer-serverless",
     "indexers/*"
   ],
   "scripts": {

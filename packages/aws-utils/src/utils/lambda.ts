@@ -19,10 +19,12 @@ export const lambdaHandler = async (
         }
 
         try {
+          console.log(`Begin processing batch ${message.startBlock}-${message.endBlock}`);
           await innerHandler(message.startBlock, message.endBlock);
+          console.log(`Processed batch ${message.startBlock}-${message.endBlock}`);
         } catch (e) {
-          console.log(
-            `Failed to handle the batch ${message.startBlock}-${message.endBlock}`,
+          console.error(
+            `Failed to process batch ${message.startBlock}-${message.endBlock}`,
             e,
           );
           return { itemIdentifier: record.messageId };
@@ -44,7 +46,7 @@ function getMessageFromBody(body: string): ProcessorMessage | null {
     };
   } catch (e) {
     console.error(e);
-    console.log('Failed to parse message from queue: ', body);
+    console.error('Failed to parse message from queue: ', body);
 
     return null;
   }

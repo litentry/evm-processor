@@ -126,7 +126,13 @@ const monitoring = () => {
         globalRegistry,
       );
 
-      return gateway.pushAdd({ jobName: 'pushgateway' });
+      return gateway.pushAdd({
+        jobName: 'pushgateway',
+        groupings: {
+          chain: process.env.CHAIN!,
+          version: process.env.DEPLOY_VERSION!
+        }
+      });
     },
   };
 };
