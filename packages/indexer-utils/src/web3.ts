@@ -23,7 +23,8 @@ function createWeb3Instance(): Web3 {
     });
     // @ts-ignore
     provider.on('error', (e) => {
-      console.error('WS Error', e);
+      console.error('Fatal Websocket error');
+      throw new Error(e);
     });
 
   } else {
