@@ -2,13 +2,9 @@ import colors from 'colors';
 import Web3 from 'web3';
 import { HttpProvider, WebsocketProvider } from 'web3-core';
 
-function createWeb3Instance(): Web3 {
+export function createWeb3Instance(): Web3 {
   if (!process.env.RPC_ENDPOINT) {
-    console.log(
-      `\n${colors.bgMagenta(
-        'process.env.RPC_ENDPOINT must be an RPC provider, ignore this if you are not making chain node calls in your indexer',
-      )}\n`,
-    );
+    throw new Error('process.env.RPC_ENDPOINT must be an RPC provider');
   }
 
   let provider: WebsocketProvider | HttpProvider;
@@ -26,7 +22,6 @@ function createWeb3Instance(): Web3 {
       console.error('Fatal Websocket error');
       throw new Error(e);
     });
-
   } else {
     provider = new Web3.providers.HttpProvider(
       process.env.RPC_ENDPOINT!,
@@ -42,10 +37,12 @@ function createWeb3Instance(): Web3 {
 
 let cachedWeb3: Web3;
 
-export default function web3(): Web3 {
+export function web3(): Web3 {
   if (!cachedWeb3) {
     cachedWeb3 = createWeb3Instance();
   }
   return cachedWeb3;
 }
+
+export default web3;
 
