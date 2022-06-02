@@ -36,7 +36,6 @@ export default async function indexer(start: number, end: number) {
       await loadBlock(block);
     }),
   );
-
   monitoring.markEnd(metrics.loadBlock);
   console.timeEnd('load');
 
