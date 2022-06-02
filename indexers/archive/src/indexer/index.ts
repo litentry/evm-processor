@@ -30,11 +30,12 @@ export default async function indexer(start: number, end: number) {
   // Load batch
   console.time('load');
   monitoring.markStart(metrics.loadBlock);
-  await Promise.all(transformedBlocks.map(loadBlock));
-  transformedBlocks.map((block) =>
-    throttle(async () => {
-      await loadBlock(block);
-    }),
+  await Promise.all(
+    transformedBlocks.map((block) =>
+      throttle(async () => {
+        await loadBlock(block);
+      }),
+    ),
   );
   monitoring.markEnd(metrics.loadBlock);
   console.timeEnd('load');
