@@ -1,8 +1,11 @@
 import { metrics, monitoring } from 'indexer-monitoring';
 import { repository } from 'indexer-utils';
+import throat from 'throat';
 import extractBlock from './extract-block';
 import loadBlock from './load-block';
 import transformBlock from './transform-block';
+
+const throttle = throat(5);
 
 export default async function indexer(start: number, end: number) {
   const blocks: number[] = [];
@@ -28,6 +31,12 @@ export default async function indexer(start: number, end: number) {
   console.time('load');
   monitoring.markStart(metrics.loadBlock);
   await Promise.all(transformedBlocks.map(loadBlock));
+  transformedBlocks.map((block) =>
+    throttle(async () => {
+      await loadBlock(block);
+    }),
+  );
+
   monitoring.markEnd(metrics.loadBlock);
   console.timeEnd('load');
 
