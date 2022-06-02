@@ -8,7 +8,7 @@ const throttle = throat(750);
 async function getReceipts(transactionHashes: string[]) {
   const receipts = transactionHashes.map((hash) => throttle(async () => {
     const startTimer = Date.now();
-    const receipt = await web3.eth.getTransactionReceipt(hash);
+    const receipt = await web3().eth.getTransactionReceipt(hash);
     const time = Date.now() - startTimer;
 
     monitoring.observe(time, metrics.rpcCalls);
@@ -25,7 +25,7 @@ async function getReceipts(transactionHashes: string[]) {
 }
 
 const rpc: ExtractBlock = async (blockNumber) => {
-  const blockWithTransactions = await web3.eth.getBlock(blockNumber, true);
+  const blockWithTransactions = await web3().eth.getBlock(blockNumber, true);
   const receipts = await getReceipts(
     blockWithTransactions.transactions.map((tx) => tx.hash),
   );
