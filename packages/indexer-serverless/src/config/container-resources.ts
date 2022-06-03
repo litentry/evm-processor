@@ -1,5 +1,4 @@
 import type { Chain, Params } from '../types';
-import { chain } from 'lodash';
 
 const ecsMultiplier = 1024; // 1 vCPU or 1 GiB memory
 
@@ -11,6 +10,8 @@ function getCpuUnits(chain: Chain): number {
   switch (chain) {
     case 'ethereum':
       return 6;
+    case 'bsc':
+      return 4;
     default:
       return 2;
   }
@@ -23,7 +24,9 @@ function getCpuUnits(chain: Chain): number {
 function getMemoryUnits(chain: Chain): number {
   switch (chain) {
     case 'ethereum':
-      return 12 ;
+      return 12;
+    case 'bsc':
+      return 8;
     default:
       return 3;
   }
