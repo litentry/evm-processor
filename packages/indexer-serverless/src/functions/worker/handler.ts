@@ -7,6 +7,7 @@ export default async function worker(
   event: SQSEvent,
   handler: (start: number, end: number) => Promise<void>,
 ): Promise<SQSBatchResponse> {
+  console.log('connect mongo server', process.env.MONGO_URI);
   await mongoose.connect(process.env.MONGO_URI!);
 
   let failedMessages: SQSBatchItemFailure[] = [];
@@ -27,8 +28,9 @@ export default async function worker(
   await mongoose.disconnect();
 
   if (failedMessages.length) {
-    console.error('Failed messages:', {response: failedMessages});
+    console.error('Failed messages:', { response: failedMessages });
   }
+
   return {
     batchItemFailures: failedMessages,
   };
