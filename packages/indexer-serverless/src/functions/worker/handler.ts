@@ -26,9 +26,6 @@ export default async function worker(
   console.log('Disconnecting from mongo');
   await mongoose.disconnect();
 
-  if (failedMessages.length) {
-    console.error('Failed messages:', {response: failedMessages});
-  }
   return {
     batchItemFailures: failedMessages,
   };
