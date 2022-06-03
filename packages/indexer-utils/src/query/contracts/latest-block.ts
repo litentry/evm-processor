@@ -4,7 +4,7 @@ import endpoint from './endpoint';
 export default async function latestBlock() {
   try {
     const response = await axios({
-      url: endpoint,
+      url: endpoint(),
       method: 'post',
       data: {
         query: `

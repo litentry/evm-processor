@@ -48,7 +48,7 @@ export default async function uniswapV2Contracts({
 
   try {
     const response = await axios({
-      url: endpoint,
+      url: endpoint(),
       method: 'post',
       data: {
         variables: {

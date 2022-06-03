@@ -34,7 +34,7 @@ export default async function nativeTokenTransactions({
 }) {
   try {
     const response = await axios({
-      url: endpoint,
+      url: endpoint(),
       method: 'post',
       data: {
         variables: {
