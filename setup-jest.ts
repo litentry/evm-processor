@@ -4,14 +4,15 @@ import { connect, disconnect } from 'mongoose';
 let mongoServer: MongoMemoryServer;
 
 jest.mock('indexer-monitoring', () => {
-  const originalModule = jest.requireActual('indexer-monitoring');
-
-  //Mock the default export and named export 'foo'
   return {
     __esModule: true,
-    ...originalModule,
+    ...jest.requireActual('indexer-monitoring'),
     monitoring: {
       pushMetrics: () => {},
+      markStart: () => {},
+      markEnd: () => {},
+      measure: () => {},
+      gauge: () => {},
     },
   };
 });
@@ -23,6 +24,7 @@ global.console = {
 };
 
 beforeAll(async () => {
+  process.env.LATEST_BLOCK_DEPENDENCY = 'archive-node';
   process.env.PUSHGATEWAY_URL = 'test';
 
   mongoServer = await MongoMemoryServer.create();

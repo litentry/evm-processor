@@ -54,6 +54,6 @@
   "scripts": {
     "prepare": "husky install",
     "build": "yarn workspaces run build",
-    "test": "jest --runInBand --silent"
+    "test": "jest --silent"
   }
 }
