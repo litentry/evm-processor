@@ -12,7 +12,7 @@ async function getReceipts(transactionHashes: string[]) {
       const receipt = await web3().eth.getTransactionReceipt(hash);
       const time = Date.now() - startTimer;
 
-      // monitoring.observe(time, metrics.rpcCalls);
+      monitoring.observe(time, metrics.rpcCalls);
 
       if (!receipt) {
         // some providers fail to provide receipts
