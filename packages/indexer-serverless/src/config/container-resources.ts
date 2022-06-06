@@ -1,27 +1,45 @@
 import type { Chain, Params } from '../types';
-import { chain } from 'lodash';
 
 const ecsMultiplier = 1024; // 1 vCPU or 1 GiB memory
 
+/**
+ * Returns the number of vCPUs required for a chain
+ * @param chain
+ */
 function getCpuUnits(chain: Chain): number {
   switch (chain) {
     case 'ethereum':
       return 6;
+    case 'bsc':
+      return 4;
     default:
       return 2;
   }
 }
+
+/**
+ * Returns the number of GiB of memory required for a chain
+ * @param chain
+ */
 function getMemoryUnits(chain: Chain): number {
   switch (chain) {
     case 'ethereum':
-      return 12 ;
+      return 12;
+    case 'bsc':
+      return 8;
     default:
       return 3;
   }
 }
-function getStorage(chain: Chain): number {
+
+/**
+ * Returns the number of GiB of storage required for a chain
+ * @param chain
+ */
+function getStorageUnits(chain: Chain): number {
   switch (chain) {
     case 'ethereum':
+    case 'bsc':
       return 1000;
     default:
       return 100;
@@ -109,7 +127,7 @@ export default function (stage: string, params: Params) {
                   Driver: 'rexray/ebs',
                   DriverOpts: {
                     volumetype: 'gp3',
-                    size: getStorage(<Chain>params.chain),
+                    size: getStorageUnits(<Chain>params.chain),
                   },
                   Scope: 'shared',
                 },

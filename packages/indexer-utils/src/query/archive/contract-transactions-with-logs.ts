@@ -56,7 +56,7 @@ export default async function contractTransactionsWithLogs({
 }) {
   try {
     const response = await axios({
-      url: endpoint,
+      url: endpoint(),
       method: 'post',
       data: {
         variables: {

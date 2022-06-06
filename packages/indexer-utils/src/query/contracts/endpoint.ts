@@ -1,13 +1,10 @@
-import colors from 'colors';
-
-if (!process.env.CONTRACT_GRAPH) {
-  console.log(
-    `\n${colors.bgMagenta(
-      'process.env.CONTRACT_GRAPH should be set if you are querying the contracts archive',
-    )}\n`,
-  );
+export function endpoint() {
+  if (!process.env.CONTRACT_GRAPH) {
+    throw new Error(
+      'process.env.ARCHIVE_GRAPH should be set if you are querying the archive',
+    );
+  }
+  return process.env.CONTRACT_GRAPH!;
 }
-
-const endpoint = process.env.CONTRACT_GRAPH!;
 
 export default endpoint;

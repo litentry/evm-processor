@@ -4,7 +4,7 @@ import { Contract } from 'web3-eth-contract';
 import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
 
 export default async function fetchTokenData(address: string, nft = false) {
-  const contract = new web3.eth.Contract(ERC20.abi as AbiItem[], address);
+  const contract = new (web3().eth).Contract(ERC20.abi as AbiItem[], address);
 
   if (nft) {
     // we can just use the ERC20 contract as the name method is the same
@@ -55,7 +55,7 @@ async function getTokenProperty(
   } catch (e) {
     try {
       // try as bytes
-      const contractBytes = new web3.eth.Contract(
+      const contractBytes = new (web3().eth).Contract(
         abiBytesMethod(property),
         address,
       );
@@ -64,7 +64,7 @@ async function getTokenProperty(
         bytesValue !==
         '0x0000000000000000000000000000000000000000000000000000000000000001'
       ) {
-        value = web3.utils.hexToString(bytesValue);
+        value = web3().utils.hexToString(bytesValue);
       }
     } catch (e) {
       // use default null

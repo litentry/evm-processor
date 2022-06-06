@@ -58,7 +58,7 @@ export default async function erc721Contracts({
 
   try {
     const response = await axios({
-      url: endpoint,
+      url: endpoint(),
       method: 'post',
       data: {
         variables: {
