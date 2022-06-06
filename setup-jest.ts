@@ -25,6 +25,7 @@ global.console = {
 
 beforeAll(async () => {
   process.env.BATCH_SIZE = '10';
+  process.env.END_BLOCK = 'undefined';
   process.env.LATEST_BLOCK_DEPENDENCY = 'archive-node';
   process.env.PUSHGATEWAY_URL = 'test';
 
