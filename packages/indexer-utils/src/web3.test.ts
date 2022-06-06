@@ -1,5 +1,7 @@
 import { createWeb3Instance, web3 } from './web3'
 
+jest.mock('web3-core-requestmanager');
+
 describe('createWeb3Instance', () => {
   it('should return a web3 instance when RPC_ENDPOINT is not a Websocket', () => {
     process.env.RPC_ENDPOINT = 'http://something.local';
