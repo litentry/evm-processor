@@ -29,7 +29,34 @@ const message = {
   ],
 };
 
+const brokenMessage = {
+  Records: [
+    {
+      messageId: 'a',
+      receiptHandle: 'b',
+      body: 'BROKEN',
+      attributes: {
+        ApproximateReceiveCount: '',
+        SentTimestamp: '',
+        SenderId: '',
+        ApproximateFirstReceiveTimestamp: '',
+      },
+      messageAttributes: {},
+      md5OfBody: 'c',
+      eventSource: 'sqs',
+      eventSourceARN: 'arn::somewhere',
+      awsRegion: 'eu-west-1',
+    },
+  ],
+};
+
 describe('AWS worker', () => {
+  it('Returns failed message IDs when message is unreadable', async () => {
+    expect(await worker(brokenMessage, errorHandler)).toStrictEqual({
+      batchItemFailures: [{ itemIdentifier: 'a' }],
+    });
+  });
+
   it('Returns failed message IDs when process errors', async () => {
     expect(await worker(message, errorHandler)).toStrictEqual({
       batchItemFailures: [{ itemIdentifier: 'a' }],
