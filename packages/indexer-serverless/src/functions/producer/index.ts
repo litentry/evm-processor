@@ -30,5 +30,6 @@ export default function (config: Config, params: Params) {
       DEPLOY_VERSION: config.version,
       MAX_WORKERS: config.maxWorkers,
     },
+    timeout: 60
   } as keyof AWS['functions'];
 }

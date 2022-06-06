@@ -46,14 +46,14 @@ export default async function producer() {
   )();
 
   const targetBlockHeight =
-    process.env.END_BLOCK !== 'undefined'
+    !isNaN(parseInt(process.env.END_BLOCK!))
       ? parseInt(process.env.END_BLOCK!)
       : chainHeight;
 
   monitoring.gauge(chainHeight, metrics.lastChainBlock);
 
   const maxWorkers = parseInt(process.env.MAX_WORKERS!) || 1;
-  const batchSize = parseInt(process.env.BATCH_SIZE!);
+  const batchSize = parseInt(process.env.BATCH_SIZE!) || 1;
 
   const sqsQueueAttributes = await sqs
     .getQueueAttributes({
@@ -77,6 +77,7 @@ export default async function producer() {
     Math.floor(currentBlocksInQueue / batchSize);
 
   console.log({
+    chainHeight,
     batchSize,
     lastQueuedEndBlock,
     targetBlockHeight,
@@ -98,7 +99,7 @@ export default async function producer() {
     };
     batches.push(batch);
     lastQueuedEndBlock = batch.endBlock;
-    if (batch.endBlock === targetBlockHeight) {
+    if (batch.endBlock >= targetBlockHeight) {
       break;
     }
   }
@@ -110,8 +111,7 @@ export default async function producer() {
     // this batch is the same length as the configured batch size,
     // otherwise use group 0
     if (blocksInBatch === batchSize) {
-      const batchGroup = b.startBlock % (maxWorkers * batchSize);
-      workerGroup = batchGroup / maxWorkers;
+      workerGroup = (b.startBlock % (maxWorkers * batchSize)) / batchSize;
     }
     return {
       Id: `${b.endBlock}`,
