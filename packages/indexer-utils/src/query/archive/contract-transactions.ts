@@ -36,7 +36,7 @@ export default async function contractTransactions({
 }) {
   try {
     const response = await axios({
-      url: endpoint,
+      url: endpoint(),
       method: 'post',
       data: {
         variables: {

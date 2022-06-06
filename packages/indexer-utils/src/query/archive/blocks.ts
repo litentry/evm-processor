@@ -32,7 +32,7 @@ export default async function blocks({
 }) {
   try {
     const response = await axios({
-      url: endpoint,
+      url: endpoint(),
       method: 'post',
       data: {
         variables: {
