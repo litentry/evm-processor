@@ -1,18 +1,16 @@
 import aws from 'aws-sdk';
 import getLatestBlock from '../../util/get-latest-block';
 import producer from './handler';
-import { saveLastQueuedEndBlock } from './lastQueuedEndblockRepository';
+import {
+  getLastQueuedEndBlock,
+  saveLastQueuedEndBlock,
+} from './lastQueuedEndblockRepository';
 
 jest.mock('../../util/get-latest-block');
+(getLatestBlock as jest.Mock).mockReturnValue(() => 20);
 
-jest.mock('./lastQueuedEndblockRepository', () => {
-  return {
-    __esModule: true,
-    default: jest.fn(),
-    saveLastQueuedEndBlock: jest.fn(),
-    getLastQueuedEndBlock: () => -1,
-  };
-});
+jest.mock('./lastQueuedEndblockRepository');
+(getLastQueuedEndBlock as jest.Mock).mockResolvedValue(-1);
 
 jest.mock('aws-sdk', () => {
   const SQSMocked = {
@@ -40,8 +38,6 @@ describe('AWS producer', () => {
     const sqs = new aws.SQS();
     const getQueueAttributesSpy = jest.spyOn(sqs, 'getQueueAttributes');
     const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
-    const mockedGetLatestBlock = jest.mocked(getLatestBlock, true);
-    mockedGetLatestBlock.mockReturnValue(async () => 20);
 
     await producer();
 
@@ -71,8 +67,6 @@ describe('AWS producer', () => {
   });
 
   it('Should save last queued end block', async () => {
-    const mockedGetLatestBlock = jest.mocked(getLatestBlock, true);
-    mockedGetLatestBlock.mockReturnValue(async () => 20);
     await producer();
 
     expect(saveLastQueuedEndBlock).toHaveBeenCalledTimes(1);
@@ -80,8 +74,8 @@ describe('AWS producer', () => {
   });
 
   it('Should not enqueue', async () => {
-    const mockedGetLatestBlock = jest.mocked(getLatestBlock, true);
-    mockedGetLatestBlock.mockReturnValue(async () => -1);
+    (getLatestBlock as jest.Mock).mockReturnValueOnce(() => -1);
+
     const sqs = new aws.SQS();
     const getQueueAttributesSpy = jest.spyOn(sqs, 'getQueueAttributes');
     const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');

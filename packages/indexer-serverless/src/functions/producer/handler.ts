@@ -45,8 +45,6 @@ export default async function producer() {
     process.env.LATEST_BLOCK_DEPENDENCY!,
   )();
 
-  console.log(process.env.END_BLOCK);
-  console.log(chainHeight);
   const targetBlockHeight =
     process.env.END_BLOCK != undefined
       ? parseInt(process.env.END_BLOCK!)
