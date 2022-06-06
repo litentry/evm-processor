@@ -4,4 +4,12 @@ module.exports = {
   transform: {
     '^.+\\.ts?$': 'ts-jest',
   },
+  testMatch: [
+    "**/?(*.)+(spec|test).[t]s?(x)"
+  ],
+  collectCoverageFrom: [
+    "**/src/**/*.[t]s?(x)",
+    "!**/node_modules/**",
+    "!**/vendor/**",
+  ]
 };

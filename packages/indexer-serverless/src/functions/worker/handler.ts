@@ -11,15 +11,7 @@ export default async function worker(
 
   let failedMessages: SQSBatchItemFailure[] = [];
 
-  try {
-    failedMessages = await awsUtils.lambdaHandler(event, handler);
-  } catch (e) {
-    console.error('Outer handler error', e);
-    console.log('Disconnecting from mongo');
-    await mongoose.disconnect();
-
-    throw e;
-  }
+  failedMessages = await awsUtils.lambdaHandler(event, handler);
 
   await monitoring.pushMetrics();
 
@@ -27,8 +19,9 @@ export default async function worker(
   await mongoose.disconnect();
 
   if (failedMessages.length) {
-    console.error('Failed messages:', {response: failedMessages});
+    console.error('Failed messages:', { response: failedMessages });
   }
+
   return {
     batchItemFailures: failedMessages,
   };
