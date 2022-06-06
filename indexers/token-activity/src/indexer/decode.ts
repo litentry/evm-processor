@@ -3,7 +3,6 @@ import { ethers } from 'ethers';
 import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
 import ERC721 from '@openzeppelin/contracts/build/contracts/ERC721.json';
 import ERC1155 from '@openzeppelin/contracts/build/contracts/ERC1155.json';
-import { ContractType } from 'indexer-utils/lib/types/contract';
 
 export type DecodedEvent = {
   value1?: string;
@@ -34,9 +33,11 @@ export type DecodedExtrinsic = {
 const contractInterface: {
   [key: string]: ethers.utils.Interface;
 } = {
-  [ContractType.ERC20]: new ethers.utils.Interface(ERC20.abi),
-  [ContractType.ERC721]: new ethers.utils.Interface(ERC721.abi),
-  [ContractType.ERC1155]: new ethers.utils.Interface(ERC1155.abi),
+  [Types.Contract.ContractType.ERC20]: new ethers.utils.Interface(ERC20.abi),
+  [Types.Contract.ContractType.ERC721]: new ethers.utils.Interface(ERC721.abi),
+  [Types.Contract.ContractType.ERC1155]: new ethers.utils.Interface(
+    ERC1155.abi,
+  ),
 };
 
 export function decodeEvent(
