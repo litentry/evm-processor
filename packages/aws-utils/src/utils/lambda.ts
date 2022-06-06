@@ -19,9 +19,13 @@ export const lambdaHandler = async (
         }
 
         try {
-          console.log(`Begin processing batch ${message.startBlock}-${message.endBlock}`);
+          console.log(
+            `Begin processing batch ${message.startBlock}-${message.endBlock}`,
+          );
           await innerHandler(message.startBlock, message.endBlock);
-          console.log(`Processed batch ${message.startBlock}-${message.endBlock}`);
+          console.log(
+            `Processed batch ${message.startBlock}-${message.endBlock}`,
+          );
         } catch (e) {
           console.error(
             `Failed to process batch ${message.startBlock}-${message.endBlock}`,

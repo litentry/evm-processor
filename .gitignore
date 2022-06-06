@@ -13,3 +13,4 @@ uniswap-indexer/db/migrations/*.js
 .serverless
 .esbuild
 .husky
+coverage

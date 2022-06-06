@@ -46,7 +46,7 @@ export default async function producer() {
   )();
 
   const targetBlockHeight =
-    process.env.END_BLOCK !== 'undefined'
+    process.env.END_BLOCK != undefined
       ? parseInt(process.env.END_BLOCK!)
       : chainHeight;
 
@@ -133,7 +133,6 @@ export default async function producer() {
   monitoring.markStart(metrics.saveLastQueuedBlock);
   await saveLastQueuedEndBlock(lastQueuedEndBlock);
   monitoring.markEnd(metrics.saveLastQueuedBlock);
-  // monitoring.gauge(lastQueuedEndBlock, metrics.lastQueuedEndBlock);
 
   monitoring.measure(metrics.lastQueuedBlock);
   monitoring.measure(metrics.batchBlocks);
@@ -144,6 +143,6 @@ export default async function producer() {
   await mongoose.disconnect();
 
   console.log(
-    `Queued ${targetJobCount} jobs. Last job end block: ${lastQueuedEndBlock}`,
+    `Queued ${dispatches.length} jobs. Last job end block: ${lastQueuedEndBlock}`,
   );
 }
