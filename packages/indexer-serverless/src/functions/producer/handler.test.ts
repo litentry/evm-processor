@@ -3,12 +3,7 @@ import getLatestBlock from '../../util/get-latest-block';
 import producer from './handler';
 import { saveLastQueuedEndBlock } from './lastQueuedEndblockRepository';
 
-jest.mock('../../util/get-latest-block', () => {
-  return jest.fn(() => ({
-    __esModule: true,
-    default: jest.fn(),
-  }));
-});
+jest.mock('../../util/get-latest-block');
 
 jest.mock('./lastQueuedEndblockRepository', () => {
   return {
