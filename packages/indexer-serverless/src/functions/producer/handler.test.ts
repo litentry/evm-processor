@@ -1,3 +1,8 @@
+const envVarMock = {
+  TARGET_TOTAL_QUEUED_BLOCKS: '200',
+  BATCH_SIZE: '1'
+}
+
 import aws from 'aws-sdk';
 import getLatestBlock from '../../util/get-latest-block';
 import producer from './handler';
@@ -5,6 +10,10 @@ import {
   getLastQueuedEndBlock,
   saveLastQueuedEndBlock,
 } from './lastQueuedEndblockRepository';
+
+jest.mock('../../util/get-env-var', () => (key: keyof typeof envVarMock) => {
+  return {...process.env, ...envVarMock}[key];
+});
 
 jest.mock('../../util/get-latest-block');
 (getLatestBlock as jest.Mock).mockReturnValue(() => 20);
@@ -16,15 +25,15 @@ jest.mock('aws-sdk', () => {
   const SQSMocked = {
     sendMessage: jest.fn().mockReturnThis(),
     promise: jest.fn(),
-    getQueueAttributes: () => ({
-      promise: () => ({
+    getQueueAttributes: jest.fn().mockReturnValue({
+      promise: jest.fn().mockReturnValue({
         Attributes: {
           ApproximateNumberOfMessagesNotVisible: 0,
           ApproximateNumberOfMessages: 0,
         },
       }),
     }),
-    sendMessageBatch: () => ({
+    sendMessageBatch: jest.fn().mockReturnValue({
       promise: jest.fn(),
     }),
   };
@@ -73,7 +82,7 @@ describe('AWS producer', () => {
     expect(saveLastQueuedEndBlock).toHaveBeenCalledWith(20);
   });
 
-  it('Should not enqueue', async () => {
+  it('Should not enqueue when latest block is -1', async () => {
     (getLatestBlock as jest.Mock).mockReturnValueOnce(() => -1);
 
     const sqs = new aws.SQS();
@@ -85,5 +94,51 @@ describe('AWS producer', () => {
     expect(getQueueAttributesSpy).toHaveBeenCalledTimes(1);
     expect(sendMessageBatchSpy).toHaveBeenCalledTimes(0);
     expect(saveLastQueuedEndBlock).toHaveBeenCalledTimes(0);
+  });
+
+  it('Should not enqueue if queue contains than the target number of blocks', async () => {
+    (getLatestBlock as jest.Mock).mockReturnValueOnce(() => 2000);
+    envVarMock['TARGET_TOTAL_QUEUED_BLOCKS'] = '200';
+    envVarMock['BATCH_SIZE'] = '1';
+
+    const sqs = new aws.SQS();
+    const mockGetQueueAttributes = (sqs.getQueueAttributes().promise as jest.Mock);
+    mockGetQueueAttributes.mockReturnValue({
+      Attributes: {
+        ApproximateNumberOfMessagesNotVisible: 1,
+        ApproximateNumberOfMessages: 199,
+      }
+    });
+
+    const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
+    await producer();
+
+    expect(getLatestBlock).toHaveBeenCalledTimes(1);
+    expect(mockGetQueueAttributes).toHaveBeenCalledTimes(1);
+    expect(sendMessageBatchSpy).toHaveBeenCalledTimes(0);
+    expect(saveLastQueuedEndBlock).toHaveBeenCalledTimes(0);
+  });
+
+  it('Should enqueue if queue contains less than the target number of blocks', async () => {
+    (getLatestBlock as jest.Mock).mockReturnValueOnce(() => 2000);
+    envVarMock['TARGET_TOTAL_QUEUED_BLOCKS'] = '201';
+    envVarMock['BATCH_SIZE'] = '1';
+
+    const sqs = new aws.SQS();
+    const mockGetQueueAttributes = (sqs.getQueueAttributes().promise as jest.Mock);
+    mockGetQueueAttributes.mockReturnValue({
+      Attributes: {
+        ApproximateNumberOfMessagesNotVisible: 1,
+        ApproximateNumberOfMessages: 199,
+      }
+    });
+
+    const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
+    await producer();
+
+    expect(getLatestBlock).toHaveBeenCalledTimes(1);
+    expect(mockGetQueueAttributes).toHaveBeenCalledTimes(1);
+    expect(sendMessageBatchSpy).toHaveBeenCalledTimes(1);
+    expect(saveLastQueuedEndBlock).toHaveBeenCalledTimes(1);
   });
 });
