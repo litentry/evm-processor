@@ -29,6 +29,7 @@ export default function (config: Config, params: Params) {
       CHAIN: config.chain,
       DEPLOY_VERSION: config.version,
       MAX_WORKERS: config.maxWorkers,
+      TARGET_TOTAL_QUEUED_BLOCKS: config.targetTotalQueuedBlocks,
     },
   } as keyof AWS['functions'];
 }
