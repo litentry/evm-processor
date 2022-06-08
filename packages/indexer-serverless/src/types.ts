@@ -35,4 +35,5 @@ export type Config = {
   contractGraph?: string;
   tokenActivityGraph?: string;
   maxWorkers: number;
+  targetTotalQueuedBlocks?: number;
 };

@@ -1,3 +1,9 @@
+const envVarMock = {
+  TARGET_TOTAL_QUEUED_BLOCKS: '200',
+  BATCH_SIZE: '10',
+  MAX_WORKERS: '1'
+}
+
 import aws from 'aws-sdk';
 import getLatestBlock from '../../util/get-latest-block';
 import producer from './handler';
@@ -7,6 +13,10 @@ import {
 } from './lastQueuedEndblockRepository';
 
 let mockLastQueuedEndBlock = -1;
+jest.mock('../../util/get-env-var', () => (key: keyof typeof envVarMock) => {
+  return {...process.env, ...envVarMock}[key];
+});
+
 jest.mock('../../util/get-latest-block');
 jest.mock('./lastQueuedEndblockRepository');
 
@@ -14,15 +24,15 @@ jest.mock('aws-sdk', () => {
   const SQSMocked = {
     sendMessage: jest.fn().mockReturnThis(),
     promise: jest.fn(),
-    getQueueAttributes: () => ({
-      promise: () => ({
+    getQueueAttributes: jest.fn().mockReturnValue({
+      promise: jest.fn().mockReturnValue({
         Attributes: {
           ApproximateNumberOfMessagesNotVisible: 0,
           ApproximateNumberOfMessages: 0,
         },
       }),
     }),
-    sendMessageBatch: () => ({
+    sendMessageBatch: jest.fn().mockReturnValue({
       promise: jest.fn(),
     }),
   };
@@ -37,8 +47,8 @@ jest.mock('aws-sdk', () => {
 describe('AWS producer', () => {
   it('Should enqueue some jobs up to chain height', async () => {
 
-    process.env.BATCH_SIZE = '10';
-    process.env.MAX_WORKERS = '1';
+    envVarMock.BATCH_SIZE = '10';
+    envVarMock.MAX_WORKERS = '1';
     mockLastQueuedEndBlock = -1;
     (getLatestBlock as jest.Mock).mockReturnValue(() => 20);
 
@@ -75,8 +85,8 @@ describe('AWS producer', () => {
 
   it('should vary MessageGroupId appropriately with workers = 10, batch size = 1', async () => {
 
-    process.env.BATCH_SIZE = '1';
-    process.env.MAX_WORKERS = '10';
+    envVarMock.BATCH_SIZE = '1';
+    envVarMock.MAX_WORKERS = '10';
     mockLastQueuedEndBlock = -1;
     (getLatestBlock as jest.Mock).mockReturnValue(() => 2);
 
@@ -113,8 +123,8 @@ describe('AWS producer', () => {
 
   it('should vary MessageGroupId appropriately with workers = 10, batch size = 10', async () => {
 
-    process.env.BATCH_SIZE = '10';
-    process.env.MAX_WORKERS = '10';
+    envVarMock.BATCH_SIZE = '10';
+    envVarMock.MAX_WORKERS = '10';
     mockLastQueuedEndBlock = -1;
     (getLatestBlock as jest.Mock).mockReturnValue(() => 40);
 
@@ -160,12 +170,12 @@ describe('AWS producer', () => {
   });
 
 
-  it('should vary MessageGroupId appropriately with workers = 100, batch size = 1, height = 299', async () => {
+  it('should vary MessageGroupId appropriately with workers = 100, batch size = 1, height = 199', async () => {
 
-    process.env.BATCH_SIZE = '1';
-    process.env.MAX_WORKERS = '100';
+    envVarMock.BATCH_SIZE = '1';
+    envVarMock.MAX_WORKERS = '100';
     mockLastQueuedEndBlock = -1;
-    (getLatestBlock as jest.Mock).mockReturnValue(() => 299);
+    (getLatestBlock as jest.Mock).mockReturnValue(() => 199);
 
     const sqs = new aws.SQS();
     const getQueueAttributesSpy = jest.spyOn(sqs, 'getQueueAttributes');
@@ -175,7 +185,7 @@ describe('AWS producer', () => {
 
     expect(getLatestBlock).toHaveBeenCalledTimes(1);
     expect(getQueueAttributesSpy).toHaveBeenCalledTimes(1);
-    expect(sendMessageBatchSpy).toHaveBeenCalledTimes(30);
+    expect(sendMessageBatchSpy).toHaveBeenCalledTimes(20);
 
     const allMessageGroupIds = sendMessageBatchSpy.mock.calls.map((call: any[]) => {
       return call[0].Entries!.map((message: any) => {
@@ -183,14 +193,14 @@ describe('AWS producer', () => {
       });
     }).flat();
     
-    expect(allMessageGroupIds.length).toStrictEqual(300);
+    expect(allMessageGroupIds.length).toStrictEqual(200);
     expect(new Set(allMessageGroupIds).size).toStrictEqual(100);
   });
 
 
   it('Should save last queued end block', async () => {
-    process.env.BATCH_SIZE = '10';
-    process.env.MAX_WORKERS = '1';
+    envVarMock.BATCH_SIZE = '10';
+    envVarMock.MAX_WORKERS = '1';
     mockLastQueuedEndBlock = -1;
     (getLatestBlock as jest.Mock).mockReturnValue(() => 20);
 
@@ -200,7 +210,7 @@ describe('AWS producer', () => {
     expect(saveLastQueuedEndBlock).toHaveBeenCalledWith(20);
   });
 
-  it('Should not enqueue', async () => {
+  it('Should not enqueue when latest block is -1', async () => {
     (getLatestBlock as jest.Mock).mockReturnValueOnce(() => -1);
 
     const sqs = new aws.SQS();
@@ -212,5 +222,51 @@ describe('AWS producer', () => {
     expect(getQueueAttributesSpy).toHaveBeenCalledTimes(1);
     expect(sendMessageBatchSpy).toHaveBeenCalledTimes(0);
     expect(saveLastQueuedEndBlock).toHaveBeenCalledTimes(0);
+  });
+
+  it('Should not enqueue if queue contains than the target number of blocks', async () => {
+    (getLatestBlock as jest.Mock).mockReturnValueOnce(() => 2000);
+    envVarMock['TARGET_TOTAL_QUEUED_BLOCKS'] = '200';
+    envVarMock['BATCH_SIZE'] = '1';
+
+    const sqs = new aws.SQS();
+    const mockGetQueueAttributes = (sqs.getQueueAttributes().promise as jest.Mock);
+    mockGetQueueAttributes.mockReturnValue({
+      Attributes: {
+        ApproximateNumberOfMessagesNotVisible: 1,
+        ApproximateNumberOfMessages: 199,
+      }
+    });
+
+    const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
+    await producer();
+
+    expect(getLatestBlock).toHaveBeenCalledTimes(1);
+    expect(mockGetQueueAttributes).toHaveBeenCalledTimes(1);
+    expect(sendMessageBatchSpy).toHaveBeenCalledTimes(0);
+    expect(saveLastQueuedEndBlock).toHaveBeenCalledTimes(0);
+  });
+
+  it('Should enqueue if queue contains less than the target number of blocks', async () => {
+    (getLatestBlock as jest.Mock).mockReturnValueOnce(() => 2000);
+    envVarMock['TARGET_TOTAL_QUEUED_BLOCKS'] = '201';
+    envVarMock['BATCH_SIZE'] = '1';
+
+    const sqs = new aws.SQS();
+    const mockGetQueueAttributes = (sqs.getQueueAttributes().promise as jest.Mock);
+    mockGetQueueAttributes.mockReturnValue({
+      Attributes: {
+        ApproximateNumberOfMessagesNotVisible: 1,
+        ApproximateNumberOfMessages: 199,
+      }
+    });
+
+    const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
+    await producer();
+
+    expect(getLatestBlock).toHaveBeenCalledTimes(1);
+    expect(mockGetQueueAttributes).toHaveBeenCalledTimes(1);
+    expect(sendMessageBatchSpy).toHaveBeenCalledTimes(1);
+    expect(saveLastQueuedEndBlock).toHaveBeenCalledTimes(1);
   });
 });

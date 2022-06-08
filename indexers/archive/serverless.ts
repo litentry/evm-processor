@@ -8,4 +8,5 @@ module.exports = serverless({
   latestBlockDependency: 'archive-node',
   rpcEndpoint: process.env.RPC_ENDPOINT,
   maxWorkers: parseInt(process.env.MAX_WORKERS!) || 1,
+  targetTotalQueuedBlocks: parseInt(process.env.TARGET_TOTAL_QUEUED_BLOCKS!) || 500,
 });
