@@ -1,6 +1,6 @@
 const envVarMock = {
   TARGET_TOTAL_QUEUED_BLOCKS: '200',
-  BATCH_SIZE: '1'
+  BATCH_SIZE: '10'
 }
 
 import aws from 'aws-sdk';
