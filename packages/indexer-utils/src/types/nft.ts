@@ -11,6 +11,4 @@ export interface ERC1155Token {
   tokenId: string;
   owner: string;
   quantity: number;
-  lastTransferedBlockNumber: number;
-  lastTransferedBlockTimestamp: number;
 }

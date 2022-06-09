@@ -35,16 +35,12 @@ function map1155Single(
   return events.flatMap((event) => [
     {
       contract: event.contract,
-      lastTransferedBlockNumber: event.blockNumber,
-      lastTransferedBlockTimestamp: event.blockTimestamp,
       tokenId: event.value4!,
       owner: event.value2!,
       quantity: -parseInt(event.value5!),
     },
     {
       contract: event.contract,
-      lastTransferedBlockNumber: event.blockNumber,
-      lastTransferedBlockTimestamp: event.blockTimestamp,
       tokenId: event.value4!,
       owner: event.value3!,
       quantity: parseInt(event.value5!),
@@ -59,16 +55,12 @@ function map1155Batch(
     event.value4!.split(',').flatMap((tokenId, index) => [
       {
         contract: event.contract,
-        lastTransferedBlockNumber: event.blockNumber,
-        lastTransferedBlockTimestamp: event.blockTimestamp,
         tokenId,
         owner: event.value2!,
         quantity: -parseInt(event.value5!.split(',')[index]),
       },
       {
         contract: event.contract,
-        lastTransferedBlockNumber: event.blockNumber,
-        lastTransferedBlockTimestamp: event.blockTimestamp,
         tokenId,
         owner: event.value3!,
         quantity: parseInt(event.value5!.split(',')[index]),

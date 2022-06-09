@@ -48,15 +48,7 @@ describe('fetch1155Events', () => {
     ).toHaveBeenCalledWith({
       blockRange: { end: 10, start: 1 },
       ercType: 1155,
-      properties: [
-        'contract',
-        'blockNumber',
-        'blockTimestamp',
-        'value2',
-        'value3',
-        'value4',
-        'value5',
-      ],
+      properties: ['contract', 'value2', 'value3', 'value4', 'value5'],
       signature: 'TransferSingle(address,address,address,uint256,uint256)',
     });
   });
@@ -78,15 +70,7 @@ describe('fetch1155BatchEvents', () => {
     ).toHaveBeenCalledWith({
       blockRange: { end: 10, start: 1 },
       ercType: 1155,
-      properties: [
-        'contract',
-        'blockNumber',
-        'blockTimestamp',
-        'value2',
-        'value3',
-        'value4',
-        'value5',
-      ],
+      properties: ['contract', 'value2', 'value3', 'value4', 'value5'],
       signature: 'TransferBatch(address,address,address,uint256[],uint256[])',
     });
   });

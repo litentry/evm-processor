@@ -162,48 +162,31 @@ describe('load', () => {
     });
 
     const results = await ERC1155TokenModel.find({});
-    console.log(
-      results.map((doc) => ({
-        lastTransferedBlockNumber: doc.lastTransferedBlockNumber,
-        quantity: doc.quantity,
-        owner: doc.owner,
-      })),
-    );
 
     expect(
       results
         .map((doc) => ({
           contract: doc.contract,
-          lastTransferedBlockNumber: doc.lastTransferedBlockNumber,
-          lastTransferedBlockTimestamp: doc.lastTransferedBlockTimestamp,
           quantity: doc.quantity,
           owner: doc.owner,
           tokenId: doc.tokenId,
         }))
-        .sort((a, b) => {
-          return a.quantity - b.quantity;
-        }),
+        .sort((a, b) => a.quantity - b.quantity),
     ).toStrictEqual([
       {
         contract: '1155-contract-address',
-        lastTransferedBlockNumber: 1,
-        lastTransferedBlockTimestamp: 1,
         owner: '0x00',
         tokenId: '1155-token-id',
         quantity: -2,
       },
       {
         contract: '1155-contract-address',
-        lastTransferedBlockNumber: 2,
-        lastTransferedBlockTimestamp: 2,
         owner: 'a',
         tokenId: '1155-token-id',
         quantity: 0,
       },
       {
         contract: '1155-contract-address',
-        lastTransferedBlockNumber: 2,
-        lastTransferedBlockTimestamp: 2,
         owner: 'b',
         tokenId: '1155-token-id',
         quantity: 2,

@@ -26,8 +26,6 @@ export const ERC1155TokenSchema = new mongoose.Schema<ERC1155TokenDocument>({
   tokenId: { type: String, required: true },
   owner: { type: String, required: true },
   quantity: { type: Number, required: true },
-  lastTransferedBlockNumber: { type: Number, required: true },
-  lastTransferedBlockTimestamp: { type: Number, required: true },
 });
 
 ERC1155TokenSchema.index(

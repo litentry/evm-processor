@@ -11,8 +11,6 @@ const event721 = {
 
 const event1155Single = {
   contract: '1155-contract-address',
-  blockNumber: 10,
-  blockTimestamp: 12345678,
   value2: 'old-owner',
   value3: 'new-owner',
   value4: '1155-token-id',
@@ -21,8 +19,6 @@ const event1155Single = {
 
 const event1155Batch = {
   contract: '1155-batch-contract-address',
-  blockNumber: 10,
-  blockTimestamp: 12345678,
   value2: 'old-owner',
   value3: 'new-owner',
   value4: '1155-batch-token1,1155-batch-token2',
@@ -52,16 +48,12 @@ describe('transform', () => {
     expect(result.sfts.slice(0, 2)).toStrictEqual([
       {
         contract: '1155-contract-address',
-        lastTransferedBlockNumber: 10,
-        lastTransferedBlockTimestamp: 12345678,
         owner: 'old-owner',
         tokenId: '1155-token-id',
         quantity: -3,
       },
       {
         contract: '1155-contract-address',
-        lastTransferedBlockNumber: 10,
-        lastTransferedBlockTimestamp: 12345678,
         owner: 'new-owner',
         tokenId: '1155-token-id',
         quantity: 3,
@@ -73,32 +65,24 @@ describe('transform', () => {
     expect(result.sfts.slice(2, 6)).toStrictEqual([
       {
         contract: '1155-batch-contract-address',
-        lastTransferedBlockNumber: 10,
-        lastTransferedBlockTimestamp: 12345678,
         owner: 'old-owner',
         tokenId: '1155-batch-token1',
         quantity: -3,
       },
       {
         contract: '1155-batch-contract-address',
-        lastTransferedBlockNumber: 10,
-        lastTransferedBlockTimestamp: 12345678,
         owner: 'new-owner',
         tokenId: '1155-batch-token1',
         quantity: 3,
       },
       {
         contract: '1155-batch-contract-address',
-        lastTransferedBlockNumber: 10,
-        lastTransferedBlockTimestamp: 12345678,
         owner: 'old-owner',
         tokenId: '1155-batch-token2',
         quantity: -2,
       },
       {
         contract: '1155-batch-contract-address',
-        lastTransferedBlockNumber: 10,
-        lastTransferedBlockTimestamp: 12345678,
         owner: 'new-owner',
         tokenId: '1155-batch-token2',
         quantity: 2,

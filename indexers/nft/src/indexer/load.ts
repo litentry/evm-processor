@@ -15,15 +15,19 @@ export default async function load(data: {
             'E11000 duplicate key error collection',
           )
         ) {
-          await ERC721TokenModel.findOneAndReplace(
+          await ERC721TokenModel.findOneAndUpdate(
             {
               contract: doc.contract,
               tokenId: doc.tokenId,
               lastTransferedBlockNumber: {
-                $lt: doc.lastTransferedBlockNumber,
+                $lt: doc.lastTransferedBlockNumber, // TODO add tx index here in case an NFT can move twice per block
               },
             },
-            doc,
+            {
+              owner: doc.owner,
+              lastTransferedBlockNumber: doc.lastTransferedBlockNumber,
+              lastTransferedBlockTimestamp: doc.lastTransferedBlockTimestamp,
+            },
           );
         } else {
           throw e;
@@ -46,16 +50,8 @@ export default async function load(data: {
               contract: doc.contract,
               tokenId: doc.tokenId,
               owner: doc.owner,
-              lastTransferedBlockNumber: {
-                $lt: doc.lastTransferedBlockNumber,
-              },
             },
             {
-              contract: doc.contract,
-              tokenId: doc.tokenId,
-              owner: doc.owner,
-              lastTransferedBlockNumber: doc.lastTransferedBlockNumber,
-              lastTransferedBlockTimestamp: doc.lastTransferedBlockTimestamp,
               $inc: {
                 quantity: doc.quantity,
               },

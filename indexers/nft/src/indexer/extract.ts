@@ -51,15 +51,7 @@ export async function fetch1155Events(start: number, end: number) {
     blockRange: { start, end },
     ercType: 1155,
     signature: TRANSFER_1155.SIGNATURE,
-    properties: [
-      'contract',
-      'blockNumber',
-      'blockTimestamp',
-      'value2',
-      'value3',
-      'value4',
-      'value5',
-    ],
+    properties: ['contract', 'value2', 'value3', 'value4', 'value5'],
   });
 
   return events;
@@ -70,15 +62,7 @@ export async function fetch1155BatchEvents(start: number, end: number) {
     blockRange: { start, end },
     ercType: 1155,
     signature: TRANSFER_1155_BATCH.SIGNATURE,
-    properties: [
-      'contract',
-      'blockNumber',
-      'blockTimestamp',
-      'value2',
-      'value3',
-      'value4',
-      'value5',
-    ],
+    properties: ['contract', 'value2', 'value3', 'value4', 'value5'],
   });
 
   return events;

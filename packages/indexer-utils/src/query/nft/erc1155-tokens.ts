@@ -7,8 +7,6 @@ const defaultProperties: (keyof ERC1155Token)[] = [
   'tokenId',
   'owner',
   'quantity',
-  'lastTransferedBlockNumber',
-  'lastTransferedBlockTimestamp',
 ];
 
 export default async function erc1155Tokens({
