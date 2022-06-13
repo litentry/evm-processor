@@ -21,10 +21,14 @@ export const DecodedEventSchema =
     value2: String,
     value3: String,
     value4: String,
+    value5: String,
+    value6: String,
     type1: String,
     type2: String,
     type3: String,
     type4: String,
+    type5: String,
+    type6: String,
   });
 
 export const DecodedTransactionSchema =
