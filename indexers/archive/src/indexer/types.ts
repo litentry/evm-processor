@@ -1,9 +1,8 @@
 import { Types } from 'indexer-utils';
-import { BlockTransactionObject, TransactionReceipt } from 'web3-eth';
 
 export interface ExtractedBlock {
-  blockWithTransactions: BlockTransactionObject;
-  receipts: TransactionReceipt[];
+  blockWithTransactions: RawBlock;
+  receipts: RawReceipt[];
 }
 
 export interface TransformedBlock {
@@ -21,3 +20,72 @@ export type TransformBlock = (
 ) => TransformedBlock;
 
 export type LoadBlock = (transformedBlock: TransformedBlock) => Promise<void>;
+
+export type RawBlock = {
+  miner: string;
+  difficulty: string;
+  gasUsed: string;
+  size: string;
+  nonce: string;
+  hash: string;
+  stateRoot: string;
+  number: string;
+  timestamp: string;
+  extraData: string;
+  parentHash: string;
+  sha3Uncles: string;
+  transactionRoot: string;
+  receiptRoot: string;
+  totalDifficulty: string;
+  gasLimit: string;
+  logsBloom: string;
+  uncles: string[];
+  mixHash: string;
+  transactions: RawTransaction[];
+};
+
+export type RawTransaction = {
+  nonce: string;
+  to?: string;
+  type: string;
+  r: string;
+  blockHash: string;
+  hash: string;
+  input: string;
+  from: string;
+  gas: string;
+  value: string;
+  v: string;
+  s: string;
+  blockNumber: string;
+  gasPrice: string;
+  transactionIndex: string;
+};
+
+export type RawReceipt = {
+  status: string;
+  contractAddress?: string;
+  blockNumber: string;
+  transactionIndex: string;
+  logs: RawLog[];
+  transactionHash: string;
+  gasUsed: string;
+  type: string;
+  from: string;
+  to?: string;
+  cumulativeGasUsed: string;
+  logsBloom: string;
+  blockHash: string;
+};
+
+export type RawLog = {
+  removed: boolean;
+  address: string;
+  topics: string[];
+  blockNumber: string;
+  transactionIndex: string;
+  blockHash: string;
+  logIndex: string;
+  data: string;
+  transactionHash: string;
+};
