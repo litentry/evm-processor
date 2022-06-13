@@ -8,18 +8,19 @@ const extractBlock: ExtractBlock = async (number) => {
     throw new Error('RPC_ENDPOINT not set');
   }
   const endpoint = process.env.RPC_ENDPOINT;
+  const blockHex = `0x${number.toString(16)}`;
 
   const startTimer = Date.now();
   const blockResponse = await axios.post(endpoint, {
     jsonrpc: '2.0',
     method: 'eth_getBlockByNumber',
-    params: [BigNumber.from(number).toHexString(), true],
+    params: [blockHex, true],
     id: 1,
   });
   const receiptsResponse = await axios.post(endpoint, {
     jsonrpc: '2.0',
     method: 'nr_getTransactionReceiptsByBlockNumber',
-    params: [BigNumber.from(number).toHexString()],
+    params: [blockHex],
     id: 1,
   });
 
