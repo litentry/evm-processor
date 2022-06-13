@@ -12,7 +12,7 @@ const transformBlock: TransformBlock = ({
     parentHash: blockWithTransactions.parentHash,
     nonce: blockWithTransactions.nonce,
     sha3Uncles: blockWithTransactions.sha3Uncles,
-    transactionRoot: blockWithTransactions.transactionRoot,
+    transactionRoot: blockWithTransactions.transactionsRoot,
     stateRoot: blockWithTransactions.stateRoot,
     miner: blockWithTransactions.miner.toLowerCase(),
     extraData: blockWithTransactions.extraData,

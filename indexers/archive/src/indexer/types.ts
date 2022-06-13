@@ -34,8 +34,8 @@ export type RawBlock = {
   extraData: string;
   parentHash: string;
   sha3Uncles: string;
-  transactionRoot: string;
-  receiptRoot: string;
+  transactionsRoot: string;
+  receiptsRoot: string;
   totalDifficulty: string;
   gasLimit: string;
   logsBloom: string;
