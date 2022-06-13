@@ -13,7 +13,7 @@ const extractBlock: ExtractBlock = async (number) => {
     jsonrpc: '2.0',
     method: 'ankr_getBlocksRange',
     params: {
-      blockchain: 'eth',
+      blockchain: process.env.CHAIN === 'ethereum' ? 'eth' : process.env.CHAIN!,
       fromBlock: number,
       toBlock: number,
     },
