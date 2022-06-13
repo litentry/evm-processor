@@ -6,9 +6,9 @@ import {
   getLastQueuedEndBlock,
   saveLastQueuedEndBlock,
 } from './lastQueuedEndblockRepository';
+import getEnvVar from "../../util/get-env-var";
 
 const sqs = new SQS();
-const maxBlocksToQueuePerExecution = 50000;
 
 type BlockBatch = {
   startBlock: number;
@@ -24,7 +24,7 @@ const dispatch = async (jobs: BatchSQSMessage[]) => {
   if (jobs.length) {
     await sqs
       .sendMessageBatch({
-        QueueUrl: process.env.QUEUE_URL!,
+        QueueUrl: getEnvVar('QUEUE_URL')!,
         Entries: jobs,
       })
       .promise();
@@ -32,7 +32,9 @@ const dispatch = async (jobs: BatchSQSMessage[]) => {
 };
 
 export default async function producer() {
-  await mongoose.connect(process.env.MONGO_URI!);
+  console.log(getEnvVar('MONGO_URI'));
+
+  await mongoose.connect(getEnvVar('MONGO_URI')!);
 
   monitoring.markStart(metrics.lastQueuedBlock);
   const existingLastQueuedEndBlock = await getLastQueuedEndBlock();
@@ -42,22 +44,22 @@ export default async function producer() {
   let lastQueuedEndBlock = existingLastQueuedEndBlock || -1;
 
   const chainHeight = await getLatestBlock(
-    process.env.LATEST_BLOCK_DEPENDENCY!,
+    getEnvVar('LATEST_BLOCK_DEPENDENCY')!,
   )();
 
   const targetBlockHeight =
-    process.env.END_BLOCK !== 'undefined'
-      ? parseInt(process.env.END_BLOCK!)
+    getEnvVar('END_BLOCK', false) !== 'undefined'
+      ? parseInt(getEnvVar('END_BLOCK')!)
       : chainHeight;
 
   monitoring.gauge(chainHeight, metrics.lastChainBlock);
 
-  const maxWorkers = parseInt(process.env.MAX_WORKERS!) || 1;
-  const batchSize = parseInt(process.env.BATCH_SIZE!);
+  const maxWorkers = parseInt(getEnvVar('MAX_WORKERS')!) || 1;
+  const batchSize = parseInt(getEnvVar('BATCH_SIZE')!);
 
   const sqsQueueAttributes = await sqs
     .getQueueAttributes({
-      QueueUrl: process.env.QUEUE_URL!,
+      QueueUrl: getEnvVar('QUEUE_URL')!,
       AttributeNames: [
         'ApproximateNumberOfMessagesNotVisible',
         'ApproximateNumberOfMessages',
@@ -72,8 +74,9 @@ export default async function producer() {
       parseInt(sqsQueueAttributes.Attributes!.ApproximateNumberOfMessages)) *
     batchSize;
 
+  const targetTotalQueuedBlocks = parseInt(getEnvVar('TARGET_TOTAL_QUEUED_BLOCKS')!);
   const targetJobCount =
-    Math.floor(maxBlocksToQueuePerExecution / batchSize) -
+    Math.floor(targetTotalQueuedBlocks / batchSize) -
     Math.floor(currentBlocksInQueue / batchSize);
 
   console.log({
@@ -130,9 +133,11 @@ export default async function producer() {
   }
   monitoring.markEnd(metrics.batchBlocks);
 
-  monitoring.markStart(metrics.saveLastQueuedBlock);
-  await saveLastQueuedEndBlock(lastQueuedEndBlock);
-  monitoring.markEnd(metrics.saveLastQueuedBlock);
+  if (existingLastQueuedEndBlock !== lastQueuedEndBlock) {
+    monitoring.markStart(metrics.saveLastQueuedBlock);
+    await saveLastQueuedEndBlock(lastQueuedEndBlock);
+    monitoring.markEnd(metrics.saveLastQueuedBlock);
+  }
 
   monitoring.measure(metrics.lastQueuedBlock);
   monitoring.measure(metrics.batchBlocks);
