@@ -2,6 +2,23 @@ import axios from 'axios';
 import { metrics, monitoring } from 'indexer-monitoring';
 import { ExtractBlock } from '../types';
 
+function getChainParam() {
+  if (!process.env.CHAIN) {
+    throw Error('CHAIN not set');
+  }
+  switch (process.env.CHAIN) {
+    case 'ethereum': {
+      return 'eth';
+    }
+    case 'bsc': {
+      return 'bsc';
+    }
+    default: {
+      throw Error('CHAIN unknown');
+    }
+  }
+}
+
 const extractBlock: ExtractBlock = async (number) => {
   if (!process.env.RPC_ENDPOINT) {
     throw new Error('RPC_ENDPOINT not set');
@@ -13,7 +30,7 @@ const extractBlock: ExtractBlock = async (number) => {
     jsonrpc: '2.0',
     method: 'ankr_getBlocksRange',
     params: {
-      blockchain: process.env.CHAIN === 'ethereum' ? 'eth' : process.env.CHAIN!,
+      blockchain: getChainParam(),
       fromBlock: number,
       toBlock: number,
     },
