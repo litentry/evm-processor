@@ -31,5 +31,6 @@ export default function (config: Config, params: Params) {
       MAX_WORKERS: config.maxWorkers,
       TARGET_TOTAL_QUEUED_BLOCKS: config.targetTotalQueuedBlocks,
     },
+    timeout: 60
   } as keyof AWS['functions'];
 }
