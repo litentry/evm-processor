@@ -25,6 +25,7 @@ const monitoring = () => {
 
   const getOrCreateHistogram = (metric: Metric): Histogram<string> => {
     const name = getNameFromMetric(metric, 'timer');
+    console.log(name);
 
     const promMetric = globalRegistry.getSingleMetric(name);
     if (promMetric) {
@@ -114,7 +115,6 @@ const monitoring = () => {
     incCounter: (value: number, metric: Metric) => {
       const counter = getOrCreateCounter(metric);
 
-      console.log('do stuff');
       counter.inc(
         { chain: process.env.CHAIN, version: process.env.DEPLOY_VERSION },
         value,
