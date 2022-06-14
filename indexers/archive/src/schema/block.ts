@@ -21,6 +21,8 @@ const BlockSchema = new mongoose.Schema<BlockDocument>({
   difficulty: { type: String, required: true },
   totalDifficulty: { type: String, required: true },
   uncles: String,
+}, {
+  shardKey: { number: 'hashed' }
 });
 
 export const BlockModel = mongoose.model('Block', BlockSchema);
