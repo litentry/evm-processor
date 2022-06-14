@@ -28,6 +28,7 @@ beforeAll(async () => {
   process.env.END_BLOCK = 'undefined';
   process.env.LATEST_BLOCK_DEPENDENCY = 'archive-node';
   process.env.PUSHGATEWAY_URL = 'test';
+  process.env.SERVICE_NAME = 'test_indexer';
 
   mongoServer = await MongoMemoryServer.create();
   process.env.MONGO_URI = mongoServer.getUri();

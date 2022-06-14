@@ -16,9 +16,10 @@ const monitoring = () => {
   let marks: MarkedTimestamp = {};
 
   const getNameFromMetric = (metric: Metric, suffix: string) => {
-    // return `${process.env.CHAIN}_${metric.serviceName}_${metric.functionName}_${metric.metricName}`.toLocaleLowerCase();
     return (
-      metric.functionName + (suffix ? '_' + suffix : '')
+      (process.env.SERVICE_NAME ? process.env.SERVICE_NAME + '_' : '') +
+      metric.functionName +
+      (suffix ? '_' + suffix : '')
     ).toLocaleLowerCase();
   };
 
@@ -113,6 +114,7 @@ const monitoring = () => {
     incCounter: (value: number, metric: Metric) => {
       const counter = getOrCreateCounter(metric);
 
+      console.log('do stuff');
       counter.inc(
         { chain: process.env.CHAIN, version: process.env.DEPLOY_VERSION },
         value,
@@ -130,10 +132,12 @@ const monitoring = () => {
         jobName: 'pushgateway',
         groupings: {
           chain: process.env.CHAIN!,
-          version: process.env.DEPLOY_VERSION!
-        }
+          version: process.env.DEPLOY_VERSION!,
+        },
       });
     },
+
+    getNameFromMetric,
   };
 };
 
