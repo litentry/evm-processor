@@ -1,27 +1,29 @@
-import { Transaction as RpcTx, TransactionReceipt } from 'web3-eth';
+import { BigNumber } from 'ethers';
 import { Types } from 'indexer-utils';
-import { TransformBlock } from './types';
+import { RawReceipt, RawTransaction, TransformBlock } from './types';
 
 const transformBlock: TransformBlock = ({
   blockWithTransactions,
   receipts,
 }) => {
   const block: Types.Archive.Block = {
-    number: blockWithTransactions.number,
+    number: BigNumber.from(blockWithTransactions.number).toNumber(),
     hash: blockWithTransactions.hash,
     parentHash: blockWithTransactions.parentHash,
     nonce: blockWithTransactions.nonce,
     sha3Uncles: blockWithTransactions.sha3Uncles,
-    transactionRoot: blockWithTransactions.transactionRoot,
+    transactionRoot: blockWithTransactions.transactionsRoot,
     stateRoot: blockWithTransactions.stateRoot,
     miner: blockWithTransactions.miner.toLowerCase(),
     extraData: blockWithTransactions.extraData,
-    gasLimit: blockWithTransactions.gasLimit,
-    gasUsed: blockWithTransactions.gasUsed,
-    timestamp: blockWithTransactions.timestamp as number,
-    size: blockWithTransactions.size,
-    difficulty: blockWithTransactions.difficulty as unknown as string,
-    totalDifficulty: blockWithTransactions.totalDifficulty as unknown as string,
+    gasLimit: BigNumber.from(blockWithTransactions.gasLimit).toNumber(),
+    gasUsed: BigNumber.from(blockWithTransactions.gasUsed).toNumber(),
+    timestamp: BigNumber.from(blockWithTransactions.timestamp).toNumber(),
+    size: BigNumber.from(blockWithTransactions.size).toNumber(),
+    difficulty: BigNumber.from(blockWithTransactions.difficulty).toString(),
+    totalDifficulty: BigNumber.from(
+      blockWithTransactions.totalDifficulty,
+    ).toString(),
     uncles: blockWithTransactions.uncles.length
       ? blockWithTransactions.uncles.join(',')
       : undefined,
@@ -102,7 +104,7 @@ const transformBlock: TransformBlock = ({
         topic3: topics[3],
         topic4: topics[4],
         data,
-        logIndex,
+        logIndex: BigNumber.from(logIndex).toNumber(),
         blockNumber: block.number,
         blockTimestamp: block.timestamp,
       });
@@ -124,20 +126,22 @@ const mapTransactionBase = (
   blockHash: string,
   blockNumber: number,
   blockTimestamp: number,
-  tx: RpcTx,
-  receipt: TransactionReceipt,
+  tx: RawTransaction,
+  receipt: RawReceipt,
 ): Types.Archive.TransactionBase => ({
   hash: tx.hash,
-  nonce: tx.nonce,
+  nonce: BigNumber.from(tx.nonce).toNumber(),
   blockHash,
   blockNumber,
   blockTimestamp,
-  transactionIndex: tx.transactionIndex!,
+  transactionIndex: BigNumber.from(tx.transactionIndex).toNumber(),
   from: tx.from.toLowerCase(),
-  value: tx.value,
-  gasPrice: tx.gasPrice,
-  gas: tx.gas,
-  receiptStatus: receipt.status,
-  receiptGasUsed: receipt.gasUsed,
-  receiptCumulativeGasUsed: receipt.cumulativeGasUsed,
+  value: BigNumber.from(tx.value).toString(),
+  gasPrice: BigNumber.from(tx.gasPrice).toString(),
+  gas: BigNumber.from(tx.gas).toNumber(),
+  receiptStatus: !!BigNumber.from(receipt.status).toNumber(),
+  receiptGasUsed: BigNumber.from(receipt.gasUsed).toNumber(),
+  receiptCumulativeGasUsed: BigNumber.from(
+    receipt.cumulativeGasUsed,
+  ).toNumber(),
 });
