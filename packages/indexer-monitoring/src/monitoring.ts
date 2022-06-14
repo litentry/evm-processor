@@ -1,4 +1,3 @@
-import { performance } from 'perf_hooks';
 import {
   Counter,
   Gauge,
@@ -83,11 +82,11 @@ const monitoring = () => {
 
   return {
     markStart: (metric: Metric) => {
-      marks[`start-${metric.functionName}`] = performance.now();
+      marks[`start-${metric.functionName}`] = Date.now();
     },
 
     markEnd: (metric: Metric) => {
-      marks[`end-${metric.functionName}`] = performance.now();
+      marks[`end-${metric.functionName}`] = Date.now();
     },
 
     measure: (metric: Metric, startMetric?: Metric, endMetric?: Metric) => {

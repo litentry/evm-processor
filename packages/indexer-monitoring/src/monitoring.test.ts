@@ -1,4 +1,3 @@
-import { performance } from 'perf_hooks';
 import {
   Counter,
   Gauge,
@@ -10,7 +9,6 @@ import { Metric } from './metrics';
 import monitoring from './monitoring';
 
 jest.mock('prom-client');
-jest.mock('perf_hooks');
 
 const firstFakeMetric: Metric = {
   functionName: 'fake_metric',
@@ -104,15 +102,14 @@ describe('Monitoring', () => {
   it('Observe a full flow of measurements', async () => {
     const spy = jest.spyOn(Histogram.prototype, 'observe');
 
-    const performanceMock = performance.now as jest.Mock;
-    performanceMock.mockReturnValue(0);
+    global.Date.now = jest.fn(() => 0);
     monitoring.markStart(firstFakeMetric);
     monitoring.markStart(secondFakeMetric);
 
-    performanceMock.mockReturnValue(1000);
+    global.Date.now = jest.fn(() => 1000);
     monitoring.markEnd(firstFakeMetric);
 
-    performanceMock.mockReturnValue(2000);
+    global.Date.now = jest.fn(() => 2000);
     monitoring.markEnd(secondFakeMetric);
 
     monitoring.measure(firstFakeMetric);
