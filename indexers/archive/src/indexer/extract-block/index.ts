@@ -5,7 +5,7 @@ import standard from './standard';
 
 let extractBlock: ExtractBlock;
 
-switch (process.env.EXTRACT_TYPE) {
+switch (process.env.EXTRACTION_SOURCE) {
   case 'nodereal': {
     extractBlock = nodereal;
     break;
