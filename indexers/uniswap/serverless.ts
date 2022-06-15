@@ -1,9 +1,9 @@
 import 'dotenv/config';
-import { serverless } from 'indexer-serverless';
+import { serverless, Chain } from 'indexer-serverless';
 
 module.exports = serverless({
   serviceName: 'uniswap',
-  chain: process.env.CHAIN!,
+  chain: <Chain>process.env.CHAIN!,
   version: process.env.DEPLOY_VERSION!,
   latestBlockDependency: 'contract-graph',
   archiveGraph: process.env.ARCHIVE_GRAPH,
