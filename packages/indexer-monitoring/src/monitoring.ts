@@ -1,4 +1,3 @@
-import { performance } from 'perf_hooks';
 import {
   Counter,
   Gauge,
@@ -16,14 +15,16 @@ const monitoring = () => {
   let marks: MarkedTimestamp = {};
 
   const getNameFromMetric = (metric: Metric, suffix: string) => {
-    // return `${process.env.CHAIN}_${metric.serviceName}_${metric.functionName}_${metric.metricName}`.toLocaleLowerCase();
     return (
-      metric.functionName + (suffix ? '_' + suffix : '')
+      (process.env.SERVICE_NAME ? process.env.SERVICE_NAME + '_' : '') +
+      metric.functionName +
+      (suffix ? '_' + suffix : '')
     ).toLocaleLowerCase();
   };
 
   const getOrCreateHistogram = (metric: Metric): Histogram<string> => {
     const name = getNameFromMetric(metric, 'timer');
+    console.log(name);
 
     const promMetric = globalRegistry.getSingleMetric(name);
     if (promMetric) {
@@ -81,11 +82,11 @@ const monitoring = () => {
 
   return {
     markStart: (metric: Metric) => {
-      marks[`start-${metric.functionName}`] = performance.now();
+      marks[`start-${metric.functionName}`] = Date.now();
     },
 
     markEnd: (metric: Metric) => {
-      marks[`end-${metric.functionName}`] = performance.now();
+      marks[`end-${metric.functionName}`] = Date.now();
     },
 
     measure: (metric: Metric, startMetric?: Metric, endMetric?: Metric) => {
@@ -130,10 +131,12 @@ const monitoring = () => {
         jobName: 'pushgateway',
         groupings: {
           chain: process.env.CHAIN!,
-          version: process.env.DEPLOY_VERSION!
-        }
+          version: process.env.DEPLOY_VERSION!,
+        },
       });
     },
+
+    getNameFromMetric,
   };
 };
 
