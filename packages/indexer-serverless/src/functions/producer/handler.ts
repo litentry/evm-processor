@@ -165,6 +165,7 @@ export default async function producer() {
     );
   } catch (error) {
     monitoring.incCounter(1, metrics.lambdaProducerFailure);
+
     throw error;
   } finally {
     monitoring.measure(metrics.lastQueuedBlock);
