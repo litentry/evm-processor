@@ -32,6 +32,7 @@ export default function (config: Config, params: Params) {
       PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
       CHAIN: config.chain,
       DEPLOY_VERSION: config.version,
+      SERVICE_NAME: config.serviceName,
     },
     timeout: 60,
     memorySize: 2048,

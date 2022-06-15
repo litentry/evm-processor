@@ -1,6 +1,6 @@
-import { getContext } from '../../util/context';
 import stageConfigFactory from '../../config/stage-config';
 import { Config, Params } from '../../types';
+import { getContext } from '../../util/context';
 
 const context = getContext();
 
@@ -26,6 +26,7 @@ export default function (config: Config, params: Params) {
     ],
     environment: {
       MONGO_URI: stageConfig.getMongoURI(),
+      SERVICE_NAME: config.serviceName,
     },
   };
 }

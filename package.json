@@ -54,7 +54,8 @@
   "scripts": {
     "prepare": "husky install",
     "build": "yarn workspaces run build",
-    "test": "jest --silent",
+    "test": "jest",
+    "test-ci": "jest --silent",
     "coverage": "jest --silent --coverage"
   }
 }
