@@ -26,9 +26,9 @@ export default function (config: Config, params: Params) {
     ],
     environment: {
       MONGO_URI: stageConfig.getMongoURI(),
-      CHAIN: config.chain,
+      CHAIN: config.chain.toString(),
       DEPLOY_VERSION: config.version,
-      PUSHGATEWAY_URL: stageConfig.getPushGatewayURL(),
+      PUSHGATEWAY_URL: stageConfig.getPushGatewayURL()!.toString(),
       SERVICE_NAME: config.serviceName,
     },
   };
