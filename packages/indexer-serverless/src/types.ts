@@ -1,6 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 
 export type Chain = 'ethereum' | 'moonbeam' | 'moonriver' | 'bsc';
+export type ExtractionSource = 'nodereal' | 'ankr';
 
 export type Params = {
   org: string;
@@ -36,4 +37,5 @@ export type Config = {
   tokenActivityGraph?: string;
   maxWorkers: number;
   targetTotalQueuedBlocks?: number;
+  extractionSource?: ExtractionSource;
 };

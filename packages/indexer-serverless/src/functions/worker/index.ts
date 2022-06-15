@@ -33,6 +33,7 @@ export default function (config: Config, params: Params) {
       CHAIN: config.chain,
       DEPLOY_VERSION: config.version,
       SERVICE_NAME: config.serviceName,
+      EXTRACTION_SOURCE: config.extractionSource,
     },
     timeout: 60,
     memorySize: 2048,
