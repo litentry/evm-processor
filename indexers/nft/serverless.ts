@@ -8,4 +8,6 @@ module.exports = serverless({
   latestBlockDependency: 'token-activity-graph',
   tokenActivityGraph: process.env.TOKEN_ACTIVITY_GRAPH,
   maxWorkers: parseInt(process.env.MAX_WORKERS!) || 1,
+  targetTotalQueuedBlocks:
+    parseInt(process.env.TARGET_TOTAL_QUEUED_BLOCKS!) || 10000,
 });
