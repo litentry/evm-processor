@@ -20,7 +20,7 @@ export type Swap = {
   token1Amount: string;
   intermediatePath?: string;
   deadline: string;
-  gas: number;
+  gas: string;
   blockNumber: number;
   timestamp: number;
 };

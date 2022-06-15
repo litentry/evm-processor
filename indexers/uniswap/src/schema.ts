@@ -18,7 +18,7 @@ export const SwapSchema = new mongoose.Schema<SwapDocument>({
   token0Amount: { type: String, required: true },
   token1Amount: { type: String, required: true },
   method: { type: String, required: true },
-  gas: { type: Number, required: true },
+  gas: { type: String, required: true },
   blockNumber: { type: Number, required: true },
   timestamp: { type: Number, required: true },
 });
