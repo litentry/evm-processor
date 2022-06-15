@@ -8,8 +8,8 @@ export interface Block {
   stateRoot: string;
   miner: string;
   extraData: string;
-  gasLimit: number;
-  gasUsed: number;
+  gasLimit: string;
+  gasUsed: string;
   timestamp: number;
   size: number;
   difficulty: string;
@@ -52,10 +52,10 @@ export interface TransactionBase {
   from: string;
   value: string;
   gasPrice: string; // 2930 & Legacy (why is this required in Web3 type?)
-  gas: number;
+  gas: string;
   receiptStatus?: boolean; // not available before byzantium upgrade
-  receiptCumulativeGasUsed: number;
-  receiptGasUsed: number;
+  receiptCumulativeGasUsed: string;
+  receiptGasUsed: string;
 }
 
 export interface NativeTokenTransaction extends TransactionBase {
