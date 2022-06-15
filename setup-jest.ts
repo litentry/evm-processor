@@ -3,19 +3,7 @@ import { connect, disconnect } from 'mongoose';
 
 let mongoServer: MongoMemoryServer;
 
-jest.mock('indexer-monitoring', () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual('indexer-monitoring'),
-    monitoring: {
-      pushMetrics: () => {},
-      markStart: () => {},
-      markEnd: () => {},
-      measure: () => {},
-      gauge: () => {},
-    },
-  };
-});
+jest.mock('indexer-monitoring');
 
 global.console = {
   ...console,

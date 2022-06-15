@@ -1,24 +1,43 @@
 import { SQSBatchItemFailure, SQSBatchResponse, SQSEvent } from 'aws-lambda';
 import { awsUtils } from 'aws-utils';
-import { monitoring } from 'indexer-monitoring';
+import { metrics, monitoring } from 'indexer-monitoring';
 import mongoose from 'mongoose';
 
 export default async function worker(
   event: SQSEvent,
   handler: (start: number, end: number) => Promise<void>,
 ): Promise<SQSBatchResponse> {
-  await mongoose.connect(process.env.MONGO_URI!);
+  try {
+    monitoring.markStart(metrics.lambdaWorkerSuccess);
 
-  let failedMessages: SQSBatchItemFailure[] = [];
+    await mongoose.connect(process.env.MONGO_URI!);
 
-  failedMessages = await awsUtils.lambdaHandler(event, handler);
+    let failedMessages: SQSBatchItemFailure[] = [];
 
-  await monitoring.pushMetrics();
+    failedMessages = await awsUtils.lambdaHandler(event, handler);
 
-  console.log('Disconnecting from mongo');
-  await mongoose.disconnect();
+    monitoring.incCounter(
+      event.Records.length,
+      metrics.lambdaWorkerSuccessfulBatches,
+    );
+    monitoring.incCounter(
+      failedMessages.length,
+      metrics.lambdaWorkerFailedBatches,
+    );
 
-  return {
-    batchItemFailures: failedMessages,
-  };
+    return {
+      batchItemFailures: failedMessages,
+    };
+  } catch (error) {
+    console.log(monitoring);
+    throw error;
+  } finally {
+    monitoring.markEnd(metrics.lambdaWorkerSuccess);
+
+    monitoring.measure(metrics.lambdaWorkerSuccess);
+
+    await monitoring.pushMetrics();
+
+    await mongoose.disconnect();
+  }
 }

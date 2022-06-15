@@ -40,6 +40,48 @@ const metrics: Metrics = {
   rpcCalls: {
     functionName: 'rpc_calls',
   },
+  lambdaWorkerSuccess: {
+    functionName: 'lambda_worker_success',
+  },
+  lambdaWorkerFailure: {
+    functionName: 'lambda_worker_failure',
+  },
+  lambdaWorkerSuccessfulBatches: {
+    functionName: 'lambda_worker_successful_batches',
+  },
+  lambdaWorkerFailedBatches: {
+    functionName: 'lambda_worker_failed_batches',
+  },
+  lambdaWorkerMaxWorkers: {
+    functionName: 'lambda_worker_max_workers',
+  },
+  lambdaProducerSuccess: {
+    functionName: 'lambda_producer_success',
+  },
+  lambdaProducerFailure: {
+    functionName: 'lambda_producer_failure',
+  },
+  lambdaProducerBatchSize: {
+    functionName: 'lambda_producer_batch_size',
+  },
+  lambdaLastIndexedSuccess: {
+    functionName: 'lambda_last_indexed_success',
+  },
+  lambdaLastIndexedFailure: {
+    functionName: 'lambda_last_indexed_failure',
+  },
+  lambdaQuerySuccess: {
+    functionName: 'lambda_query_success',
+  },
+  lambdaQueryFailure: {
+    functionName: 'lambda_query_failure',
+  },
+  sqsMessageCount: {
+    functionName: 'sqs_message_count',
+  },
+  sqsDlqMessageCount: {
+    functionName: 'sqs_dlq_message_count',
+  },
 };
 
 export default metrics;
