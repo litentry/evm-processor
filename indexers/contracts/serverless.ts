@@ -1,9 +1,9 @@
 import 'dotenv/config';
-import { serverless } from 'indexer-serverless';
+import { serverless, Chain } from 'indexer-serverless';
 
 module.exports = serverless({
   serviceName: 'contracts',
-  chain: process.env.CHAIN!,
+  chain: <Chain>process.env.CHAIN!,
   version: process.env.DEPLOY_VERSION!,
   latestBlockDependency: 'archive-graph',
   rpcEndpoint: process.env.RPC_ENDPOINT,
