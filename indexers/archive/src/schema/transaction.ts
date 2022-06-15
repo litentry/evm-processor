@@ -23,10 +23,10 @@ const sharedSchema = {
   from: { type: String, required: true },
   value: { type: String, required: true },
   gasPrice: { type: String, required: true },
-  gas: { type: Number, required: true },
+  gas: { type: String, required: true },
   receiptStatus: Boolean,
-  receiptGasUsed: { type: Number, required: true },
-  receiptCumulativeGasUsed: { type: Number, required: true },
+  receiptGasUsed: { type: String, required: true },
+  receiptCumulativeGasUsed: { type: String, required: true },
 };
 
 // no input/method, no contract created, must have a receiver (to)

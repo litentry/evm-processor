@@ -17,10 +17,10 @@ describe('transformSwap()', () => {
           from: 'USER',
           value: '0',
           gasPrice: '30000000000',
-          gas: 9000,
+          gas: '9000',
           receiptStatus: true,
-          receiptCumulativeGasUsed: 9000,
-          receiptGasUsed: 9000,
+          receiptCumulativeGasUsed: '9000',
+          receiptGasUsed: '9000',
           to: 'WETH_CONTRACT',
           input: '0xSomeBinary',
           methodId: '0xSwapETHForExactTokensHash',
@@ -71,7 +71,7 @@ describe('transformSwap()', () => {
       token1: 'token_contract',
       token0Amount: '40', // 10 + 30 calculated from logs
       token1Amount: '100',
-      gas: 9000,
+      gas: '9000',
       blockNumber: 1,
       timestamp: 1517234642,
     });
