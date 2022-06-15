@@ -59,6 +59,7 @@ const getConfig = async (config: Config) => {
     jobQueueName: `${config.chain}-${config.serviceName}-JobQueue-${config.version}`,
     maxWorkers: config.maxWorkers,
     chain: config.chain,
+    version: config.version,
   };
 
   const context = getContext();

@@ -29,11 +29,17 @@ const sharedSchema = {
   receiptCumulativeGasUsed: { type: String, required: true },
 };
 
+const sharedSchemaOptions = {
+  shardKey: { hash: 'hashed' }
+};
+
 // no input/method, no contract created, must have a receiver (to)
 const nativeTokenTransactionSchema =
   new mongoose.Schema<NativeTokenTransactionDocument>({
     ...sharedSchema,
     to: { type: String, required: true },
+  }, {
+    ...sharedSchemaOptions
   });
 
 // to is the contract, must have an input
@@ -43,6 +49,8 @@ const contractTransactionSchema =
     to: { type: String, required: true },
     methodId: { type: String, required: true },
     input: { type: String, required: true },
+  }, {
+    ...sharedSchemaOptions
   });
 
 // no to address, input is contract creation code, must have contract address in receipt
@@ -52,6 +60,8 @@ const contractCreationTransactionSchema =
     methodId: { type: String, required: true },
     input: { type: String, required: true },
     receiptContractAddress: { type: String, required: true },
+  }, {
+    ...sharedSchemaOptions
   });
 
 // INDEXES

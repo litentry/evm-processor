@@ -67,7 +67,7 @@ function getRouterInstances(version: string): number {
 function getShardInstances(version: string): number {
   switch (version) {
     case 'cluster-test':
-      return 3;
+      return 5;
     default:
       return 0;
   }
@@ -99,7 +99,7 @@ export default function(stage: string, params: Params) {
                         TTL: 10
                       }
                     ],
-                    RoutingPolicy: 'WEIGHTED'
+                    RoutingPolicy: 'MULTIVALUE'
                   },
                   Name: `config${index}.${params.mongoDnsName}`,
                   NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`
@@ -124,7 +124,7 @@ export default function(stage: string, params: Params) {
                         TTL: 10
                       }
                     ],
-                    RoutingPolicy: 'WEIGHTED'
+                    RoutingPolicy: 'MULTIVALUE'
                   },
                   Name: `router${index}.${params.mongoDnsName}`,
                   NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`
@@ -149,7 +149,7 @@ export default function(stage: string, params: Params) {
                         TTL: 10
                       }
                     ],
-                    RoutingPolicy: 'WEIGHTED'
+                    RoutingPolicy: 'MULTIVALUE'
                   },
                   Name: `shard${index}.${params.mongoDnsName}`,
                   NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`
@@ -322,7 +322,7 @@ export default function(stage: string, params: Params) {
                     Ref: `MongoTaskRouter${index}`
                   },
                   Cluster: `\${cf:${params.clusterStackName}.EcsCluster}`,
-                  DesiredCount: 1,
+                  DesiredCount: 3,
                   PlacementStrategies: [{
                     Type: 'binpack',
                     Field: 'memory'
@@ -373,6 +373,7 @@ export default function(stage: string, params: Params) {
                         { Name: 'MONGODB_REPLICA_SET_MODE', Value: `primary` },
                         { Name: 'MONGODB_REPLICA_SET_NAME', Value: `shard${index}` },
                         { Name: 'MONGODB_REPLICA_SET_KEY', Value: 'replicakey' },
+                        { Name: 'MONGODB_EXTRA_FLAGS', Value: `--wiredTigerCacheSizeGB=31 --slowOpSampleRate 0.001 --quiet`},
                         {
                           Name: 'MONGODB_ADVERTISED_HOSTNAME',
                           Value: `shard${index}.${params.mongoDnsName}.${params.org}`
@@ -398,8 +399,8 @@ export default function(stage: string, params: Params) {
                       PseudoTerminal: 'false'
                     }
                   ],
-                  Cpu: 1.5 * ecsMultiplier,
-                  Memory: 8 * ecsMultiplier,
+                  Cpu: 6 * ecsMultiplier,
+                  Memory: 60 * ecsMultiplier,
                   NetworkMode: 'awsvpc',
                   RequiresCompatibilities: ['EC2'],
                   TaskRoleArn: { 'Fn::Sub': 'arn:aws:iam::${AWS::AccountId}:role/ecs-task-sensitiveconfig-access-role' },
@@ -427,7 +428,7 @@ export default function(stage: string, params: Params) {
                     Ref: `MongoTaskShard${index}`
                   },
                   Cluster: `\${cf:${params.clusterStackName}.EcsCluster}`,
-                  DesiredCount: 1,
+                  DesiredCount: 0,
                   PlacementStrategies: [{
                     Type: 'binpack',
                     Field: 'memory'

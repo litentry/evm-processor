@@ -5,7 +5,7 @@ import { Types, filter } from 'indexer-utils';
 interface BlockDocument extends Types.Archive.Block, mongoose.Document {}
 
 const BlockSchema = new mongoose.Schema<BlockDocument>({
-  number: { type: Number, required: true, unique: true, index: true },
+  number: { type: Number, required: true, index: true },
   hash: { type: String, required: true, unique: true },
   parentHash: { type: String, required: true },
   nonce: String,
@@ -22,7 +22,7 @@ const BlockSchema = new mongoose.Schema<BlockDocument>({
   totalDifficulty: { type: String, required: true },
   uncles: String,
 }, {
-  shardKey: { number: 'hashed' }
+  shardKey: { hash: 'hashed' }
 });
 
 export const BlockModel = mongoose.model('Block', BlockSchema);

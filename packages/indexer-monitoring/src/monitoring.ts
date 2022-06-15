@@ -24,7 +24,6 @@ const monitoring = () => {
 
   const getOrCreateHistogram = (metric: Metric): Histogram<string> => {
     const name = getNameFromMetric(metric, 'timer');
-    console.log(name);
 
     const promMetric = globalRegistry.getSingleMetric(name);
     if (promMetric) {

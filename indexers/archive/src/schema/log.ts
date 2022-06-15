@@ -16,6 +16,8 @@ const LogSchema = new mongoose.Schema<LogDocument>({
   data: { type: String, required: true },
   logIndex: { type: Number, required: true },
   blockTimestamp: { type: Number, required: true },
+}, {
+  shardKey: { blockNumber: 'hashed' }
 });
 
 export const LogModel = mongoose.model('Log', LogSchema);

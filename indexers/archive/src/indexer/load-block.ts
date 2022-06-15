@@ -7,7 +7,6 @@ import {
   BlockModel,
 } from '../schema';
 import { LoadBlock } from './types';
-import { ensureShardedSchema } from 'indexer-utils/lib/utils/upsert-mongo-models';
 
 /**
  * Try bulk insert, if error try bulk delete to avoid partial imports
@@ -25,9 +24,7 @@ const mongo: LoadBlock = async ({
 }) => {
   try {
     const results = await Promise.allSettled([
-      ensureShardedSchema(BlockModel, NativeTokenTransactionModel, ContractCreationTransactionModel, ContractTransactionModel, LogModel),
-
-      utils.upsertMongoModels(BlockModel, [block], ['number']),
+      utils.upsertMongoModels(BlockModel, [block], ['hash']),
       utils.upsertMongoModels(
         NativeTokenTransactionModel,
         nativeTokenTransactions,

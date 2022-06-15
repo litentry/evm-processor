@@ -7,6 +7,7 @@ import {
   saveLastQueuedEndBlock,
 } from './lastQueuedEndblockRepository';
 import getEnvVar from "../../util/get-env-var";
+import { repository, utils } from 'indexer-utils';
 
 const sqs = new SQS();
 
@@ -37,6 +38,7 @@ export default async function producer() {
   await mongoose.connect(getEnvVar('MONGO_URI')!);
 
   monitoring.markStart(metrics.lastQueuedBlock);
+  await utils.ensureShardedCollections(repository.lastQueuedBlock.Model);
   const existingLastQueuedEndBlock = await getLastQueuedEndBlock();
   monitoring.markEnd(metrics.lastQueuedBlock);
 
