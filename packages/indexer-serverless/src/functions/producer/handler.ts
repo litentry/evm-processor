@@ -167,12 +167,10 @@ export default async function producer() {
     monitoring.incCounter(1, metrics.lambdaProducerFailure);
     throw error;
   } finally {
-    monitoring.markEnd(metrics.lambdaProducerSuccess);
-
     monitoring.measure(metrics.lastQueuedBlock);
     monitoring.measure(metrics.batchBlocks);
     monitoring.measure(metrics.saveLastQueuedBlock);
-    monitoring.measure(metrics.lambdaProducerSuccess);
+    monitoring.markEndAndMeasure(metrics.lambdaProducerSuccess);
 
     await monitoring.pushMetrics();
 

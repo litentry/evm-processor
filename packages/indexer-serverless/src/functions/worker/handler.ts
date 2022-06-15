@@ -12,29 +12,35 @@ export default async function worker(
 
     await mongoose.connect(process.env.MONGO_URI!);
 
-    let failedMessages: SQSBatchItemFailure[] = [];
-
-    failedMessages = await awsUtils.lambdaHandler(event, handler);
-
-    monitoring.incCounter(
-      event.Records.length,
-      metrics.lambdaWorkerSuccessfulBatches,
+    const failedMessages: SQSBatchItemFailure[] = await awsUtils.lambdaHandler(
+      event,
+      handler,
     );
-    monitoring.incCounter(
-      failedMessages.length,
-      metrics.lambdaWorkerFailedBatches,
-    );
+
+    const failedMessagesCount = failedMessages.length;
+    const successfulMessagesCount = event.Records.length - failedMessagesCount;
+
+    if (successfulMessagesCount) {
+      monitoring.incCounter(
+        successfulMessagesCount,
+        metrics.lambdaWorkerSuccessfulBatches,
+      );
+    }
+    if (failedMessagesCount) {
+      monitoring.incCounter(
+        failedMessagesCount,
+        metrics.lambdaWorkerFailedBatches,
+      );
+    }
 
     return {
       batchItemFailures: failedMessages,
     };
   } catch (error) {
-    console.log(monitoring);
+    monitoring.incCounter(1, metrics.lambdaWorkerFailure);
     throw error;
   } finally {
-    monitoring.markEnd(metrics.lambdaWorkerSuccess);
-
-    monitoring.measure(metrics.lambdaWorkerSuccess);
+    monitoring.markEndAndMeasure(metrics.lambdaWorkerSuccess);
 
     await monitoring.pushMetrics();
 

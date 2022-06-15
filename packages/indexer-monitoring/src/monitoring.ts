@@ -108,6 +108,15 @@ const monitoring = () => {
 
     measure,
 
+    markEndAndMeasure: (
+      metric: Metric,
+      startMetric?: Metric,
+      endMetric?: Metric,
+    ) => {
+      markEnd(metric);
+      measure(metric, startMetric, endMetric);
+    },
+
     observe,
 
     gauge: (value: number, metric: Metric) => {
