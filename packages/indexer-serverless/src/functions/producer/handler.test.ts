@@ -17,7 +17,6 @@ jest.mock('../../util/get-env-var', () => (key: keyof typeof envVarMock) => {
   return { ...process.env, ...envVarMock }[key];
 });
 
-jest.mock('../../util/get-latest-block');
 jest.mock('./lastQueuedEndblockRepository');
 
 jest.mock('aws-sdk', () => {
