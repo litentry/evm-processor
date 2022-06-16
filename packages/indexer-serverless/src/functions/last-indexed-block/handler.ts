@@ -17,10 +17,10 @@ export default async function lastIndexedBlock() {
       await monitoring.pushMetrics();
     } catch (error) {
       monitoring.incCounter(1, metrics.lambdaLastIndexedFailure);
+      await monitoring.pushMetrics();
 
       throw error;
     }
   });
-
   await mongoose.disconnect();
 }

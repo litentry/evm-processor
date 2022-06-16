@@ -341,10 +341,8 @@ describe('AWS producer', () => {
 
     await expect(producer()).rejects.toThrow('e');
 
-    expect(monitoring.markEndAndMeasure).toBeCalledTimes(1);
-    expect(monitoring.markEndAndMeasure).lastCalledWith(
-      metrics.lambdaProducerSuccess,
-    );
+    expect(monitoring.markEndAndMeasure).toBeCalledTimes(0);
+
     expect(monitoring.incCounter).toBeCalledTimes(1);
     expect(monitoring.incCounter).lastCalledWith(
       1,

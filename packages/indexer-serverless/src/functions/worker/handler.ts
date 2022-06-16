@@ -20,6 +20,8 @@ export default async function worker(
 
     trackSqsCountMetrics(failedMessages, event);
 
+    monitoring.markEndAndMeasure(metrics.lambdaWorkerSuccess);
+
     return {
       batchItemFailures: failedMessages,
     };
@@ -27,8 +29,6 @@ export default async function worker(
     monitoring.incCounter(1, metrics.lambdaWorkerFailure);
     throw error;
   } finally {
-    monitoring.markEndAndMeasure(metrics.lambdaWorkerSuccess);
-
     await monitoring.pushMetrics();
 
     await mongoose.disconnect();
