@@ -1,8 +1,9 @@
-import mongoose from 'mongoose';
-import { Context } from 'aws-lambda';
 import serverlessExpress from '@vendia/serverless-express';
-import { graphqlServer } from 'indexer-utils';
+import { Context } from 'aws-lambda';
 import { GraphQLSchema } from 'graphql';
+import { metrics, monitoring } from 'indexer-monitoring';
+import { graphqlServer } from 'indexer-utils';
+import mongoose from 'mongoose';
 
 let serverlessExpressInstance: any;
 
@@ -11,11 +12,25 @@ export default async function query(
   context: Context,
   schema: GraphQLSchema,
 ) {
-  if (!serverlessExpressInstance) {
-    await mongoose.connect(process.env.MONGO_URI!);
-    const app = graphqlServer(schema);
-    serverlessExpressInstance = serverlessExpress({ app });
-  }
+  try {
+    monitoring.markStart(metrics.lambdaQuerySuccess);
 
-  return serverlessExpressInstance(event, context);
+    if (!serverlessExpressInstance) {
+      await mongoose.connect(process.env.MONGO_URI!);
+      const app = graphqlServer(schema);
+      serverlessExpressInstance = serverlessExpress({ app });
+    }
+
+    monitoring.markEndAndMeasure(metrics.lambdaQuerySuccess);
+
+    return serverlessExpressInstance(event, context);
+  } catch (error) {
+    monitoring.incCounter(1, metrics.lambdaQueryFailure);
+
+    throw error;
+  } finally {
+    await monitoring.pushMetrics();
+
+    await mongoose.disconnect();
+  }
 }
