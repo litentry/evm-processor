@@ -27,6 +27,7 @@ export type Config = {
   chain: Chain;
   version: string;
   rpcEndpoint?: string;
+  lastBlockRpcEndpoint?: string;
   archiveGraph?: string;
   contractGraph?: string;
   tokenActivityGraph?: string;

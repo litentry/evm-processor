@@ -18,7 +18,7 @@ export default function (config: Config, params: Params) {
     environment: {
       QUEUE_URL: { Ref: 'JobQueue' },
       QUEUE_DLQ_URL: { Ref: 'JobQueueDLQ' },
-      RPC_ENDPOINT: config.rpcEndpoint,
+      RPC_ENDPOINT: config.lastBlockRpcEndpoint || config.rpcEndpoint,
       ARCHIVE_GRAPH: config.archiveGraph,
       TOKEN_ACTIVITY_GRAPH: config.tokenActivityGraph,
       CONTRACT_GRAPH: config.contractGraph,
