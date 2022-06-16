@@ -22,7 +22,6 @@ export default function (config: Config, params: Params) {
       ARCHIVE_GRAPH: config.archiveGraph,
       TOKEN_ACTIVITY_GRAPH: config.tokenActivityGraph,
       CONTRACT_GRAPH: config.contractGraph,
-      LATEST_BLOCK_DEPENDENCY: config.latestBlockDependency,
       BATCH_SIZE: String(stageConfig.getProducerBatchSize()),
       END_BLOCK: String(stageConfig.getProducerEndBlock()),
       MONGO_URI: stageConfig.getMongoURI(),
