@@ -76,7 +76,7 @@ describe('AWS worker', () => {
     });
   });
 
-  it('Returns empty failed message IDs when process succeeds', async () => {
+  it('Should track success metrics when process succeeds', async () => {
     console.log = jest.fn();
 
     await worker(message, successHandler);
