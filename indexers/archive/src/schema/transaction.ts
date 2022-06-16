@@ -58,10 +58,10 @@ const contractCreationTransactionSchema =
 nativeTokenTransactionSchema.index({ blockNumber: 1 });
 nativeTokenTransactionSchema.index({ to: 1 });
 nativeTokenTransactionSchema.index({ from: 1 });
-nativeTokenTransactionSchema.index({ value: 1 });
+// nativeTokenTransactionSchema.index({ value: 1 });
 contractTransactionSchema.index({ blockNumber: 1 });
-contractTransactionSchema.index({ to: 1 });
-contractTransactionSchema.index({ methodId: 1 });
+// contractTransactionSchema.index({ to: 1 });
+// contractTransactionSchema.index({ methodId: 1 });
 contractCreationTransactionSchema.index({ blockNumber: 1 });
 contractCreationTransactionSchema.index({ receiptContractAddress: 1 });
 

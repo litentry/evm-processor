@@ -6,9 +6,9 @@ interface LogDocument extends Types.Archive.Log, mongoose.Document {}
 
 const LogSchema = new mongoose.Schema<LogDocument>({
   blockNumber: { type: Number, required: true, index: true },
-  transactionHash: { type: String, required: true, index: true },
-  address: { type: String, required: true, index: true },
-  topic0: { type: String, required: true, index: true },
+  transactionHash: { type: String, required: true },
+  address: { type: String, required: true },
+  topic0: { type: String, required: true },
   topic1: String,
   topic2: String,
   topic3: String,
