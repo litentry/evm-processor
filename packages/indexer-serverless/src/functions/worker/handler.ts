@@ -1,6 +1,7 @@
 import { SQSBatchItemFailure, SQSBatchResponse, SQSEvent } from 'aws-lambda';
 import { awsUtils } from 'aws-utils';
 import { metrics, monitoring } from 'indexer-monitoring';
+import { isNumber } from 'lodash';
 import mongoose from 'mongoose';
 
 export default async function worker(
@@ -17,21 +18,7 @@ export default async function worker(
       handler,
     );
 
-    const failedMessagesCount = failedMessages.length;
-    const successfulMessagesCount = event.Records.length - failedMessagesCount;
-
-    if (successfulMessagesCount) {
-      monitoring.incCounter(
-        successfulMessagesCount,
-        metrics.lambdaWorkerSuccessfulBatches,
-      );
-    }
-    if (failedMessagesCount) {
-      monitoring.incCounter(
-        failedMessagesCount,
-        metrics.lambdaWorkerFailedBatches,
-      );
-    }
+    trackSqsCountMetrics(failedMessages, event);
 
     return {
       batchItemFailures: failedMessages,
@@ -46,4 +33,38 @@ export default async function worker(
 
     await mongoose.disconnect();
   }
+}
+
+function trackSqsCountMetrics(
+  failedMessages: SQSBatchItemFailure[],
+  event: SQSEvent,
+) {
+  const failedMessagesCount = failedMessages.length;
+  const successfulMessagesCount = event.Records.length - failedMessagesCount;
+
+  if (successfulMessagesCount) {
+    monitoring.incCounter(
+      successfulMessagesCount,
+      metrics.lambdaWorkerSuccessfulBatches,
+    );
+  }
+
+  if (failedMessagesCount) {
+    monitoring.incCounter(
+      failedMessagesCount,
+      metrics.lambdaWorkerFailedBatches,
+    );
+  }
+
+  event.Records.forEach((r) => {
+    if (
+      r.attributes.ApproximateReceiveCount &&
+      isNumber(r.attributes.ApproximateReceiveCount)
+    ) {
+      monitoring.observe(
+        parseInt(r.attributes.ApproximateReceiveCount),
+        metrics.sqsMessageReceiveCount,
+      );
+    }
+  });
 }

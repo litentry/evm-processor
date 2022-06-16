@@ -79,6 +79,9 @@ const metrics: Metrics = {
   sqsMessageCount: {
     functionName: 'sqs_message_count',
   },
+  sqsMessageReceiveCount: {
+    functionName: 'sqs_message_receive_count',
+  },
   sqsDlqMessageCount: {
     functionName: 'sqs_dlq_message_count',
   },
