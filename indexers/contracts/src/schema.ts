@@ -19,53 +19,43 @@ interface UniswapV3Document
   extends Types.Contract.UniswapV3Contract,
     mongoose.Document {}
 
-const ERC20ContractSchema = new mongoose.Schema<ERC20Document>({
-  address: { type: String, required: true, index: true },
+const sharedSchema = {
+  address: { type: String, required: true, index: true, unique: true },
   creator: { type: String, required: true, index: true },
   blockNumber: { type: Number, required: true, index: true },
   erc165: { type: Boolean, required: true, index: true },
   timestamp: { type: Number, required: true },
+};
+
+const ERC20ContractSchema = new mongoose.Schema<ERC20Document>({
+  ...sharedSchema,
   symbol: String,
   name: String,
   decimals: Number,
 });
 
 const ERC721ContractSchema = new mongoose.Schema<ERC721Document>({
-  address: { type: String, required: true, index: true },
-  creator: { type: String, required: true, index: true },
-  blockNumber: { type: Number, required: true, index: true },
-  erc165: { type: Boolean, required: true, index: true },
+  ...sharedSchema,
   erc721TokenReceiver: { type: Boolean, required: true, index: true },
   erc721Metadata: { type: Boolean, required: true, index: true },
   erc721Enumerable: { type: Boolean, required: true, index: true },
-  timestamp: { type: Number, required: true },
   name: String,
 });
 
 const ERC1155ContractSchema = new mongoose.Schema<ERC1155Document>({
-  address: { type: String, required: true, index: true },
-  creator: { type: String, required: true, index: true },
-  blockNumber: { type: Number, required: true, index: true },
-  erc165: { type: Boolean, required: true, index: true },
+  ...sharedSchema,
   erc1155TokenReceiver: { type: Boolean, required: true, index: true },
   erc1155MetadataURI: { type: Boolean, required: true, index: true },
-  timestamp: { type: Number, required: true },
   name: String,
 });
 
-const UniswapV2ContractSchema = new mongoose.Schema<UniswapV2Document>({
-  address: { type: String, required: true, index: true },
-  creator: { type: String, required: true, index: true },
-  blockNumber: { type: Number, required: true, index: true },
-  erc165: { type: Boolean, required: true, index: true },
-});
+const UniswapV2ContractSchema = new mongoose.Schema<UniswapV2Document>(
+  sharedSchema,
+);
 
-const UniswapV3ContractSchema = new mongoose.Schema<UniswapV3Document>({
-  address: { type: String, required: true, index: true },
-  creator: { type: String, required: true, index: true },
-  blockNumber: { type: Number, required: true, index: true },
-  erc165: { type: Boolean, required: true, index: true },
-});
+const UniswapV3ContractSchema = new mongoose.Schema<UniswapV3Document>(
+  sharedSchema,
+);
 
 export const ERC20ContractModel = mongoose.model(
   'ERC20Contract',
