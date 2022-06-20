@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { CONTRACT_SIGNATURES } from './contract-signatures';
 import { ContractType } from '../../types/contract';
 
@@ -6,7 +7,7 @@ export default function isType(type: ContractType, input: string) {
     ({ ID, REQUIRED }) => {
       if (!REQUIRED) return true;
 
-      return input.includes(ID);
+      return input.includes(stripZeros(ID));
     },
   );
 
@@ -16,9 +17,13 @@ export default function isType(type: ContractType, input: string) {
     ({ ID, REQUIRED }) => {
       if (!REQUIRED) return true;
 
-      return input.includes(ID);
+      return input.includes(stripZeros(ID));
     },
   );
 
   return hasExtrinsics;
+}
+
+function stripZeros(id: string): string {
+  return ethers.utils.hexStripZeros(`0x${id}`).substring(2);
 }
