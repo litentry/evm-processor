@@ -1,29 +1,25 @@
-import { query, repository } from 'indexer-utils';
+import { repository } from 'indexer-utils';
 import { metrics, monitoring } from 'indexer-monitoring';
-import handleContractCreation from './handle-contract-creation';
+import extract from './extract';
+import transform from './transform';
+import load from './load';
 
 export default async function indexer(startBlock: number, endBlock: number) {
   console.time('extract');
   monitoring.markStart(metrics.extractBlock);
-  const txs = await query.archive.contractCreationTransactions({
-    startBlock,
-    endBlock,
-    properties: [
-      'receiptContractAddress',
-      'from',
-      'blockNumber',
-      'blockTimestamp',
-      'input',
-      'receiptStatus',
-    ],
-  });
+  const txs = await extract(startBlock, endBlock);
   monitoring.markEnd(metrics.extractBlock);
   console.timeEnd('extract');
 
-  // Transform & load batch
+  console.time('transform');
+  monitoring.markStart(metrics.transformBlock);
+  const transformed = await transform(txs);
+  monitoring.markEnd(metrics.transformBlock);
+  console.timeEnd('transform');
+
   console.time('load');
   monitoring.markStart(metrics.loadBlock);
-  const results = await Promise.allSettled(txs.map(handleContractCreation));
+  const results = await load(transformed);
   monitoring.markEnd(metrics.loadBlock);
   console.timeEnd('load');
 
