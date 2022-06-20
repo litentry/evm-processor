@@ -1,6 +1,12 @@
 import mongoose from 'mongoose';
 import { composeMongoose } from 'graphql-compose-mongoose';
 import { Types, filter } from 'indexer-utils';
+import getEnvVar from 'indexer-serverless/lib/util/get-env-var';
+
+const schemaOptions: mongoose.SchemaOptions = {};
+if (getEnvVar('SHARDING_ENABLED')) {
+  schemaOptions.shardKey = { hash: 'hashed' }
+}
 
 interface LogDocument extends Types.Archive.Log, mongoose.Document {}
 
@@ -17,7 +23,7 @@ const LogSchema = new mongoose.Schema<LogDocument>({
   logIndex: { type: Number, required: true },
   blockTimestamp: { type: Number, required: true },
 }, {
-  shardKey: { blockNumber: 'hashed' }
+  ...schemaOptions
 });
 
 export const LogModel = mongoose.model('Log', LogSchema);

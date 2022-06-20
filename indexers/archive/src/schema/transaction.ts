@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { filter, Types } from 'indexer-utils';
 import { composeMongoose } from 'graphql-compose-mongoose';
 import { LogTC, LogModel } from './log';
+import getEnvVar from 'indexer-serverless/lib/util/get-env-var';
 
 interface NativeTokenTransactionDocument
   extends Types.Archive.NativeTokenTransaction,
@@ -29,9 +30,10 @@ const sharedSchema = {
   receiptCumulativeGasUsed: { type: String, required: true },
 };
 
-const sharedSchemaOptions = {
-  shardKey: { hash: 'hashed' }
-};
+const sharedSchemaOptions: mongoose.SchemaOptions = {};
+if (getEnvVar('SHARDING_ENABLED')) {
+  sharedSchemaOptions.shardKey = { hash: 'hashed' }
+}
 
 // no input/method, no contract created, must have a receiver (to)
 const nativeTokenTransactionSchema =

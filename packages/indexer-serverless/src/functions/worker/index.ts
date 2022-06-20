@@ -2,6 +2,7 @@ import { AWS } from '@serverless/typescript';
 import stageConfigFactory from '../../config/stage-config';
 import { Config, Params } from '../../types';
 import { getContext } from '../../util/context';
+import getEnvVar from '../../util/get-env-var';
 
 const context = getContext();
 
@@ -35,6 +36,7 @@ export default function (config: Config, params: Params) {
       DEPLOY_VERSION: config.version,
       SERVICE_NAME: config.serviceName,
       EXTRACTION_SOURCE: config.extractionSource,
+      SHARDING_ENABLED: <string>getEnvVar('SHARDING_ENABLED', true)
     },
     timeout: 60,
     memorySize: 2048,

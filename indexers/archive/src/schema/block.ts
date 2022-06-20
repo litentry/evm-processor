@@ -1,8 +1,14 @@
 import mongoose from 'mongoose';
 import { composeMongoose } from 'graphql-compose-mongoose';
 import { Types, filter } from 'indexer-utils';
+import getEnvVar from 'indexer-serverless/lib/util/get-env-var';
 
 interface BlockDocument extends Types.Archive.Block, mongoose.Document {}
+
+const schemaOptions: mongoose.SchemaOptions = {};
+if (getEnvVar('SHARDING_ENABLED')) {
+  schemaOptions.shardKey = { hash: 'hashed' }
+}
 
 const BlockSchema = new mongoose.Schema<BlockDocument>({
   number: { type: Number, required: true, index: true },
@@ -22,7 +28,7 @@ const BlockSchema = new mongoose.Schema<BlockDocument>({
   totalDifficulty: { type: String, required: true },
   uncles: String,
 }, {
-  shardKey: { hash: 'hashed' }
+  ...schemaOptions
 });
 
 export const BlockModel = mongoose.model('Block', BlockSchema);
