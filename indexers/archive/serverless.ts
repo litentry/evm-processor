@@ -5,7 +5,6 @@ module.exports = serverless({
   serviceName: 'archive',
   chain: <Chain>process.env.CHAIN!,
   version: process.env.DEPLOY_VERSION!,
-  latestBlockDependency: 'archive-node',
   rpcEndpoint: process.env.RPC_ENDPOINT,
   lastBlockRpcEndpoint: process.env.LAST_BLOCK_RPC_ENDPOINT,
   extractionSource: <ExtractionSource>process.env.EXTRACTION_SOURCE,
