@@ -79,24 +79,41 @@ const monitoring = () => {
     ); // observe takes time in seconds
   };
 
+  const markEnd = (metric: Metric) => {
+    marks[`end-${metric.functionName}`] = Date.now();
+  };
+
+  const measure = (
+    metric: Metric,
+    startMetric?: Metric,
+    endMetric?: Metric,
+  ) => {
+    const startMark = startMetric || metric;
+    const endMark = endMetric || metric;
+    const timer = Math.abs(
+      (marks[`end-${endMark.functionName}`] ?? 0) -
+        (marks[`start-${startMark.functionName}`] ?? 0),
+    );
+
+    observe(timer, metric);
+  };
+
   return {
     markStart: (metric: Metric) => {
       marks[`start-${metric.functionName}`] = Date.now();
     },
 
-    markEnd: (metric: Metric) => {
-      marks[`end-${metric.functionName}`] = Date.now();
-    },
+    markEnd,
 
-    measure: (metric: Metric, startMetric?: Metric, endMetric?: Metric) => {
-      const startMark = startMetric || metric;
-      const endMark = endMetric || metric;
-      const timer = Math.abs(
-        (marks[`end-${endMark.functionName}`] ?? 0) -
-          (marks[`start-${startMark.functionName}`] ?? 0),
-      );
+    measure,
 
-      observe(timer, metric);
+    markEndAndMeasure: (
+      metric: Metric,
+      startMetric?: Metric,
+      endMetric?: Metric,
+    ) => {
+      markEnd(metric);
+      measure(metric, startMetric, endMetric);
     },
 
     observe,

@@ -33,6 +33,7 @@ export type Config = {
     | 'contract-graph'
     | 'token-activity-graph';
   rpcEndpoint?: string;
+  lastBlockRpcEndpoint?: string;
   archiveGraph?: string;
   contractGraph?: string;
   tokenActivityGraph?: string;
