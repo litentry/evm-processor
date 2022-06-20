@@ -4,9 +4,9 @@ import mongoose from 'mongoose';
 import getLatestBlock from '../../util/get-latest-block';
 import {
   getLastQueuedEndBlock,
-  saveLastQueuedEndBlock,
+  saveLastQueuedEndBlock
 } from './lastQueuedEndblockRepository';
-import getEnvVar from "../../util/get-env-var";
+import getEnvVar from '../../util/get-env-var';
 import { repository, utils } from 'indexer-utils';
 
 const sqs = new SQS();
@@ -32,9 +32,11 @@ const dispatch = async (jobs: BatchSQSMessage[]) => {
   }
 };
 
-export default async function producer() {
-  console.log(getEnvVar('MONGO_URI'));
-
+export default async function producer(payload?: {
+  start: number,
+  end: number,
+  batchSize: number
+}) {
   await mongoose.connect(getEnvVar('MONGO_URI')!);
 
   monitoring.markStart(metrics.lastQueuedBlock);
@@ -57,7 +59,7 @@ export default async function producer() {
   monitoring.gauge(chainHeight, metrics.lastChainBlock);
 
   const maxWorkers = parseInt(getEnvVar('MAX_WORKERS')!) || 1;
-  const batchSize = parseInt(getEnvVar('BATCH_SIZE')!);
+  let batchSize = parseInt(getEnvVar('BATCH_SIZE')!);
 
   const sqsQueueAttributes = await sqs
     .getQueueAttributes({
@@ -77,7 +79,7 @@ export default async function producer() {
     batchSize;
 
   const targetTotalQueuedBlocks = parseInt(getEnvVar('TARGET_TOTAL_QUEUED_BLOCKS')!);
-  const targetJobCount =
+  let targetJobCount =
     Math.floor(targetTotalQueuedBlocks / batchSize) -
     Math.floor(currentBlocksInQueue / batchSize);
 
@@ -94,6 +96,13 @@ export default async function producer() {
   if (targetBlockHeight <= lastQueuedEndBlock) {
     console.log(`Last queued message is up to the chain height`);
     return;
+  }
+
+  if (payload?.start) {
+    const range = payload.end - payload.start;
+    batchSize = payload.batchSize;
+    targetJobCount = Math.ceil(range / payload.batchSize);
+    lastQueuedEndBlock = payload.start;
   }
 
   const batches = [];
@@ -135,7 +144,7 @@ export default async function producer() {
   }
   monitoring.markEnd(metrics.batchBlocks);
 
-  if (existingLastQueuedEndBlock !== lastQueuedEndBlock) {
+  if (existingLastQueuedEndBlock !== lastQueuedEndBlock && !(payload?.start)) {
     monitoring.markStart(metrics.saveLastQueuedBlock);
     await saveLastQueuedEndBlock(lastQueuedEndBlock);
     monitoring.markEnd(metrics.saveLastQueuedBlock);
