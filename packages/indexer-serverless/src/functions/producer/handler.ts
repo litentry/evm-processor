@@ -2,7 +2,6 @@ import { SQS } from 'aws-sdk';
 import { metrics, monitoring } from 'indexer-monitoring';
 import mongoose from 'mongoose';
 import getEnvVar from '../../util/get-env-var';
-import getLatestBlock from '../../util/get-latest-block';
 import {
   getLastQueuedEndBlock,
   saveLastQueuedEndBlock,
@@ -31,7 +30,7 @@ const dispatch = async (jobs: BatchSQSMessage[]) => {
   }
 };
 
-export default async function producer() {
+export default async function producer(getLatestBlock: () => Promise<number>) {
   monitoring.markStart(metrics.lambdaProducerSuccess);
 
   try {
@@ -44,9 +43,7 @@ export default async function producer() {
     // always start at -1 so we increment at start of the loop
     let lastQueuedEndBlock = existingLastQueuedEndBlock || -1;
 
-    const chainHeight = await getLatestBlock(
-      getEnvVar('LATEST_BLOCK_DEPENDENCY')!,
-    )();
+    const chainHeight = await getLatestBlock();
 
     const targetBlockHeight =
       getEnvVar('END_BLOCK', false) !== 'undefined'
