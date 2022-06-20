@@ -27,7 +27,6 @@ export default async function query(
 
     return res;
   } catch (error) {
-    console.log(error);
     monitoring.incCounter(1, metrics.lambdaQueryFailure);
 
     throw error;
