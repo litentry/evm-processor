@@ -22,6 +22,9 @@ export async function upsertMongoModels(
           upsert: true,
         },
       })),
+      {
+        ordered: false,
+      }
     );
   }
 }
