@@ -14,11 +14,7 @@ export default async function handleContractCreation({
   blockNumber,
   blockTimestamp: timestamp,
   input,
-  receiptStatus,
 }: Types.Archive.ContractCreationTransaction) {
-  // failure (or pre byzantium... may need to handle this better)
-  if (!receiptStatus) return;
-
   const erc165 = utils.contract.isType(
     Types.Contract.ContractType.ERC165,
     input,
