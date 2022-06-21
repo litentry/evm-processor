@@ -11,7 +11,7 @@ const ensuredShardedModels: {[key: string]: boolean} = {};
 export async function ensureShardedCollections(
   ...models: mongoose.Model<any>[]
 ) {
-  if (getEnvVar('SHARDING_ENABLED') === 'true') {
+  if (getEnvVar('SHARDING_ENABLED', false) === 'true') {
     for (const model of models) {
       if (!ensuredShardedModels[model.collection.collectionName]) {
         const shardKey = model.schema.get('shardKey');

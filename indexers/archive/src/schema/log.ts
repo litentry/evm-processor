@@ -4,7 +4,7 @@ import { Types, filter } from 'indexer-utils';
 import getEnvVar from 'indexer-serverless/lib/util/get-env-var';
 
 const schemaOptions: mongoose.SchemaOptions = {};
-if (getEnvVar('SHARDING_ENABLED')) {
+if (getEnvVar('SHARDING_ENABLED', false)) {
   schemaOptions.shardKey = { hash: 'hashed' }
 }
 

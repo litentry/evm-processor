@@ -31,7 +31,7 @@ const sharedSchema = {
 };
 
 const sharedSchemaOptions: mongoose.SchemaOptions = {};
-if (getEnvVar('SHARDING_ENABLED')) {
+if (getEnvVar('SHARDING_ENABLED', false)) {
   sharedSchemaOptions.shardKey = { hash: 'hashed' }
 }
 

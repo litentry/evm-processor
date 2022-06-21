@@ -1,4 +1,4 @@
-import { Config, Params } from '../types';
+import { Params } from '../types';
 
 type StageConfigParameter = {
   envVar?: string | number;

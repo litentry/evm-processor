@@ -21,16 +21,16 @@ export default async function query(
       serverlessExpressInstance = serverlessExpress({ app });
     }
 
+    const res = serverlessExpressInstance(event, context);
+
     monitoring.markEndAndMeasure(metrics.lambdaQuerySuccess);
 
-    return serverlessExpressInstance(event, context);
+    return res;
   } catch (error) {
     monitoring.incCounter(1, metrics.lambdaQueryFailure);
 
     throw error;
   } finally {
     await monitoring.pushMetrics();
-
-    await mongoose.disconnect();
   }
 }

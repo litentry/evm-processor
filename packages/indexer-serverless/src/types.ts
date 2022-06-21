@@ -27,11 +27,6 @@ export type Config = {
   serviceName: string;
   chain: Chain;
   version: string;
-  latestBlockDependency:
-    | 'archive-node'
-    | 'archive-graph'
-    | 'contract-graph'
-    | 'token-activity-graph';
   rpcEndpoint?: string;
   lastBlockRpcEndpoint?: string;
   archiveGraph?: string;

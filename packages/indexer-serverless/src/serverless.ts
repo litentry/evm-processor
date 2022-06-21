@@ -1,12 +1,12 @@
 import type { AWS } from '@serverless/typescript';
-import { Config, Params } from './types';
 import containerResources from './config/container-resources';
-import producer from './functions/producer';
-import worker from './functions/worker';
-import query from './functions/query';
 import lastIndexedBlock from './functions/last-indexed-block';
-import getInfraStack from './util/get-infra-stack';
+import producer from './functions/producer';
+import query from './functions/query';
+import worker from './functions/worker';
+import { Config, Params } from './types';
 import { getContext } from './util/context';
+import getInfraStack from './util/get-infra-stack';
 
 const vpcOptions = async (stage: string, clusterStackName: string) => {
   if (stage === 'production') {
@@ -97,6 +97,15 @@ const getConfig = async (config: Config) => {
               Resource: [
                 {
                   'Fn::GetAtt': ['JobQueue', 'Arn'],
+                },
+              ],
+            },
+            {
+              Effect: 'Allow',
+              Action: ['sqs:GetQueueAttributes'],
+              Resource: [
+                {
+                  'Fn::GetAtt': ['JobQueueDLQ', 'Arn'],
                 },
               ],
             },

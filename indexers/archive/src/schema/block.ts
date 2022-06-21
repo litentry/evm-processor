@@ -6,7 +6,7 @@ import getEnvVar from 'indexer-serverless/lib/util/get-env-var';
 interface BlockDocument extends Types.Archive.Block, mongoose.Document {}
 
 const schemaOptions: mongoose.SchemaOptions = {};
-if (getEnvVar('SHARDING_ENABLED')) {
+if (getEnvVar('SHARDING_ENABLED', false)) {
   schemaOptions.shardKey = { hash: 'hashed' }
 }
 
