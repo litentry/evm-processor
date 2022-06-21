@@ -20,7 +20,7 @@ const monitoring = () => {
       metric.functionName +
       (suffix ? '_' + suffix : '')
     )
-      .toLocaleLowerCase()
+      .toLowerCase()
       .replace(/\-/g, '_');
   };
 
