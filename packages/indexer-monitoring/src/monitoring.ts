@@ -16,13 +16,12 @@ const monitoring = () => {
 
   const getNameFromMetric = (metric: Metric, suffix: string) => {
     return (
-      (process.env.SERVICE_NAME
-        ? process.env.SERVICE_NAME + '_'
-        : ''
-      ).replaceAll('-', '_') +
+      (process.env.SERVICE_NAME ? process.env.SERVICE_NAME + '_' : '') +
       metric.functionName +
       (suffix ? '_' + suffix : '')
-    ).toLocaleLowerCase();
+    )
+      .toLocaleLowerCase()
+      .replaceAll('-', '_');
   };
 
   const getOrCreateHistogram = (metric: Metric): Histogram<string> => {
