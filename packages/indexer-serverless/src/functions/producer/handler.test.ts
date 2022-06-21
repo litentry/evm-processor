@@ -348,4 +348,48 @@ describe('AWS producer', () => {
       metrics.lambdaProducerFailure,
     );
   });
+
+  it('Should create batches appropriately for an explicit payload', async () => {
+    const sqs = new aws.SQS();
+    const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
+    envVarMock.MAX_WORKERS = '10';
+
+    await producer(
+      {
+        start: 0,
+        end: 39,
+        batchSize: 10
+      },
+      getLatestBlock.fn(100)
+    );
+
+    expect(sendMessageBatchSpy).toHaveBeenCalledTimes(1);
+    expect(sendMessageBatchSpy).toHaveBeenCalledWith({
+      Entries: [
+        {
+          Id: '9',
+          MessageBody: '{"startBlock":0,"endBlock":9}',
+          MessageGroupId: '0',
+        },
+        {
+          Id: '19',
+          MessageBody: '{"startBlock":10,"endBlock":19}',
+          MessageGroupId: '1',
+        },
+        {
+          Id: '29',
+          MessageBody: '{"startBlock":20,"endBlock":29}',
+          MessageGroupId: '2',
+        },
+        {
+          Id: '39',
+          MessageBody: '{"startBlock":30,"endBlock":39}',
+          MessageGroupId: '3',
+        },
+      ],
+      QueueUrl: undefined,
+    });
+    expect(saveLastQueuedEndBlock).not.toHaveBeenCalled();
+
+  });
 });

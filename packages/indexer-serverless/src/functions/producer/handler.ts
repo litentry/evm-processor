@@ -124,11 +124,11 @@ export default async function producer(
       return;
     }
 
-    if (payload.start) {
+    if (payload.start !== undefined) {
       const range = payload.end - payload.start;
       batchSize = payload.batchSize;
       targetJobCount = Math.ceil(range / payload.batchSize);
-      lastQueuedEndBlock = payload.start;
+      lastQueuedEndBlock = payload.start - 1;
       updateLastQueued = false;
     }
 
