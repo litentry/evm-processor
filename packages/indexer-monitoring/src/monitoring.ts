@@ -21,7 +21,7 @@ const monitoring = () => {
       (suffix ? '_' + suffix : '')
     )
       .toLocaleLowerCase()
-      .replaceAll('-', '_');
+      .replace(/\-/g, '_');
   };
 
   const getOrCreateHistogram = (metric: Metric): Histogram<string> => {
