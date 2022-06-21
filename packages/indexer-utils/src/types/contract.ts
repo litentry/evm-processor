@@ -99,6 +99,7 @@ export interface DecodedContractEvent {
   signatureHash: string;
   blockNumber: number;
   blockTimestamp: number;
+  logIndex: number;
   value1?: string;
   value2?: string;
   value3?: string;
