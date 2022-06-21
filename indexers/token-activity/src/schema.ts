@@ -17,6 +17,7 @@ export const DecodedEventSchema =
     transactionHash: { type: String, required: true, index: true },
     blockTimestamp: { type: Number, required: true },
     signature: { type: String, required: true, index: true },
+    logIndex: { type: Number, required: true, index: true },
     value1: String,
     value2: String,
     value3: String,
