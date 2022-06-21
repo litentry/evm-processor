@@ -63,7 +63,7 @@ describe('AWS producer', () => {
     const getQueueAttributesSpy = jest.spyOn(sqs, 'getQueueAttributes');
     const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
 
-    await producer(getLatestBlock.fn(20));
+    await producer({}, getLatestBlock.fn(20));
 
     expect(getLatestBlock.fn).toHaveBeenCalledTimes(1);
     expect(getQueueAttributesSpy).toHaveBeenCalledTimes(2);
@@ -99,7 +99,7 @@ describe('AWS producer', () => {
     const getQueueAttributesSpy = jest.spyOn(sqs, 'getQueueAttributes');
     const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
 
-    await producer(getLatestBlock.fn(2));
+    await producer({}, getLatestBlock.fn(2));
 
     expect(getLatestBlock.fn).toHaveBeenCalledTimes(1);
     expect(getQueueAttributesSpy).toHaveBeenCalledTimes(2);
@@ -135,7 +135,7 @@ describe('AWS producer', () => {
     const getQueueAttributesSpy = jest.spyOn(sqs, 'getQueueAttributes');
     const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
 
-    await producer(getLatestBlock.fn(40));
+    await producer({}, getLatestBlock.fn(40));
 
     expect(getLatestBlock.fn).toHaveBeenCalledTimes(1);
     expect(getQueueAttributesSpy).toHaveBeenCalledTimes(2);
@@ -181,7 +181,7 @@ describe('AWS producer', () => {
     const getQueueAttributesSpy = jest.spyOn(sqs, 'getQueueAttributes');
     const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
 
-    await producer(getLatestBlock.fn(199));
+    await producer({}, getLatestBlock.fn(199));
 
     expect(getLatestBlock.fn).toHaveBeenCalledTimes(1);
     expect(getQueueAttributesSpy).toHaveBeenCalledTimes(2);
@@ -204,7 +204,7 @@ describe('AWS producer', () => {
     envVarMock.MAX_WORKERS = '1';
     mockLastQueuedEndBlock = -1;
 
-    await producer(getLatestBlock.fn(20));
+    await producer({}, getLatestBlock.fn(20));
 
     expect(saveLastQueuedEndBlock).toHaveBeenCalledTimes(1);
     expect(saveLastQueuedEndBlock).toHaveBeenCalledWith(20);
@@ -214,7 +214,7 @@ describe('AWS producer', () => {
     const sqs = new aws.SQS();
     const getQueueAttributesSpy = jest.spyOn(sqs, 'getQueueAttributes');
     const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
-    await producer(getLatestBlock.fn(-1));
+    await producer({}, getLatestBlock.fn(-1));
 
     expect(getLatestBlock.fn).toHaveBeenCalledTimes(1);
     expect(getQueueAttributesSpy).toHaveBeenCalledTimes(2);
@@ -237,7 +237,7 @@ describe('AWS producer', () => {
     });
 
     const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
-    await producer(getLatestBlock.fn(2000));
+    await producer({}, getLatestBlock.fn(2000));
 
     expect(getLatestBlock.fn).toHaveBeenCalledTimes(1);
     expect(mockGetQueueAttributes).toHaveBeenCalledTimes(2);
@@ -260,7 +260,7 @@ describe('AWS producer', () => {
     });
 
     const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
-    await producer(getLatestBlock.fn(2000));
+    await producer({}, getLatestBlock.fn(2000));
 
     expect(getLatestBlock.fn).toHaveBeenCalledTimes(1);
     expect(mockGetQueueAttributes).toHaveBeenCalledTimes(2);
@@ -282,7 +282,7 @@ describe('AWS producer', () => {
       },
     });
 
-    await producer(getLatestBlock.fn(2000));
+    await producer({}, getLatestBlock.fn(2000));
 
     expect(monitoring.markEndAndMeasure).toBeCalledTimes(1);
     expect(monitoring.markEndAndMeasure).lastCalledWith(
@@ -338,7 +338,7 @@ describe('AWS producer', () => {
       return 0;
     };
 
-    await expect(producer(mockLatestBlock(1))).rejects.toThrow('e');
+    await expect(producer({}, mockLatestBlock(1))).rejects.toThrow('e');
 
     expect(monitoring.markEndAndMeasure).toBeCalledTimes(0);
 
@@ -347,5 +347,48 @@ describe('AWS producer', () => {
       1,
       metrics.lambdaProducerFailure,
     );
+  });
+
+  it('Should create batches appropriately for an explicit payload', async () => {
+    const sqs = new aws.SQS();
+    const sendMessageBatchSpy = jest.spyOn(sqs, 'sendMessageBatch');
+    envVarMock.MAX_WORKERS = '10';
+
+    await producer(
+      {
+        start: 0,
+        end: 39,
+        batchSize: 10,
+      },
+      getLatestBlock.fn(100),
+    );
+
+    expect(sendMessageBatchSpy).toHaveBeenCalledTimes(1);
+    expect(sendMessageBatchSpy).toHaveBeenCalledWith({
+      Entries: [
+        {
+          Id: '9',
+          MessageBody: '{"startBlock":0,"endBlock":9}',
+          MessageGroupId: '0',
+        },
+        {
+          Id: '19',
+          MessageBody: '{"startBlock":10,"endBlock":19}',
+          MessageGroupId: '1',
+        },
+        {
+          Id: '29',
+          MessageBody: '{"startBlock":20,"endBlock":29}',
+          MessageGroupId: '2',
+        },
+        {
+          Id: '39',
+          MessageBody: '{"startBlock":30,"endBlock":39}',
+          MessageGroupId: '3',
+        },
+      ],
+      QueueUrl: undefined,
+    });
+    expect(saveLastQueuedEndBlock).not.toHaveBeenCalled();
   });
 });

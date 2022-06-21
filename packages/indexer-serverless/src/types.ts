@@ -13,6 +13,7 @@ export type Params = {
   jobQueueName: string;
   maxWorkers: number;
   chain: Chain;
+  version: string;
 };
 
 export type ProducerConfig = {

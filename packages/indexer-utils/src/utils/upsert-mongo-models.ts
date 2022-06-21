@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-export default async function upsertMongoModels(
+export async function upsertMongoModels(
   model: mongoose.Model<any>,
   documents: any[],
   primaryKey: string[],
@@ -22,6 +22,11 @@ export default async function upsertMongoModels(
           upsert: true,
         },
       })),
+      {
+        ordered: false,
+      },
     );
   }
 }
+
+export default upsertMongoModels;

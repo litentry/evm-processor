@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 
 export default async function lastIndexedBlock() {
   await mongoose.connect(process.env.MONGO_URI!);
+  await utils.ensureShardedCollections(repository.lastIndexedBlock.Model);
   await utils.callXTimesOverYSeconds(3, 25, async () => {
     try {
       monitoring.markStart(metrics.lambdaLastIndexedSuccess);

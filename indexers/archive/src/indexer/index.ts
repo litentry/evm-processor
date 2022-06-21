@@ -1,8 +1,15 @@
 import { metrics, monitoring } from 'indexer-monitoring';
-import { repository } from 'indexer-utils';
+import { repository, utils } from 'indexer-utils';
 import extractBlock from './extract-block';
 import loadBlock from './load-block';
 import transformBlock from './transform-block';
+import {
+  BlockModel,
+  ContractCreationTransactionModel,
+  ContractTransactionModel,
+  LogModel,
+  NativeTokenTransactionModel,
+} from '../schema';
 
 export default async function indexer(start: number, end: number) {
   const blocks: number[] = [];
@@ -27,6 +34,15 @@ export default async function indexer(start: number, end: number) {
   // Load batch
   console.time('load');
   monitoring.markStart(metrics.loadBlock);
+
+  await utils.ensureShardedCollections(
+    BlockModel,
+    NativeTokenTransactionModel,
+    ContractCreationTransactionModel,
+    ContractTransactionModel,
+    LogModel,
+  );
+
   await Promise.all(transformedBlocks.map(loadBlock));
   monitoring.markEnd(metrics.loadBlock);
   console.timeEnd('load');
