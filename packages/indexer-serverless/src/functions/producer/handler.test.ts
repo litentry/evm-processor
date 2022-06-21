@@ -358,9 +358,9 @@ describe('AWS producer', () => {
       {
         start: 0,
         end: 39,
-        batchSize: 10
+        batchSize: 10,
       },
-      getLatestBlock.fn(100)
+      getLatestBlock.fn(100),
     );
 
     expect(sendMessageBatchSpy).toHaveBeenCalledTimes(1);
@@ -390,6 +390,5 @@ describe('AWS producer', () => {
       QueueUrl: undefined,
     });
     expect(saveLastQueuedEndBlock).not.toHaveBeenCalled();
-
   });
 });

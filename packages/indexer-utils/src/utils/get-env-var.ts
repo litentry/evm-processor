@@ -6,4 +6,4 @@ export default (envVarName: string, required = true) => {
   }
 
   return value;
-}
+};

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import getEnvVar from '../utils/get-env-var';
 
-const ensuredShardedModels: {[key: string]: boolean} = {};
+const ensuredShardedModels: { [key: string]: boolean } = {};
 
 /**
  * Attempt to shard a collection. This will only be done once per import of
@@ -20,21 +20,27 @@ export async function ensureShardedCollections(
           if (!documentCount) {
             const adminDb = model.base.connection.db.admin();
             const enableShardingResult = await adminDb.command({
-              enableSharding: `${model.db.name}`
+              enableSharding: `${model.db.name}`,
             });
             const shardCollectionResult = await adminDb.command({
               shardCollection: `${model.db.name}.${model.collection.collectionName}`,
               key: shardKey,
             });
-            console.log(`Sharding ${model.db.name}.${model.collection.collectionName} `)
+            console.log(
+              `Sharding ${model.db.name}.${model.collection.collectionName} `,
+            );
             console.log({ enableShardingResult, shardCollectionResult });
             if (!enableShardingResult.ok) {
               throw new Error(`Database ${model.db.name} sharding error`);
             }
             if (!shardCollectionResult.ok) {
-              throw new Error(`Collection ${model.db.name}.${model.collection.collectionName} sharding error`);
+              throw new Error(
+                `Collection ${model.db.name}.${model.collection.collectionName} sharding error`,
+              );
             }
-            console.log(`Sharded ${model.db.name}.${model.collection.collectionName}`);
+            console.log(
+              `Sharded ${model.db.name}.${model.collection.collectionName}`,
+            );
           }
         }
         ensuredShardedModels[model.name] = true;

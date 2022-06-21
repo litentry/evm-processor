@@ -24,7 +24,7 @@ export async function upsertMongoModels(
       })),
       {
         ordered: false,
-      }
+      },
     );
   }
 }

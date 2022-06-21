@@ -8,7 +8,7 @@ import {
   ContractCreationTransactionModel,
   ContractTransactionModel,
   LogModel,
-  NativeTokenTransactionModel
+  NativeTokenTransactionModel,
 } from '../schema';
 
 export default async function indexer(start: number, end: number) {
@@ -40,7 +40,7 @@ export default async function indexer(start: number, end: number) {
     NativeTokenTransactionModel,
     ContractCreationTransactionModel,
     ContractTransactionModel,
-    LogModel
+    LogModel,
   );
 
   await Promise.all(transformedBlocks.map(loadBlock));

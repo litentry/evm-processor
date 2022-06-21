@@ -1,4 +1,4 @@
-import { createWeb3Instance, web3 } from './web3'
+import { createWeb3Instance, web3 } from './web3';
 
 jest.mock('web3-core-requestmanager');
 

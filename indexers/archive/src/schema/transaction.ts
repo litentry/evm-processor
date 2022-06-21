@@ -32,39 +32,48 @@ const sharedSchema = {
 
 const sharedSchemaOptions: mongoose.SchemaOptions = {};
 if (getEnvVar('SHARDING_ENABLED', false)) {
-  sharedSchemaOptions.shardKey = { hash: 'hashed' }
+  sharedSchemaOptions.shardKey = { hash: 'hashed' };
 }
 
 // no input/method, no contract created, must have a receiver (to)
 const nativeTokenTransactionSchema =
-  new mongoose.Schema<NativeTokenTransactionDocument>({
-    ...sharedSchema,
-    to: { type: String, required: true },
-  }, {
-    ...sharedSchemaOptions
-  });
+  new mongoose.Schema<NativeTokenTransactionDocument>(
+    {
+      ...sharedSchema,
+      to: { type: String, required: true },
+    },
+    {
+      ...sharedSchemaOptions,
+    },
+  );
 
 // to is the contract, must have an input
 const contractTransactionSchema =
-  new mongoose.Schema<ContractTransactionDocument>({
-    ...sharedSchema,
-    to: { type: String, required: true },
-    methodId: { type: String, required: true },
-    input: { type: String, required: true },
-  }, {
-    ...sharedSchemaOptions
-  });
+  new mongoose.Schema<ContractTransactionDocument>(
+    {
+      ...sharedSchema,
+      to: { type: String, required: true },
+      methodId: { type: String, required: true },
+      input: { type: String, required: true },
+    },
+    {
+      ...sharedSchemaOptions,
+    },
+  );
 
 // no to address, input is contract creation code, must have contract address in receipt
 const contractCreationTransactionSchema =
-  new mongoose.Schema<ContractCreationTransactionDocument>({
-    ...sharedSchema,
-    methodId: { type: String, required: true },
-    input: { type: String, required: true },
-    receiptContractAddress: { type: String, required: true },
-  }, {
-    ...sharedSchemaOptions
-  });
+  new mongoose.Schema<ContractCreationTransactionDocument>(
+    {
+      ...sharedSchema,
+      methodId: { type: String, required: true },
+      input: { type: String, required: true },
+      receiptContractAddress: { type: String, required: true },
+    },
+    {
+      ...sharedSchemaOptions,
+    },
+  );
 
 // INDEXES
 nativeTokenTransactionSchema.index({ blockNumber: 1 });

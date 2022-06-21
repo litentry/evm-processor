@@ -23,13 +23,10 @@ export function createWeb3Instance(): Web3 {
       throw new Error(e);
     });
   } else {
-    provider = new Web3.providers.HttpProvider(
-      process.env.RPC_ENDPOINT!,
-      {
-        keepAlive: false,
-        timeout: 10000,
-      }
-    );
+    provider = new Web3.providers.HttpProvider(process.env.RPC_ENDPOINT!, {
+      keepAlive: false,
+      timeout: 10000,
+    });
   }
 
   return new Web3(provider);
@@ -45,4 +42,3 @@ export function web3(): Web3 {
 }
 
 export default web3;
-
