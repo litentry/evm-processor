@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import getEnvVar from 'indexer-serverless/lib/util/get-env-var';
+import getEnvVar from '../utils/get-env-var';
 
 const ensuredShardedModels: {[key: string]: boolean} = {};
 
