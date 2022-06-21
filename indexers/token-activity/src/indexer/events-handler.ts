@@ -1,4 +1,4 @@
-import { query, Types } from 'indexer-utils';
+import { query, Types, utils } from 'indexer-utils';
 import { decodeEvent, DecodedEvent } from './decode';
 import {
   ERC1155EventDecodedModel,
@@ -46,38 +46,39 @@ export default async function eventsHandler(
     .flat()
     .filter((log) => ercContractAddresses.includes(log.address));
 
-  await model.insertMany(
-    ercLogs
-      .map((log) => {
-        const sig = sigs.find((sig) => `0x${sig.ID}` === log.topic0)!;
+  const docs = ercLogs
+    .map((log) => {
+      const sig = sigs.find((sig) => `0x${sig.ID}` === log.topic0)!;
 
-        let decoded: DecodedEvent;
-        try {
-          decoded = decodeEvent(
-            type,
-            sig,
-            log.data,
-            [log.topic0, log.topic1, log.topic2, log.topic3, log.topic4].filter(
-              (t) => t,
-            ) as string[],
-          );
-        } catch (e) {
-          // contracts can be more than 1 standard, when the same methods are found on both we know this will blow up for 1 of the contract types as the log data won't match up (e.g. unit256 on transfer is indexed in 721 but not 20)
-          if (CONFLICTING_SIGNATURES.includes(sig.SIGNATURE)) {
-            return null;
-          }
-          throw new Error(JSON.stringify(e));
+      let decoded: DecodedEvent;
+      try {
+        decoded = decodeEvent(
+          type,
+          sig,
+          log.data,
+          [log.topic0, log.topic1, log.topic2, log.topic3, log.topic4].filter(
+            (t) => t,
+          ) as string[],
+        );
+      } catch (e) {
+        // contracts can be more than 1 standard, when the same methods are found on both we know this will blow up for 1 of the contract types as the log data won't match up (e.g. unit256 on transfer is indexed in 721 but not 20)
+        if (CONFLICTING_SIGNATURES.includes(sig.SIGNATURE)) {
+          return null;
         }
-        return {
-          contract: log.address,
-          blockNumber: log.blockNumber,
-          blockTimestamp: log.blockTimestamp,
-          transactionHash: log.transactionHash,
-          signature: sig.SIGNATURE,
-          signatureHash: sig.ID,
-          ...decoded,
-        } as Types.Contract.DecodedContractEvent;
-      })
-      .filter((log) => log),
-  );
+        throw new Error(JSON.stringify(e));
+      }
+      return {
+        contract: log.address,
+        blockNumber: log.blockNumber,
+        blockTimestamp: log.blockTimestamp,
+        transactionHash: log.transactionHash,
+        logIndex: log.logIndex,
+        signature: sig.SIGNATURE,
+        signatureHash: sig.ID,
+        ...decoded,
+      } as Types.Contract.DecodedContractEvent;
+    })
+    .filter((log) => log);
+
+  await utils.upsertMongoModels(model, docs, ['logIndex', 'blockNumber']);
 }

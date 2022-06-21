@@ -1,4 +1,4 @@
-import { query, Types } from 'indexer-utils';
+import { query, Types, utils } from 'indexer-utils';
 import { decodeParams, DecodedExtrinsic } from './decode';
 import {
   ERC1155TransactionDecodedModel,
@@ -54,33 +54,33 @@ export default async function extrinsicsHandler(
     .flat()
     .filter((tx) => ercContractAddresses.includes(tx.to));
 
-  await model.insertMany(
-    ercTxs
-      .map((tx) => {
-        const ex = extrinsics.find((ex) => ex.ID === tx.methodId)!;
-        let decoded: DecodedExtrinsic;
+  const docs = ercTxs
+    .map((tx) => {
+      const ex = extrinsics.find((ex) => ex.ID === tx.methodId)!;
+      let decoded: DecodedExtrinsic;
 
-        try {
-          decoded = decodeParams(ex.PARAMS, tx.input);
-        } catch (e) {
-          // contracts can be more than 1 standard, when the same methods are found on both we know this will blow up for 1 of the contract types as the log data won't match up (e.g. unit256 on transfer is indexed in 721 but not 20)
-          if (CONFLICTING_SIGNATURES.includes(ex.SIGNATURE)) {
-            return null;
-          }
-          throw new Error(JSON.stringify(e));
+      try {
+        decoded = decodeParams(ex.PARAMS, tx.input);
+      } catch (e) {
+        // contracts can be more than 1 standard, when the same methods are found on both we know this will blow up for 1 of the contract types as the log data won't match up (e.g. unit256 on transfer is indexed in 721 but not 20)
+        if (CONFLICTING_SIGNATURES.includes(ex.SIGNATURE)) {
+          return null;
         }
-        const transaction: Types.Contract.DecodedContractTransaction = {
-          hash: tx.hash,
-          contract: tx.to,
-          signer: tx.from,
-          signature: ex.SIGNATURE,
-          signatureHash: ex.ID,
-          blockNumber: tx.blockNumber,
-          blockTimestamp: tx.blockTimestamp,
-          ...decoded,
-        };
-        return transaction;
-      })
-      .filter((tx) => tx),
-  );
+        throw new Error(JSON.stringify(e));
+      }
+      const transaction: Types.Contract.DecodedContractTransaction = {
+        hash: tx.hash,
+        contract: tx.to,
+        signer: tx.from,
+        signature: ex.SIGNATURE,
+        signatureHash: ex.ID,
+        blockNumber: tx.blockNumber,
+        blockTimestamp: tx.blockTimestamp,
+        ...decoded,
+      };
+      return transaction;
+    })
+    .filter((tx) => tx);
+
+  await utils.upsertMongoModels(model, docs, ['hash']);
 }
