@@ -1,4 +1,4 @@
-import { repository } from 'indexer-utils';
+import { repository, utils } from 'indexer-utils';
 import extractTransactions from './extract-transactions';
 import transformV2Swaps from './transform-v2-swaps';
 import transformMulticall from './transform-multicall';
@@ -10,7 +10,11 @@ export default async function indexer(startBlock: number, endBlock: number) {
   const v2Swaps = v2.map((item) => transformV2Swaps[item.method](item.txs[0]));
   const v3Swaps = v3.map((tx) => transformMulticall(tx));
 
-  await SwapModel.insertMany([...v2Swaps, ...v3Swaps]);
+  await utils.upsertMongoModels(
+    SwapModel,
+    [...v2Swaps, ...v3Swaps],
+    ['transactionHash'],
+  );
 
   await repository.indexedBlockRange.save(startBlock, endBlock);
 }

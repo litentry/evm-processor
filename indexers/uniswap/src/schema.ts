@@ -7,7 +7,7 @@ import { Swap } from './indexer/types';
 interface SwapDocument extends Swap, mongoose.Document {}
 
 export const SwapSchema = new mongoose.Schema<SwapDocument>({
-  transactionHash: { type: String, required: true, index: true },
+  transactionHash: { type: String, required: true, index: true, unique: true },
   address: { type: String, required: true, index: true },
   contract: { type: String, required: true, index: true },
   pair: { type: String, required: true, index: true },
