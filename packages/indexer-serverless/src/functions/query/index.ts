@@ -31,7 +31,7 @@ export default function (config: Config, params: Params) {
       DEPLOY_VERSION: config.version,
       PUSHGATEWAY_URL: stageConfig.getPushGatewayURL()?.toString() || '',
       SERVICE_NAME: config.serviceName,
-      SHARDING_ENABLED: <string>getEnvVar('SHARDING_ENABLED', true)
+      SHARDING_ENABLED: <string>getEnvVar('SHARDING_ENABLED', true),
     },
   };
 }

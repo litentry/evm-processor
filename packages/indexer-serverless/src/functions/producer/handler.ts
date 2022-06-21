@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import getEnvVar from '../../util/get-env-var';
 import {
   getLastQueuedEndBlock,
-  saveLastQueuedEndBlock
+  saveLastQueuedEndBlock,
 } from './lastQueuedEndblockRepository';
 import { repository, utils } from 'indexer-utils';
 
@@ -21,9 +21,9 @@ interface BatchSQSMessage {
 }
 
 interface ProducerPayload {
- start: number;
- end: number;
- batchSize: number;
+  start: number;
+  end: number;
+  batchSize: number;
 }
 
 const dispatch = async (jobs: BatchSQSMessage[]) => {
@@ -31,7 +31,7 @@ const dispatch = async (jobs: BatchSQSMessage[]) => {
     await sqs
       .sendMessageBatch({
         QueueUrl: getEnvVar('QUEUE_URL')!,
-        Entries: jobs
+        Entries: jobs,
       })
       .promise();
   }
@@ -39,7 +39,7 @@ const dispatch = async (jobs: BatchSQSMessage[]) => {
 
 export default async function producer(
   payload: ProducerPayload | any,
-  getLatestBlock: () => Promise<number>
+  getLatestBlock: () => Promise<number>,
 ) {
   monitoring.markStart(metrics.lambdaProducerSuccess);
   let caughtError: Error | undefined;
@@ -74,36 +74,36 @@ export default async function producer(
         QueueUrl: getEnvVar('QUEUE_URL')!,
         AttributeNames: [
           'ApproximateNumberOfMessagesNotVisible',
-          'ApproximateNumberOfMessages'
-        ]
+          'ApproximateNumberOfMessages',
+        ],
       })
       .promise();
 
     const sqsDlqQueueAttributes = await sqs
       .getQueueAttributes({
         QueueUrl: getEnvVar('QUEUE_DLQ_URL')!,
-        AttributeNames: ['ApproximateNumberOfMessages']
+        AttributeNames: ['ApproximateNumberOfMessages'],
       })
       .promise();
 
     monitoring.gauge(
       parseInt(sqsQueueAttributes.Attributes!.ApproximateNumberOfMessages),
-      metrics.sqsMessageCount
+      metrics.sqsMessageCount,
     );
     monitoring.gauge(
       parseInt(sqsDlqQueueAttributes.Attributes!.ApproximateNumberOfMessages),
-      metrics.sqsDlqMessageCount
+      metrics.sqsDlqMessageCount,
     );
 
     const currentBlocksInQueue =
       (parseInt(
-          sqsQueueAttributes.Attributes!.ApproximateNumberOfMessagesNotVisible
-        ) +
+        sqsQueueAttributes.Attributes!.ApproximateNumberOfMessagesNotVisible,
+      ) +
         parseInt(sqsQueueAttributes.Attributes!.ApproximateNumberOfMessages)) *
       batchSize;
 
     const targetTotalQueuedBlocks = parseInt(
-      getEnvVar('TARGET_TOTAL_QUEUED_BLOCKS')!
+      getEnvVar('TARGET_TOTAL_QUEUED_BLOCKS')!,
     );
     let targetJobCount =
       Math.floor(targetTotalQueuedBlocks / batchSize) -
@@ -116,7 +116,7 @@ export default async function producer(
       targetBlockHeight,
       existingLastQueuedEndBlock,
       currentBlocksInQueue,
-      targetJobCount
+      targetJobCount,
     });
 
     if (targetBlockHeight <= lastQueuedEndBlock) {
@@ -141,7 +141,7 @@ export default async function producer(
       batches,
       maxWorkers,
       existingLastQueuedEndBlock,
-      updateLastQueued
+      updateLastQueued,
     );
 
     monitoring.measure(metrics.lastQueuedBlock);
@@ -172,7 +172,7 @@ async function dispatchBatches(
   for (let i = 0; i < targetJobCount; i++) {
     const batch: BlockBatch = {
       startBlock: lastQueuedEndBlock + 1,
-      endBlock: Math.min(targetBlockHeight, lastQueuedEndBlock + batchSize)
+      endBlock: Math.min(targetBlockHeight, lastQueuedEndBlock + batchSize),
     };
     batches.push(batch);
     lastQueuedEndBlock = batch.endBlock;
@@ -193,7 +193,7 @@ async function dispatchBatches(
     return {
       Id: `${b.endBlock}`,
       MessageBody: JSON.stringify(b),
-      MessageGroupId: `${workerGroup}`
+      MessageGroupId: `${workerGroup}`,
     };
   });
 
@@ -214,7 +214,7 @@ async function dispatchBatches(
   }
 
   console.log(
-    `Queued ${dispatches.length} jobs. Last job end block: ${lastQueuedEndBlock}`
+    `Queued ${dispatches.length} jobs. Last job end block: ${lastQueuedEndBlock}`,
   );
   return lastQueuedEndBlock;
 }

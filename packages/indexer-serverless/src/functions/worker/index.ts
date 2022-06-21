@@ -36,7 +36,7 @@ export default function (config: Config, params: Params) {
       DEPLOY_VERSION: config.version,
       SERVICE_NAME: config.serviceName,
       EXTRACTION_SOURCE: config.extractionSource,
-      SHARDING_ENABLED: <string>getEnvVar('SHARDING_ENABLED', true)
+      SHARDING_ENABLED: <string>getEnvVar('SHARDING_ENABLED', true),
     },
     timeout: 60,
     memorySize: 2048,

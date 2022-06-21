@@ -16,7 +16,7 @@ interface ClusterConfig {
 }
 
 const clusterConfigs: { [k: string]: ClusterConfig } = {
-  'bsc': {
+  bsc: {
     routerCpu: 1,
     routerMemory: 4,
     configServerCpu: 0.5,
@@ -26,10 +26,9 @@ const clusterConfigs: { [k: string]: ClusterConfig } = {
 
     routerInstances: 3,
     shardInstances: 5,
-    configServerInstances: 1
-  }
+    configServerInstances: 1,
+  },
 };
-
 
 /**
  * Returns the number of vCPUs required for a chain
@@ -70,11 +69,9 @@ function getStorageUnits(chain: Chain): number {
   }
 }
 
-
-export default function(stage: string, params: Params) {
-
+export default function (stage: string, params: Params) {
   const getMongoConfiguration = (chain: string) => {
-    const isSharded = (getEnvVar('SHARDING_ENABLED', true) === 'true');
+    const isSharded = getEnvVar('SHARDING_ENABLED', true) === 'true';
 
     if (isSharded) {
       const {
@@ -102,15 +99,15 @@ export default function(stage: string, params: Params) {
                   DnsRecords: [
                     {
                       Type: 'A',
-                      TTL: 10
-                    }
+                      TTL: 10,
+                    },
                   ],
-                  RoutingPolicy: 'MULTIVALUE'
+                  RoutingPolicy: 'MULTIVALUE',
                 },
                 Name: `config${index}.${params.mongoDnsName}`,
-                NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`
-              }
-            }
+                NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`,
+              },
+            },
           };
         }, {});
 
@@ -127,15 +124,15 @@ export default function(stage: string, params: Params) {
                   DnsRecords: [
                     {
                       Type: 'A',
-                      TTL: 10
-                    }
+                      TTL: 10,
+                    },
                   ],
-                  RoutingPolicy: 'MULTIVALUE'
+                  RoutingPolicy: 'MULTIVALUE',
                 },
                 Name: `router${index}.${params.mongoDnsName}`,
-                NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`
-              }
-            }
+                NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`,
+              },
+            },
           };
         }, {});
 
@@ -152,22 +149,22 @@ export default function(stage: string, params: Params) {
                   DnsRecords: [
                     {
                       Type: 'A',
-                      TTL: 10
-                    }
+                      TTL: 10,
+                    },
                   ],
-                  RoutingPolicy: 'MULTIVALUE'
+                  RoutingPolicy: 'MULTIVALUE',
                 },
                 Name: `shard${index}.${params.mongoDnsName}`,
-                NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`
-              }
-            }
+                NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`,
+              },
+            },
           };
         }, {});
 
       const serviceDiscovery = {
         ...configServiceDiscovery,
         ...routerServiceDiscovery,
-        ...shardServiceDiscovery
+        ...shardServiceDiscovery,
       };
 
       const configServers = Array(configServerInstances)
@@ -186,13 +183,19 @@ export default function(stage: string, params: Params) {
                       { Name: 'MONGODB_SHARDING_MODE', Value: 'configsvr' },
                       { Name: 'MONGODB_ROOT_PASSWORD', Value: 'password123' },
                       { Name: 'MONGODB_REPLICA_SET_MODE', Value: 'primary' },
-                      { Name: 'MONGODB_REPLICA_SET_NAME', Value: 'config-replicaset' },
-                      { Name: 'MONGODB_CFG_REPLICA_SET_NAME', Value: 'config-replicaset' },
+                      {
+                        Name: 'MONGODB_REPLICA_SET_NAME',
+                        Value: 'config-replicaset',
+                      },
+                      {
+                        Name: 'MONGODB_CFG_REPLICA_SET_NAME',
+                        Value: 'config-replicaset',
+                      },
                       { Name: 'MONGODB_REPLICA_SET_KEY', Value: 'replicakey' },
                       {
                         Name: 'MONGODB_ADVERTISED_HOSTNAME',
-                        Value: `config${index}.${params.mongoDnsName}.${params.org}`
-                      }
+                        Value: `config${index}.${params.mongoDnsName}.${params.org}`,
+                      },
                     ],
                     Essential: 'true',
                     Image: `373947115420.dkr.ecr.eu-west-1.amazonaws.com/litentry/mongodb:latest`,
@@ -201,24 +204,27 @@ export default function(stage: string, params: Params) {
                       Options: {
                         'awslogs-region': params.region,
                         'awslogs-stream-prefix': `${params.mongoImageVersion}/configsvr/${index}`,
-                        'awslogs-group': { Ref: 'MongoLogGroup' }
-                      }
+                        'awslogs-group': { Ref: 'MongoLogGroup' },
+                      },
                     },
                     MountPoints: [
                       {
                         ContainerPath: '/bitnami',
-                        SourceVolume: `${params.ebsVolumeName}-config-${index}`
-                      }
+                        SourceVolume: `${params.ebsVolumeName}-config-${index}`,
+                      },
                     ],
                     Privileged: 'false',
-                    PseudoTerminal: 'false'
-                  }
+                    PseudoTerminal: 'false',
+                  },
                 ],
                 Cpu: configServerCpu * ecsMultiplier,
                 Memory: configServerMemory * ecsMultiplier,
                 NetworkMode: 'awsvpc',
                 RequiresCompatibilities: ['EC2'],
-                TaskRoleArn: { 'Fn::Sub': 'arn:aws:iam::${AWS::AccountId}:role/ecs-task-sensitiveconfig-access-role' },
+                TaskRoleArn: {
+                  'Fn::Sub':
+                    'arn:aws:iam::${AWS::AccountId}:role/ecs-task-sensitiveconfig-access-role',
+                },
                 Volumes: [
                   {
                     Name: `${params.ebsVolumeName}-config-${index}`,
@@ -227,137 +233,155 @@ export default function(stage: string, params: Params) {
                       Driver: 'rexray/ebs',
                       DriverOpts: {
                         volumetype: 'gp3',
-                        size: 10
+                        size: 10,
                       },
-                      Scope: 'shared'
-                    }
-                  }
-                ]
-              }
+                      Scope: 'shared',
+                    },
+                  },
+                ],
+              },
             },
             [`MongoServiceConfig${index}`]: {
               Type: 'AWS::ECS::Service',
               Properties: {
                 ServiceName: `${params.mongoDnsName}-config${index}`,
                 TaskDefinition: {
-                  Ref: `MongoTaskConfig${index}`
+                  Ref: `MongoTaskConfig${index}`,
                 },
                 Cluster: `\${cf:${params.clusterStackName}.EcsCluster}`,
                 DesiredCount: 1,
-                PlacementStrategies: [{
-                  Type: 'binpack',
-                  Field: 'memory'
-                }],
+                PlacementStrategies: [
+                  {
+                    Type: 'binpack',
+                    Field: 'memory',
+                  },
+                ],
                 ServiceRegistries: [
                   {
                     RegistryArn: {
-                      'Fn::GetAtt': [`MongoConfigServiceDiscovery${index}`, 'Arn']
-                    }
-                  }
-                ],
-                NetworkConfiguration: {
-                  AwsvpcConfiguration: {
-                    SecurityGroups: [
-                      `\${cf:${params.clusterStackName}.SecurityGroupUniversal}`
-                    ],
-                    Subnets: {
-                      'Fn::Split': [
-                        ',',
-                        `\${cf:${params.clusterStackName}.PrivateSubnets}`
-                      ]
-                    }
-                  }
-                },
-                EnableECSManagedTags: true,
-                EnableExecuteCommand: true
-              }
-            }
-          };
-        }, {});
-
-      const routers = [0]
-        .reduce((config, value, index) => {
-          return {
-            ...config,
-            [`MongoTaskRouter${index}`]: {
-              Type: 'AWS::ECS::TaskDefinition',
-              Properties: {
-                Family: `${params.mongoDnsName}-router${index}`,
-                ContainerDefinitions: [
-                  {
-                    Name: 'mongo',
-                    Environment: [
-                      { Name: 'MONGODB_SHARDING_MODE', Value: 'mongos' },
-                      { Name: 'MONGODB_ROOT_PASSWORD', Value: 'password123' },
-                      { Name: 'MONGODB_CFG_PRIMARY_HOST', Value: `config0.${params.mongoDnsName}.${params.org}` },
-                      { Name: 'MONGODB_CFG_REPLICA_SET_NAME', Value: 'config-replicaset' },
-                      { Name: 'MONGODB_REPLICA_SET_KEY', Value: 'replicakey' },
-                      {
-                        Name: 'MONGODB_ADVERTISED_HOSTNAME',
-                        Value: `router${index}.${params.mongoDnsName}.${params.org}`
-                      }
-                    ],
-                    Essential: 'true',
-                    Image: `373947115420.dkr.ecr.eu-west-1.amazonaws.com/litentry/mongodb:latest`,
-
-                    LogConfiguration: {
-                      LogDriver: 'awslogs',
-                      Options: {
-                        'awslogs-region': params.region,
-                        'awslogs-stream-prefix': `${params.mongoImageVersion}/router/${index}`,
-                        'awslogs-group': { Ref: 'MongoLogGroup' }
-                      }
+                      'Fn::GetAtt': [
+                        `MongoConfigServiceDiscovery${index}`,
+                        'Arn',
+                      ],
                     },
-                    Privileged: 'false',
-                    PseudoTerminal: 'false'
-                  }
-                ],
-                Cpu: routerCpu * ecsMultiplier,
-                Memory: routerMemory * ecsMultiplier,
-                NetworkMode: 'awsvpc',
-                RequiresCompatibilities: ['EC2'],
-                TaskRoleArn: { 'Fn::Sub': 'arn:aws:iam::${AWS::AccountId}:role/ecs-task-sensitiveconfig-access-role' }
-              }
-            },
-            [`MongoServiceRouter${index}`]: {
-              Type: 'AWS::ECS::Service',
-              Properties: {
-                ServiceName: `${params.mongoDnsName}-router${index}`,
-                TaskDefinition: {
-                  Ref: `MongoTaskRouter${index}`
-                },
-                Cluster: `\${cf:${params.clusterStackName}.EcsCluster}`,
-                DesiredCount: routerInstances,
-                PlacementStrategies: [{
-                  Type: 'binpack',
-                  Field: 'memory'
-                }],
-                ServiceRegistries: [
-                  {
-                    RegistryArn: {
-                      'Fn::GetAtt': [`MongoRouterServiceDiscovery${index}`, 'Arn']
-                    }
-                  }
+                  },
                 ],
                 NetworkConfiguration: {
                   AwsvpcConfiguration: {
                     SecurityGroups: [
-                      `\${cf:${params.clusterStackName}.SecurityGroupUniversal}`
+                      `\${cf:${params.clusterStackName}.SecurityGroupUniversal}`,
                     ],
                     Subnets: {
                       'Fn::Split': [
                         ',',
-                        `\${cf:${params.clusterStackName}.PrivateSubnets}`
-                      ]
-                    }
-                  }
+                        `\${cf:${params.clusterStackName}.PrivateSubnets}`,
+                      ],
+                    },
+                  },
                 },
                 EnableECSManagedTags: true,
-                EnableExecuteCommand: true
-              }
-            }
+                EnableExecuteCommand: true,
+              },
+            },
           };
         }, {});
+
+      const routers = [0].reduce((config, value, index) => {
+        return {
+          ...config,
+          [`MongoTaskRouter${index}`]: {
+            Type: 'AWS::ECS::TaskDefinition',
+            Properties: {
+              Family: `${params.mongoDnsName}-router${index}`,
+              ContainerDefinitions: [
+                {
+                  Name: 'mongo',
+                  Environment: [
+                    { Name: 'MONGODB_SHARDING_MODE', Value: 'mongos' },
+                    { Name: 'MONGODB_ROOT_PASSWORD', Value: 'password123' },
+                    {
+                      Name: 'MONGODB_CFG_PRIMARY_HOST',
+                      Value: `config0.${params.mongoDnsName}.${params.org}`,
+                    },
+                    {
+                      Name: 'MONGODB_CFG_REPLICA_SET_NAME',
+                      Value: 'config-replicaset',
+                    },
+                    { Name: 'MONGODB_REPLICA_SET_KEY', Value: 'replicakey' },
+                    {
+                      Name: 'MONGODB_ADVERTISED_HOSTNAME',
+                      Value: `router${index}.${params.mongoDnsName}.${params.org}`,
+                    },
+                  ],
+                  Essential: 'true',
+                  Image: `373947115420.dkr.ecr.eu-west-1.amazonaws.com/litentry/mongodb:latest`,
+
+                  LogConfiguration: {
+                    LogDriver: 'awslogs',
+                    Options: {
+                      'awslogs-region': params.region,
+                      'awslogs-stream-prefix': `${params.mongoImageVersion}/router/${index}`,
+                      'awslogs-group': { Ref: 'MongoLogGroup' },
+                    },
+                  },
+                  Privileged: 'false',
+                  PseudoTerminal: 'false',
+                },
+              ],
+              Cpu: routerCpu * ecsMultiplier,
+              Memory: routerMemory * ecsMultiplier,
+              NetworkMode: 'awsvpc',
+              RequiresCompatibilities: ['EC2'],
+              TaskRoleArn: {
+                'Fn::Sub':
+                  'arn:aws:iam::${AWS::AccountId}:role/ecs-task-sensitiveconfig-access-role',
+              },
+            },
+          },
+          [`MongoServiceRouter${index}`]: {
+            Type: 'AWS::ECS::Service',
+            Properties: {
+              ServiceName: `${params.mongoDnsName}-router${index}`,
+              TaskDefinition: {
+                Ref: `MongoTaskRouter${index}`,
+              },
+              Cluster: `\${cf:${params.clusterStackName}.EcsCluster}`,
+              DesiredCount: routerInstances,
+              PlacementStrategies: [
+                {
+                  Type: 'binpack',
+                  Field: 'memory',
+                },
+              ],
+              ServiceRegistries: [
+                {
+                  RegistryArn: {
+                    'Fn::GetAtt': [
+                      `MongoRouterServiceDiscovery${index}`,
+                      'Arn',
+                    ],
+                  },
+                },
+              ],
+              NetworkConfiguration: {
+                AwsvpcConfiguration: {
+                  SecurityGroups: [
+                    `\${cf:${params.clusterStackName}.SecurityGroupUniversal}`,
+                  ],
+                  Subnets: {
+                    'Fn::Split': [
+                      ',',
+                      `\${cf:${params.clusterStackName}.PrivateSubnets}`,
+                    ],
+                  },
+                },
+              },
+              EnableECSManagedTags: true,
+              EnableExecuteCommand: true,
+            },
+          },
+        };
+      }, {});
 
       const shards = Array(shardInstances)
         .fill(0)
@@ -374,18 +398,26 @@ export default function(stage: string, params: Params) {
                     Environment: [
                       { Name: 'MONGODB_SHARDING_MODE', Value: 'shardsvr' },
                       { Name: 'MONGODB_ROOT_PASSWORD', Value: 'password123' },
-                      { Name: 'MONGODB_MONGOS_HOST', Value: `router0.${params.mongoDnsName}.${params.org}` },
+                      {
+                        Name: 'MONGODB_MONGOS_HOST',
+                        Value: `router0.${params.mongoDnsName}.${params.org}`,
+                      },
                       { Name: 'MONGODB_REPLICA_SET_MODE', Value: `primary` },
-                      { Name: 'MONGODB_REPLICA_SET_NAME', Value: `shard${index}` },
+                      {
+                        Name: 'MONGODB_REPLICA_SET_NAME',
+                        Value: `shard${index}`,
+                      },
                       { Name: 'MONGODB_REPLICA_SET_KEY', Value: 'replicakey' },
                       {
                         Name: 'MONGODB_EXTRA_FLAGS',
-                        Value: `--wiredTigerCacheSizeGB=${Math.floor(shardMemory/2)} --slowOpSampleRate 0.001 --quiet`
+                        Value: `--wiredTigerCacheSizeGB=${Math.floor(
+                          shardMemory / 2,
+                        )} --slowOpSampleRate 0.001 --quiet`,
                       },
                       {
                         Name: 'MONGODB_ADVERTISED_HOSTNAME',
-                        Value: `shard${index}.${params.mongoDnsName}.${params.org}`
-                      }
+                        Value: `shard${index}.${params.mongoDnsName}.${params.org}`,
+                      },
                     ],
                     Essential: 'true',
                     Image: `373947115420.dkr.ecr.eu-west-1.amazonaws.com/litentry/mongodb:latest`,
@@ -394,24 +426,27 @@ export default function(stage: string, params: Params) {
                       Options: {
                         'awslogs-region': params.region,
                         'awslogs-stream-prefix': `${params.mongoImageVersion}/shard/${index}`,
-                        'awslogs-group': { Ref: 'MongoLogGroup' }
-                      }
+                        'awslogs-group': { Ref: 'MongoLogGroup' },
+                      },
                     },
                     MountPoints: [
                       {
                         ContainerPath: '/bitnami',
-                        SourceVolume: `${params.ebsVolumeName}-shard-${index}`
-                      }
+                        SourceVolume: `${params.ebsVolumeName}-shard-${index}`,
+                      },
                     ],
                     Privileged: 'false',
-                    PseudoTerminal: 'false'
-                  }
+                    PseudoTerminal: 'false',
+                  },
                 ],
                 Cpu: shardCpu * ecsMultiplier,
                 Memory: shardMemory * ecsMultiplier,
                 NetworkMode: 'awsvpc',
                 RequiresCompatibilities: ['EC2'],
-                TaskRoleArn: { 'Fn::Sub': 'arn:aws:iam::${AWS::AccountId}:role/ecs-task-sensitiveconfig-access-role' },
+                TaskRoleArn: {
+                  'Fn::Sub':
+                    'arn:aws:iam::${AWS::AccountId}:role/ecs-task-sensitiveconfig-access-role',
+                },
                 Volumes: [
                   {
                     Name: `${params.ebsVolumeName}-shard-${index}`,
@@ -420,51 +455,56 @@ export default function(stage: string, params: Params) {
                       Driver: 'rexray/ebs',
                       DriverOpts: {
                         volumetype: 'gp3',
-                        size: 100
+                        size: 100,
                       },
-                      Scope: 'shared'
-                    }
-                  }
-                ]
-              }
+                      Scope: 'shared',
+                    },
+                  },
+                ],
+              },
             },
             [`MongoServiceShard${index}`]: {
               Type: 'AWS::ECS::Service',
               Properties: {
                 ServiceName: `${params.mongoDnsName}-shard${index}`,
                 TaskDefinition: {
-                  Ref: `MongoTaskShard${index}`
+                  Ref: `MongoTaskShard${index}`,
                 },
                 Cluster: `\${cf:${params.clusterStackName}.EcsCluster}`,
                 DesiredCount: 1,
-                PlacementStrategies: [{
-                  Type: 'binpack',
-                  Field: 'memory'
-                }],
+                PlacementStrategies: [
+                  {
+                    Type: 'binpack',
+                    Field: 'memory',
+                  },
+                ],
                 ServiceRegistries: [
                   {
                     RegistryArn: {
-                      'Fn::GetAtt': [`MongoShardServiceDiscovery${index}`, 'Arn']
-                    }
-                  }
+                      'Fn::GetAtt': [
+                        `MongoShardServiceDiscovery${index}`,
+                        'Arn',
+                      ],
+                    },
+                  },
                 ],
                 NetworkConfiguration: {
                   AwsvpcConfiguration: {
                     SecurityGroups: [
-                      `\${cf:${params.clusterStackName}.SecurityGroupUniversal}`
+                      `\${cf:${params.clusterStackName}.SecurityGroupUniversal}`,
                     ],
                     Subnets: {
                       'Fn::Split': [
                         ',',
-                        `\${cf:${params.clusterStackName}.PrivateSubnets}`
-                      ]
-                    }
-                  }
+                        `\${cf:${params.clusterStackName}.PrivateSubnets}`,
+                      ],
+                    },
+                  },
                 },
                 EnableECSManagedTags: true,
-                EnableExecuteCommand: true
-              }
-            }
+                EnableExecuteCommand: true,
+              },
+            },
           };
         }, {});
 
@@ -472,7 +512,7 @@ export default function(stage: string, params: Params) {
         ...serviceDiscovery,
         ...configServers,
         ...routers,
-        ...shards
+        ...shards,
       };
     } else {
       return {
@@ -484,14 +524,14 @@ export default function(stage: string, params: Params) {
               DnsRecords: [
                 {
                   Type: 'A',
-                  TTL: 10
-                }
+                  TTL: 10,
+                },
               ],
-              RoutingPolicy: 'WEIGHTED'
+              RoutingPolicy: 'WEIGHTED',
             },
             Name: params.mongoDnsName,
-            NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`
-          }
+            NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`,
+          },
         },
         MongoTask: {
           Type: 'AWS::ECS::TaskDefinition',
@@ -503,7 +543,7 @@ export default function(stage: string, params: Params) {
                 Command: [
                   'mongod',
                   '--wiredTigerCacheSizeGB',
-                  `${getMemoryUnits(params.chain) / 2}`
+                  `${getMemoryUnits(params.chain) / 2}`,
                 ],
                 Essential: 'true',
                 Image: `mongo:${params.mongoImageVersion}`,
@@ -512,24 +552,27 @@ export default function(stage: string, params: Params) {
                   Options: {
                     'awslogs-region': params.region,
                     'awslogs-stream-prefix': `${params.mongoImageVersion}`,
-                    'awslogs-group': { Ref: 'MongoLogGroup' }
-                  }
+                    'awslogs-group': { Ref: 'MongoLogGroup' },
+                  },
                 },
                 MountPoints: [
                   {
                     ContainerPath: '/data/db',
-                    SourceVolume: params.ebsVolumeName
-                  }
+                    SourceVolume: params.ebsVolumeName,
+                  },
                 ],
                 Privileged: 'false',
-                PseudoTerminal: 'false'
-              }
+                PseudoTerminal: 'false',
+              },
             ],
             Cpu: getCpuUnits(<Chain>params.chain) * ecsMultiplier,
             Memory: getMemoryUnits(<Chain>params.chain) * ecsMultiplier,
             NetworkMode: 'awsvpc',
             RequiresCompatibilities: ['EC2'],
-            TaskRoleArn: { 'Fn::Sub': 'arn:aws:iam::${AWS::AccountId}:role/ecs-task-sensitiveconfig-access-role' },
+            TaskRoleArn: {
+              'Fn::Sub':
+                'arn:aws:iam::${AWS::AccountId}:role/ecs-task-sensitiveconfig-access-role',
+            },
             Volumes: [
               {
                 Name: params.ebsVolumeName,
@@ -538,51 +581,53 @@ export default function(stage: string, params: Params) {
                   Driver: 'rexray/ebs',
                   DriverOpts: {
                     volumetype: 'gp3',
-                    size: getStorageUnits(<Chain>params.chain)
+                    size: getStorageUnits(<Chain>params.chain),
                   },
-                  Scope: 'shared'
-                }
-              }
-            ]
-          }
+                  Scope: 'shared',
+                },
+              },
+            ],
+          },
         },
         MongoService: {
           Type: 'AWS::ECS::Service',
           Properties: {
             ServiceName: params.mongoDnsName,
             TaskDefinition: {
-              Ref: 'MongoTask'
+              Ref: 'MongoTask',
             },
             Cluster: `\${cf:${params.clusterStackName}.EcsCluster}`,
             DesiredCount: 1,
-            PlacementStrategies: [{
-              Type: 'binpack',
-              Field: 'memory'
-            }],
+            PlacementStrategies: [
+              {
+                Type: 'binpack',
+                Field: 'memory',
+              },
+            ],
             ServiceRegistries: [
               {
                 RegistryArn: {
-                  'Fn::GetAtt': ['MongoServiceDiscovery', 'Arn']
-                }
-              }
+                  'Fn::GetAtt': ['MongoServiceDiscovery', 'Arn'],
+                },
+              },
             ],
             NetworkConfiguration: {
               AwsvpcConfiguration: {
                 SecurityGroups: [
-                  `\${cf:${params.clusterStackName}.SecurityGroupUniversal}`
+                  `\${cf:${params.clusterStackName}.SecurityGroupUniversal}`,
                 ],
                 Subnets: {
                   'Fn::Split': [
                     ',',
-                    `\${cf:${params.clusterStackName}.PrivateSubnets}`
-                  ]
-                }
-              }
+                    `\${cf:${params.clusterStackName}.PrivateSubnets}`,
+                  ],
+                },
+              },
             },
             EnableECSManagedTags: true,
-            EnableExecuteCommand: true
-          }
-        }
+            EnableExecuteCommand: true,
+          },
+        },
       };
     }
   };
@@ -594,11 +639,11 @@ export default function(stage: string, params: Params) {
           Type: 'AWS::Logs::LogGroup',
           Properties: {
             LogGroupName: params.mongoDnsName,
-            RetentionInDays: 1
-          }
+            RetentionInDays: 1,
+          },
         },
-        ...getMongoConfiguration(params.chain)
-      }
+        ...getMongoConfiguration(params.chain),
+      },
     };
   }
   return {};
