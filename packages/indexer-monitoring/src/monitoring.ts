@@ -16,7 +16,10 @@ const monitoring = () => {
 
   const getNameFromMetric = (metric: Metric, suffix: string) => {
     return (
-      (process.env.SERVICE_NAME ? process.env.SERVICE_NAME + '_' : '') +
+      (process.env.SERVICE_NAME
+        ? process.env.SERVICE_NAME + '_'
+        : ''
+      ).replaceAll('-', '_') +
       metric.functionName +
       (suffix ? '_' + suffix : '')
     ).toLocaleLowerCase();
