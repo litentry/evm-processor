@@ -22,7 +22,5 @@ export default async function extract(
     }),
   );
 
-  const txs = results.flatMap((txArr) => txArr);
-
-  return txs;
+  return results.flatMap((txArr) => txArr);
 }
