@@ -1,8 +1,5 @@
 import { metrics, monitoring } from 'indexer-monitoring';
 import { repository, utils } from 'indexer-utils';
-import extractBlock from './extract-block';
-import loadBlock from './load-block';
-import transformBlock from './transform-block';
 import {
   BlockModel,
   ContractCreationTransactionModel,
@@ -10,6 +7,9 @@ import {
   LogModel,
   NativeTokenTransactionModel,
 } from '../schema';
+import extractBlock from './extract-block';
+import loadBlock from './load-block';
+import transformBlock from './transform-block';
 
 export default async function indexer(start: number, end: number) {
   const blocks: number[] = [];
@@ -54,9 +54,4 @@ export default async function indexer(start: number, end: number) {
   monitoring.measure(metrics.extractBlock);
   monitoring.measure(metrics.transformBlock);
   monitoring.measure(metrics.loadBlock);
-  monitoring.measure(
-    metrics.fullWorkerProcess,
-    metrics.extractBlock,
-    metrics.loadBlock,
-  );
 }

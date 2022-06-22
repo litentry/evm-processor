@@ -16,9 +16,6 @@ const metrics: Metrics = {
   loadBlock: {
     functionName: 'load_block',
   },
-  fullWorkerProcess: {
-    functionName: 'full_worker_process',
-  },
   getLastQueuedBlock: {
     functionName: 'get_last_queued_block',
   },
