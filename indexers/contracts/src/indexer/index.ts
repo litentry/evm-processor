@@ -1,8 +1,8 @@
-import { repository } from 'indexer-utils';
 import { metrics, monitoring } from 'indexer-monitoring';
+import { repository } from 'indexer-utils';
 import extract from './extract';
-import transform from './transform';
 import load from './load';
+import transform from './transform';
 
 export default async function indexer(startBlock: number, endBlock: number) {
   console.time('extract');
@@ -31,10 +31,6 @@ export default async function indexer(startBlock: number, endBlock: number) {
   await repository.indexedBlockRange.save(startBlock, endBlock);
 
   monitoring.measure(metrics.extractBlock);
+  monitoring.measure(metrics.transformBlock);
   monitoring.measure(metrics.loadBlock);
-  monitoring.measure(
-    metrics.fullWorkerProcess,
-    metrics.extractBlock,
-    metrics.loadBlock,
-  );
 }
