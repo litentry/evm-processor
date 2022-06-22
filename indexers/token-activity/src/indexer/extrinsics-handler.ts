@@ -55,6 +55,7 @@ export default async function extrinsicsHandler(
     .filter((tx) => ercContractAddresses.includes(tx.to));
 
   const docs = ercTxs
+    .filter((tx) => tx.receiptStatus !== false)
     .map((tx) => {
       const ex = extrinsics.find((ex) => ex.ID === tx.methodId)!;
       let decoded: DecodedExtrinsic;
@@ -64,6 +65,10 @@ export default async function extrinsicsHandler(
       } catch (e) {
         // contracts can be more than 1 standard, when the same methods are found on both we know this will blow up for 1 of the contract types as the log data won't match up (e.g. unit256 on transfer is indexed in 721 but not 20)
         if (CONFLICTING_SIGNATURES.includes(ex.SIGNATURE)) {
+          return null;
+        }
+        // these could be malformed transactions, before the byzantium upgrade the filter above on receipt status won't work
+        if (tx.blockNumber < 4370000) {
           return null;
         }
         throw new Error(JSON.stringify(e));
