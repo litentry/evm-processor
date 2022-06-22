@@ -1,4 +1,3 @@
-import colors from 'colors';
 import Web3 from 'web3';
 import { HttpProvider, WebsocketProvider } from 'web3-core';
 

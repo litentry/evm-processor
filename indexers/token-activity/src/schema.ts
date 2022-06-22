@@ -17,6 +17,7 @@ export const DecodedEventSchema =
     transactionHash: { type: String, required: true, index: true },
     blockTimestamp: { type: Number, required: true },
     signature: { type: String, required: true, index: true },
+    logIndex: { type: Number, required: true, index: true },
     value1: String,
     value2: String,
     value3: String,
@@ -33,7 +34,7 @@ export const DecodedEventSchema =
 
 export const DecodedTransactionSchema =
   new mongoose.Schema<DecodedContractTransactionDocument>({
-    hash: { type: String, required: true, index: true },
+    hash: { type: String, required: true, index: true, unique: true },
     blockNumber: { type: Number, required: true, index: true },
     contract: { type: String, required: true, index: true },
     signer: { type: String, required: true },

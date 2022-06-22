@@ -11,17 +11,15 @@ export default async function fetchTokenData(address: string, nft = false) {
     const name = await getTokenProperty('name', address, contract);
     return {
       name,
-      decimals: null,
-      symbol: null,
     };
   }
 
-  let decimals: number | null;
+  let decimals: number | undefined;
   try {
     const response = await contract.methods.decimals().call();
     decimals = response;
   } catch (e) {
-    decimals = null;
+    //
   }
   const name = await getTokenProperty('name', address, contract);
   const symbol = await getTokenProperty('symbol', address, contract);
@@ -71,7 +69,7 @@ async function getTokenProperty(
     }
   }
 
-  return value;
+  return typeof value === 'string' ? value : undefined;
 }
 
 const abiBytesMethod = (name: string) =>

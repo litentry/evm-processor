@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { CONTRACT_SIGNATURES } from './contract-signatures';
 import { ContractSignatureItem } from '../../types/contract';
 
@@ -23,7 +24,7 @@ const ERC1155TokenReceiverSigs = CONTRACT_SIGNATURES.ERC1155.EXTRINSICS.filter(
     ].includes(sig.SIGNATURE),
 );
 
-const ERC1155Metadata_URISig = CONTRACT_SIGNATURES.ERC721.EXTRINSICS.find(
+const ERC1155Metadata_URISig = CONTRACT_SIGNATURES.ERC1155.EXTRINSICS.find(
   (sig) => sig.SIGNATURE === 'uri(uint256)',
 )!;
 
@@ -39,5 +40,7 @@ export default {
 };
 
 function supports(interfaceSigs: ContractSignatureItem[], input: string) {
-  return interfaceSigs.every((sig) => input.includes(sig.ID));
+  return interfaceSigs.every((sig) =>
+    input.includes(ethers.utils.hexStripZeros(`0x${sig.ID}`).substring(2)),
+  );
 }

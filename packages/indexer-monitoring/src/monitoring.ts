@@ -19,7 +19,9 @@ const monitoring = () => {
       (process.env.SERVICE_NAME ? process.env.SERVICE_NAME + '_' : '') +
       metric.functionName +
       (suffix ? '_' + suffix : '')
-    ).toLocaleLowerCase();
+    )
+      .toLowerCase()
+      .replace(/\-/g, '_');
   };
 
   const getOrCreateHistogram = (metric: Metric): Histogram<string> => {

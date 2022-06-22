@@ -108,11 +108,9 @@ const SIMPLE_CONTRACT_SIGNATURES: SimpleContractSignatures = {
         'TransferSingle(address,address,address,uint256,uint256)',
         'TransferBatch(address,address,address,uint256[],uint256[])',
         'ApprovalForAll(address,address,bool)',
-      ],
-      OPTIONAL: [
-        // Listed with required events but is only relevant to optional ERC1155Metadata_URI interface
         'URI(string,uint256)',
       ],
+      OPTIONAL: [],
     },
     EXTRINSICS: {
       REQUIRED: [
@@ -160,14 +158,16 @@ const SIMPLE_CONTRACT_SIGNATURES: SimpleContractSignatures = {
     EXTRINSICS: {
       REQUIRED: [
         'multicall(uint256,bytes[])',
+        'swapExactTokensForTokens(uint256,uint256,address[],address)',
+        'swapTokensForExactTokens(uint256,uint256,address[],address)',
+      ],
+      OPTIONAL: [
+        // im pretty sure these dont exist, but I want to confirm this with with full chain data - leaving them in optional stops them breaking the contract type detection, but allows them to be used in the indexer
         'swapTokensForExactETH(uint256,uint256,address[],address)',
         'swapExactETHForTokens(uint256,address[],address)',
-        'swapTokensForExactTokens(uint256,uint256,address[],address)',
-        'swapExactTokensForTokens(uint256,uint256,address[],address)',
         'swapExactTokensForETH(uint256,uint256,address[],address)',
         'swapETHForExactTokens(uint256,address[],address)',
       ],
-      OPTIONAL: [],
     },
   },
 };

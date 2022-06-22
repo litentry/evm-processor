@@ -18,10 +18,14 @@ const secondFakeMetric: Metric = {
   functionName: 'fake_metric2',
 };
 
+const thirdFakeMetric: Metric = {
+  functionName: 'fake_metric-with-dashes',
+};
+
 describe('Monitoring', () => {
   it('Returns the correct metric name with suffix', async () => {
-    expect(monitoring.getNameFromMetric(firstFakeMetric, 'test')).toStrictEqual(
-      'test_indexer_fake_metric_test',
+    expect(monitoring.getNameFromMetric(thirdFakeMetric, 'test')).toStrictEqual(
+      'test_indexer_fake_metric_with_dashes_test',
     );
   });
 
