@@ -57,10 +57,16 @@ describe('AWS worker', () => {
       batchItemFailures: [{ itemIdentifier: 'a' }],
     });
 
-    expect(monitoring.incCounter).toBeCalledTimes(1);
-    expect(monitoring.incCounter).lastCalledWith(
+    expect(monitoring.incCounter).toBeCalledTimes(2);
+    expect(monitoring.incCounter).toHaveBeenNthCalledWith(
+      1,
       1,
       metrics.lambdaWorkerFailedBatches,
+    );
+    expect(monitoring.incCounter).toHaveBeenNthCalledWith(
+      2,
+      1,
+      metrics.lambdaWorkerFailure,
     );
   });
 
