@@ -1,34 +1,24 @@
-import { Types } from 'indexer-utils';
+import { utils, Types } from 'indexer-utils';
 import { ethers } from 'ethers';
 import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
 import ERC721 from '@openzeppelin/contracts/build/contracts/ERC721.json';
 import ERC1155 from '@openzeppelin/contracts/build/contracts/ERC1155.json';
+import { DecodedEvent, DecodedExtrinsic, ErcStandard } from './types';
 
-export type DecodedEvent = {
-  value1?: string;
-  value2?: string;
-  value3?: string;
-  value4?: string;
-  type1?: string;
-  type2?: string;
-  type3?: string;
-  type4?: string;
-};
+export const standards: ErcStandard[] = [20, 721, 1155];
 
-export type DecodedExtrinsic = {
-  value1?: string;
-  value2?: string;
-  value3?: string;
-  value4?: string;
-  value5?: string;
-  value6?: string;
-  type1?: string;
-  type2?: string;
-  type3?: string;
-  type4?: string;
-  type5?: string;
-  type6?: string;
-};
+export function getSignaturesByErcStandard(ercStandard: ErcStandard) {
+  switch (ercStandard) {
+    case 20:
+      return utils.contract.CONTRACT_SIGNATURES.ERC20.EVENTS;
+    case 721:
+      return utils.contract.CONTRACT_SIGNATURES.ERC721.EVENTS;
+    case 1155:
+      return utils.contract.CONTRACT_SIGNATURES.ERC1155.EVENTS;
+    default:
+      throw Error('unknown standard');
+  }
+}
 
 const contractInterface: {
   [key: string]: ethers.utils.Interface;
@@ -40,8 +30,8 @@ const contractInterface: {
   ),
 };
 
-export function decodeEvent(
-  type: 20 | 721 | 1155,
+export function decodeLog(
+  type: ErcStandard,
   item: Types.Contract.ContractSignatureItem,
   data: string,
   topics: string[],
