@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import { BigNumber, ethers } from 'ethers';
 import { Types, utils } from 'indexer-utils';
-import { Swap, SwapMethod } from './types';
+import { Swap, SwapMethod } from '../types';
 import transformSwap from './transform-swap';
-import { findMethodsInInput, filterCalls, getMethodIdFromCall } from './utils';
+import { findMethodsInInput, filterCalls, getMethodIdFromCall } from '../utils';
 
 const EXTRINSICS = utils.contract.CONTRACT_SIGNATURES.UNISWAPV3.EXTRINSICS;
 
