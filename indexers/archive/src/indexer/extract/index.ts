@@ -19,4 +19,10 @@ switch (process.env.EXTRACTION_SOURCE) {
   }
 }
 
-export default extractBlock;
+export default async function extract(startBlock: number, endBlock: number) {
+  const blocks: number[] = [];
+  for (let block = startBlock; block <= endBlock; block++) {
+    blocks.push(block);
+  }
+  return Promise.all(blocks.map(extractBlock));
+}

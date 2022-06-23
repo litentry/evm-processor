@@ -6,7 +6,7 @@ import {
   ContractTransactionModel,
   BlockModel,
 } from '../schema';
-import { LoadBlock } from './types';
+import { ExtractedBlock, TransformedBlock } from './types';
 
 /**
  * Try bulk insert, if error try bulk delete to avoid partial imports
@@ -15,13 +15,13 @@ import { LoadBlock } from './types';
  * @param logs
  * @param contractSignatures
  */
-const mongo: LoadBlock = async ({
+const loadBlock = async ({
   nativeTokenTransactions,
   contractCreationTransactions,
   contractTransactions,
   logs,
   block,
-}) => {
+}: TransformedBlock) => {
   try {
     const results = await Promise.allSettled([
       utils.upsertMongoModels(BlockModel, [block], ['hash']),
@@ -54,4 +54,19 @@ const mongo: LoadBlock = async ({
   }
 };
 
-export default mongo;
+export default async function load(blocks: TransformedBlock[]) {
+  await utils.ensureShardedCollections(
+    BlockModel,
+    NativeTokenTransactionModel,
+    ContractCreationTransactionModel,
+    ContractTransactionModel,
+    LogModel,
+  );
+
+  const results = await Promise.allSettled(blocks.map(loadBlock));
+
+  const rejected = results.filter((result) => result.status === 'rejected');
+  if (rejected.length) {
+    throw rejected;
+  }
+}

@@ -1,11 +1,13 @@
 import { BigNumber } from 'ethers';
 import { Types } from 'indexer-utils';
-import { RawReceipt, RawTransaction, TransformBlock } from './types';
+import {
+  ExtractedBlock,
+  RawReceipt,
+  RawTransaction,
+  TransformedBlock,
+} from './types';
 
-const transformBlock: TransformBlock = ({
-  blockWithTransactions,
-  receipts,
-}) => {
+function transformBlock({ blockWithTransactions, receipts }: ExtractedBlock) {
   const block: Types.Archive.Block = {
     number: BigNumber.from(blockWithTransactions.number).toNumber(),
     hash: blockWithTransactions.hash,
@@ -118,9 +120,7 @@ const transformBlock: TransformBlock = ({
     contractTransactions,
     logs,
   };
-};
-
-export default transformBlock;
+}
 
 const mapTransactionBase = (
   blockHash: string,
@@ -145,3 +145,9 @@ const mapTransactionBase = (
     receipt.cumulativeGasUsed,
   ).toString(),
 });
+
+export default function transform(
+  blocks: ExtractedBlock[],
+): TransformedBlock[] {
+  return blocks.map(transformBlock);
+}
