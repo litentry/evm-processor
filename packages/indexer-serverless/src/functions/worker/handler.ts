@@ -18,9 +18,7 @@ export default async function worker(
       handler,
     );
 
-    trackSqsCountMetrics(failedMessages, event);
-
-    monitoring.markEndAndMeasure(metrics.lambdaWorkerSuccess);
+    trackMetrics(failedMessages, event);
 
     return {
       batchItemFailures: failedMessages,
@@ -35,27 +33,7 @@ export default async function worker(
   }
 }
 
-function trackSqsCountMetrics(
-  failedMessages: SQSBatchItemFailure[],
-  event: SQSEvent,
-) {
-  const failedMessagesCount = failedMessages.length;
-  const successfulMessagesCount = event.Records.length - failedMessagesCount;
-
-  if (successfulMessagesCount) {
-    monitoring.incCounter(
-      successfulMessagesCount,
-      metrics.lambdaWorkerSuccessfulBatches,
-    );
-  }
-
-  if (failedMessagesCount) {
-    monitoring.incCounter(
-      failedMessagesCount,
-      metrics.lambdaWorkerFailedBatches,
-    );
-  }
-
+function trackMetrics(failedMessages: SQSBatchItemFailure[], event: SQSEvent) {
   event.Records.forEach((r) => {
     if (
       r.attributes.ApproximateReceiveCount &&
@@ -67,4 +45,20 @@ function trackSqsCountMetrics(
       );
     }
   });
+
+  const failedMessagesCount = failedMessages.length;
+  const successfulMessagesCount = event.Records.length - failedMessagesCount;
+
+  if (failedMessagesCount == 0) {
+    monitoring.incCounter(
+      successfulMessagesCount,
+      metrics.lambdaWorkerSuccessfulBatches,
+    );
+
+    monitoring.markEndAndMeasure(metrics.lambdaWorkerSuccess);
+    return;
+  }
+
+  monitoring.incCounter(failedMessagesCount, metrics.lambdaWorkerFailedBatches);
+  monitoring.incCounter(1, metrics.lambdaWorkerFailure);
 }
