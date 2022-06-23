@@ -1,10 +1,12 @@
-import { Types } from 'indexer-utils';
+import { Types, utils } from 'indexer-utils';
 import { ERC721TokenModel, ERC1155TokenModel } from '../schema';
 
 export default async function load(data: {
   nfts: Types.Nft.ERC721Token[];
   sfts: Types.Nft.ERC1155Token[];
 }): Promise<void> {
+  await utils.ensureShardedCollections(ERC721TokenModel, ERC1155TokenModel);
+
   await Promise.all(
     data.nfts.map(async (doc) => {
       try {
