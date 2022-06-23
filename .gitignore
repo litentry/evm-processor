@@ -14,4 +14,4 @@ uniswap-indexer/db/migrations/*.js
 .esbuild
 .husky
 coverage
-local.test.ts
+local.*.test.ts
