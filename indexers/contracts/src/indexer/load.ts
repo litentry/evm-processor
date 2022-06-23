@@ -26,7 +26,15 @@ function getModel(key: string) {
 }
 
 export default async function load(data: TransformResult) {
-  return Promise.allSettled(
+  await utils.ensureShardedCollections(
+    ERC1155ContractModel,
+    ERC20ContractModel,
+    ERC721ContractModel,
+    UniswapV2ContractModel,
+    UniswapV3ContractModel,
+  );
+
+  const results = await Promise.allSettled(
     Object.keys(data).map(async (key) => {
       await utils.upsertMongoModels(
         getModel(key),
@@ -35,4 +43,9 @@ export default async function load(data: TransformResult) {
       );
     }),
   );
+
+  const rejected = results.filter((result) => result.status === 'rejected');
+  if (rejected.length) {
+    throw rejected;
+  }
 }
