@@ -10,6 +10,12 @@ import { standards } from './utils';
 export default async function load(
   data: Types.Contract.DecodedContractEvent[][],
 ): Promise<void> {
+  await utils.ensureShardedCollections(
+    ERC1155EventDecodedModel,
+    ERC20EventDecodedModel,
+    ERC721EventDecodedModel,
+  );
+
   const results = await Promise.allSettled(
     standards.map(async (standard, i) =>
       utils.upsertMongoModels(getModelByStandard(standard), data[i], [
