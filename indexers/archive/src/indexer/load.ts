@@ -6,7 +6,7 @@ import {
   ContractTransactionModel,
   BlockModel,
 } from '../schema';
-import { ExtractedBlock, TransformedBlock } from './types';
+import { TransformedBlock } from './types';
 
 /**
  * Try bulk insert, if error try bulk delete to avoid partial imports
@@ -23,6 +23,20 @@ const loadBlock = async ({
   block,
 }: TransformedBlock) => {
   try {
+    // this is cheaper than an upsert, so do this first & it'll succeed 99.9% of the time, and fall back to an upsert attempt
+    const results = await Promise.allSettled([
+      BlockModel.create(block),
+      NativeTokenTransactionModel.insertMany(nativeTokenTransactions),
+      ContractCreationTransactionModel.insertMany(contractCreationTransactions),
+      ContractTransactionModel.insertMany(contractTransactions),
+      LogModel.insertMany(logs),
+    ]);
+
+    const rejected = results.filter((result) => result.status === 'rejected');
+    if (rejected.length) {
+      throw rejected;
+    }
+  } catch (e) {
     const results = await Promise.allSettled([
       utils.upsertMongoModels(BlockModel, [block], ['hash']),
       utils.upsertMongoModels(
@@ -38,19 +52,14 @@ const loadBlock = async ({
       utils.upsertMongoModels(ContractTransactionModel, contractTransactions, [
         'hash',
       ]),
-      utils.upsertMongoModels(LogModel, logs, [
-        'blockNumber',
-        'transactionHash',
-      ]),
+      utils.upsertMongoModels(LogModel, logs, ['uniqueIndex']),
     ]);
 
     const rejected = results.filter((result) => result.status === 'rejected');
     if (rejected.length) {
+      console.error('Error in block mongo loader', rejected);
       throw rejected;
     }
-  } catch (e) {
-    console.error('Error in block mongo loader', e);
-    throw e;
   }
 };
 
