@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import { BigNumber } from 'ethers';
 import { Types } from 'indexer-utils';
-import { getIntermediatePath } from './utils';
-import { SwapMethod, Swap } from './types';
+import { getIntermediatePath } from '../utils';
+import { SwapMethod, Swap } from '../types';
 
 export const TRANSFER_METHOD_ID = '0xddf252ad';
 

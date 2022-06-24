@@ -4,10 +4,7 @@ import { SwapMethod } from './types';
 const V2_SIGS = utils.contract.CONTRACT_SIGNATURES.UNISWAPV2.EXTRINSICS;
 const V3_SIG = utils.contract.CONTRACT_SIGNATURES.UNISWAPV3.EXTRINSICS[0]; // multicall (the rest are internal) -> todo check contracts indexed to see if we get a match on this (as internal methods might not be in op-codes)
 
-export default async function extractTransactions(
-  startBlock: number,
-  endBlock: number,
-) {
+export default async function extract(startBlock: number, endBlock: number) {
   const [v2, v3] = await Promise.all([
     fetchV2Txs(startBlock, endBlock),
     fetchV3Txs(startBlock, endBlock),

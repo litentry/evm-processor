@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import transformSwap, { TRANSFER_METHOD_ID } from './transform-swap';
-import { SwapMethod } from './types';
+import { SwapMethod } from '../types';
 
 describe('transformSwap()', () => {
   it('Converts transaction data into a Swap model', async () => {

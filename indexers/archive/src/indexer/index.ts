@@ -1,57 +1,15 @@
-import { metrics, monitoring } from 'indexer-monitoring';
-import { repository, utils } from 'indexer-utils';
-import {
-  BlockModel,
-  ContractCreationTransactionModel,
-  ContractTransactionModel,
-  LogModel,
-  NativeTokenTransactionModel,
-} from '../schema';
-import extractBlock from './extract-block';
-import loadBlock from './load-block';
-import transformBlock from './transform-block';
+import { indexer } from 'indexer-utils';
+import extract from './extract';
+import transform from './transform';
+import load from './load';
+import { ExtractedBlock, TransformedBlock } from './types';
 
-export default async function indexer(start: number, end: number) {
-  const blocks: number[] = [];
-  for (let block = start; block <= end; block++) {
-    blocks.push(block);
-  }
-
-  // Extract batch
-  console.time('extract');
-  monitoring.markStart(metrics.extractBlock);
-  const extractedBlocks = await Promise.all(blocks.map(extractBlock));
-  monitoring.markEnd(metrics.extractBlock);
-  console.timeEnd('extract');
-
-  // Transform batch
-  console.time('transform');
-  monitoring.markStart(metrics.transformBlock);
-  const transformedBlocks = extractedBlocks.map(transformBlock);
-  monitoring.markEnd(metrics.transformBlock);
-  console.timeEnd('transform');
-
-  // Load batch
-  console.time('load');
-  monitoring.markStart(metrics.loadBlock);
-
-  await utils.ensureShardedCollections(
-    BlockModel,
-    NativeTokenTransactionModel,
-    ContractCreationTransactionModel,
-    ContractTransactionModel,
-    LogModel,
+export default async function handler(startBlock: number, endBlock: number) {
+  return indexer<ExtractedBlock[], TransformedBlock[]>(
+    startBlock,
+    endBlock,
+    extract,
+    transform,
+    load,
   );
-
-  await Promise.all(transformedBlocks.map(loadBlock));
-  monitoring.markEnd(metrics.loadBlock);
-  console.timeEnd('load');
-
-  // Log completion
-  await repository.indexedBlockRange.save(start, end);
-
-  // Prepare metrics
-  monitoring.measure(metrics.extractBlock);
-  monitoring.measure(metrics.transformBlock);
-  monitoring.measure(metrics.loadBlock);
 }
