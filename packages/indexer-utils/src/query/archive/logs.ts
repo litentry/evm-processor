@@ -3,6 +3,7 @@ import { Log } from '../../types/archive';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof Log)[] = [
+  'uniqueIndex',
   'blockNumber',
   'blockTimestamp',
   'transactionHash',

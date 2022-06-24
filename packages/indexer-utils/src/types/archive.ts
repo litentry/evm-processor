@@ -18,6 +18,7 @@ export interface Block {
 }
 
 export interface Log {
+  uniqueIndex: string;
   blockNumber: number; // index
   blockTimestamp: number;
   transactionHash: string; // index

@@ -96,21 +96,25 @@ function transformBlock({ blockWithTransactions, receipts }: ExtractedBlock) {
       }
     }
 
-    receipt.logs.forEach(({ address, topics, data, logIndex }) => {
-      logs.push({
-        transactionHash: tx.hash,
-        address: address?.toLowerCase(),
-        topic0: topics[0],
-        topic1: topics[1],
-        topic2: topics[2],
-        topic3: topics[3],
-        topic4: topics[4],
-        data,
-        logIndex: BigNumber.from(logIndex).toNumber(),
-        blockNumber: block.number,
-        blockTimestamp: block.timestamp,
-      });
-    });
+    receipt.logs.forEach(
+      ({ address, topics, data, logIndex: logIndexHash }) => {
+        const logIndex = BigNumber.from(logIndexHash).toNumber();
+        logs.push({
+          uniqueIndex: `${block.number}.${logIndex}`,
+          transactionHash: tx.hash,
+          address: address?.toLowerCase(),
+          topic0: topics[0],
+          topic1: topics[1],
+          topic2: topics[2],
+          topic3: topics[3],
+          topic4: topics[4],
+          data,
+          logIndex,
+          blockNumber: block.number,
+          blockTimestamp: block.timestamp,
+        });
+      },
+    );
   });
 
   return {
