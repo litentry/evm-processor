@@ -1,4 +1,5 @@
-export * as Contract from './contract';
+export * as Aggregator from './aggregator';
 export * as Archive from './archive';
-export * as Process from './process';
+export * as Contract from './contract';
 export * as Nft from './nft';
+export * as Process from './process';
