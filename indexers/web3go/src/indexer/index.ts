@@ -67,7 +67,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
     const querySql = blocks
       .map(
         (block: Block) => `(
-          ${wrap(block.number)},
+          ${wrap(block._id)},
           ${wrap(block.hash)},
           ${wrap(block.parentHash)},
           ${wrap(block.nonce)},
@@ -172,7 +172,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
       .map(
         (tx: ContractCreationTransaction) => `(
           ${wrap(`${tx.blockNumber}-${tx.transactionIndex}`)},
-          ${wrap(tx.hash)},
+          ${wrap(tx._id)},
           ${wrap(tx.nonce)},
           ${wrap(tx.blockHash)},
           ${wrap(tx.blockNumber)},
@@ -230,7 +230,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
       .map(
         (tx: ContractTransaction) => `(
           ${wrap(`${tx.blockNumber}-${tx.transactionIndex}`)},
-          ${wrap(tx.hash)},
+          ${wrap(tx._id)},
           ${wrap(tx.nonce)},
           ${wrap(tx.blockHash)},
           ${wrap(tx.blockNumber)},
@@ -279,7 +279,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
       startBlock,
       endBlock,
       properties: [
-        'hash',
+        '_id',
         'nonce',
         'blockHash',
         'blockNumber',
@@ -304,7 +304,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
       .map(
         (tx: NativeTokenTransaction) => `(
           ${wrap(`${tx.blockNumber}-${tx.transactionIndex}`)},
-          ${wrap(tx.hash)},
+          ${wrap(tx._id)},
           ${wrap(tx.nonce)},
           ${wrap(tx.blockHash)},
           ${wrap(tx.blockNumber)},

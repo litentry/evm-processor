@@ -8,13 +8,14 @@ if (getEnvVar('SHARDING_ENABLED', false)) {
   schemaOptions.shardKey = { hash: 'hashed' };
 }
 
+// @ts-ignore
 interface LogDocument extends Types.Archive.Log, mongoose.Document {}
 
 const LogSchema = new mongoose.Schema<LogDocument>(
   {
-    uniqueIndex: { type: String, required: true, index: true, unique: true },
+    _id: String,
+    transactionId: { type: String, required: true, index: true },
     blockNumber: { type: Number, required: true, index: true },
-    transactionHash: { type: String, required: true, index: true },
     address: { type: String, required: true, index: true },
     topic0: { type: String, required: true, index: true },
     topic1: String,
@@ -23,6 +24,7 @@ const LogSchema = new mongoose.Schema<LogDocument>(
     topic4: String,
     data: { type: String, required: true },
     logIndex: { type: Number, required: true },
+    transactionHash: { type: String, required: true },
     blockTimestamp: { type: Number, required: true },
   },
   {

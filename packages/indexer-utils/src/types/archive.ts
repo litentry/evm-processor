@@ -1,5 +1,5 @@
 export interface Block {
-  number: number;
+  _id: number;
   hash: string;
   parentHash: string;
   nonce?: string;
@@ -18,12 +18,13 @@ export interface Block {
 }
 
 export interface Log {
-  uniqueIndex: string;
-  blockNumber: number; // index
+  _id: string;
+  transactionId: string;
+  blockNumber: number;
   blockTimestamp: number;
-  transactionHash: string; // index
-  address: string; // index (contract triggered by)
-  topic0: string; // index (eventId)
+  transactionHash: string;
+  address: string;
+  topic0: string;
   topic1?: string;
   topic2?: string;
   topic3?: string;
@@ -44,10 +45,10 @@ export type Transaction =
   | ContractTransaction;
 
 export interface TransactionBase {
-  hash: string;
+  _id: string;
   nonce: number;
   blockHash: string;
-  blockNumber: number; // index
+  blockNumber: number;
   blockTimestamp: number;
   transactionIndex: number;
   from: string;

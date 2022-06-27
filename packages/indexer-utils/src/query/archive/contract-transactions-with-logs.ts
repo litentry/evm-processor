@@ -7,7 +7,8 @@ import {
 import endpoint from './endpoint';
 
 const defaultLogProperties: (keyof Log)[] = [
-  'uniqueIndex',
+  '_id',
+  'transactionId',
   'blockNumber',
   'blockTimestamp',
   'transactionHash',
@@ -22,7 +23,7 @@ const defaultLogProperties: (keyof Log)[] = [
 ];
 
 const defaultTxProperties: (keyof ContractTransaction)[] = [
-  'hash',
+  '_id',
   'nonce',
   'blockHash',
   'blockNumber',

@@ -22,44 +22,28 @@ const loadBlock = async ({
   logs,
   block,
 }: TransformedBlock) => {
-  try {
-    // this is cheaper than an upsert, so do this first & it'll succeed 99.9% of the time, and fall back to an upsert attempt
-    const results = await Promise.allSettled([
-      BlockModel.create(block),
-      NativeTokenTransactionModel.insertMany(nativeTokenTransactions),
-      ContractCreationTransactionModel.insertMany(contractCreationTransactions),
-      ContractTransactionModel.insertMany(contractTransactions),
-      LogModel.insertMany(logs),
-    ]);
+  const results = await Promise.allSettled([
+    utils.upsertMongoModels(BlockModel, [block], ['_id']),
+    utils.upsertMongoModels(
+      NativeTokenTransactionModel,
+      nativeTokenTransactions,
+      ['_id'],
+    ),
+    utils.upsertMongoModels(
+      ContractCreationTransactionModel,
+      contractCreationTransactions,
+      ['_id'],
+    ),
+    utils.upsertMongoModels(ContractTransactionModel, contractTransactions, [
+      '_id',
+    ]),
+    utils.upsertMongoModels(LogModel, logs, ['_id']),
+  ]);
 
-    const rejected = results.filter((result) => result.status === 'rejected');
-    if (rejected.length) {
-      throw rejected;
-    }
-  } catch (e) {
-    const results = await Promise.allSettled([
-      utils.upsertMongoModels(BlockModel, [block], ['hash']),
-      utils.upsertMongoModels(
-        NativeTokenTransactionModel,
-        nativeTokenTransactions,
-        ['hash'],
-      ),
-      utils.upsertMongoModels(
-        ContractCreationTransactionModel,
-        contractCreationTransactions,
-        ['hash'],
-      ),
-      utils.upsertMongoModels(ContractTransactionModel, contractTransactions, [
-        'hash',
-      ]),
-      utils.upsertMongoModels(LogModel, logs, ['uniqueIndex']),
-    ]);
-
-    const rejected = results.filter((result) => result.status === 'rejected');
-    if (rejected.length) {
-      console.error('Error in block mongo loader', rejected);
-      throw rejected;
-    }
+  const rejected = results.filter((result) => result.status === 'rejected');
+  if (rejected.length) {
+    console.error('Error in the mongo load method', JSON.stringify(rejected));
+    throw rejected;
   }
 };
 

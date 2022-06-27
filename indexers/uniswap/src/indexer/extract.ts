@@ -24,7 +24,7 @@ async function fetchV2Txs(startBlock: number, endBlock: number) {
         endBlock,
         methodId: sig.ID,
         transactionProperties: [
-          'hash',
+          '_id',
           'from',
           'to',
           'input',
@@ -55,7 +55,7 @@ async function fetchV3Txs(startBlock: number, endBlock: number) {
     endBlock,
     methodId: V3_SIG.ID,
     transactionProperties: [
-      'hash',
+      '_id',
       'from',
       'to',
       'input',

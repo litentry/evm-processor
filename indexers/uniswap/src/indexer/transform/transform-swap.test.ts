@@ -8,7 +8,7 @@ describe('transformSwap()', () => {
       transformSwap(
         SwapMethod.swapETHForExactTokens,
         {
-          hash: 'TX_HASH',
+          _id: 'TX_HASH',
           nonce: 1,
           blockHash: '0xblock1',
           blockNumber: 1,
@@ -26,7 +26,8 @@ describe('transformSwap()', () => {
           methodId: '0xSwapETHForExactTokensHash',
           logs: [
             {
-              uniqueIndex: '1.1',
+              _id: '1.4.0',
+              transactionId: '1.4',
               blockNumber: 1,
               blockTimestamp: 1517234642,
               transactionHash: 'TX_HASH',
@@ -36,7 +37,8 @@ describe('transformSwap()', () => {
               logIndex: 0,
             },
             {
-              uniqueIndex: '1.1',
+              _id: '1.4.1',
+              transactionId: '1.4',
               blockNumber: 1,
               blockTimestamp: 1517234642,
               transactionHash: 'TX_HASH',
@@ -46,7 +48,8 @@ describe('transformSwap()', () => {
               logIndex: 1,
             },
             {
-              uniqueIndex: '1.1',
+              _id: '1.4.2',
+              transactionId: '1.4',
               blockNumber: 1,
               blockTimestamp: 1517234642,
               transactionHash: 'TX_HASH',

@@ -9,7 +9,7 @@ import {
 
 function transformBlock({ blockWithTransactions, receipts }: ExtractedBlock) {
   const block: Types.Archive.Block = {
-    number: BigNumber.from(blockWithTransactions.number).toNumber(),
+    _id: BigNumber.from(blockWithTransactions.number).toNumber(),
     hash: blockWithTransactions.hash,
     parentHash: blockWithTransactions.parentHash,
     nonce: blockWithTransactions.nonce,
@@ -59,7 +59,7 @@ function transformBlock({ blockWithTransactions, receipts }: ExtractedBlock) {
 
     const txBase = mapTransactionBase(
       block.hash,
-      block.number,
+      block._id,
       block.timestamp,
       tx,
       receipt,
@@ -100,7 +100,8 @@ function transformBlock({ blockWithTransactions, receipts }: ExtractedBlock) {
       ({ address, topics, data, logIndex: logIndexHash }) => {
         const logIndex = BigNumber.from(logIndexHash).toNumber();
         logs.push({
-          uniqueIndex: `${block.number}.${logIndex}`,
+          _id: `${tx.blockNumber}.${tx.transactionIndex}.${logIndex}`,
+          transactionId: `${tx.blockNumber}.${tx.transactionIndex}`,
           transactionHash: tx.hash,
           address: address?.toLowerCase(),
           topic0: topics[0],
@@ -110,7 +111,7 @@ function transformBlock({ blockWithTransactions, receipts }: ExtractedBlock) {
           topic4: topics[4],
           data,
           logIndex,
-          blockNumber: block.number,
+          blockNumber: block._id,
           blockTimestamp: block.timestamp,
         });
       },
@@ -133,7 +134,7 @@ const mapTransactionBase = (
   tx: RawTransaction,
   receipt: RawReceipt,
 ): Types.Archive.TransactionBase => ({
-  hash: tx.hash,
+  _id: tx.hash,
   nonce: BigNumber.from(tx.nonce).toNumber(),
   blockHash,
   blockNumber,
