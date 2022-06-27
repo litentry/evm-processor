@@ -10,10 +10,10 @@ export enum SwapMethod {
 }
 
 export type Swap = {
-  transactionHash: string; // index
-  address: string; // index
-  contract: string; // index
-  pair: string; // index "tokenAddress:tokenAddress"
+  _id: string;
+  address: string;
+  contract: string;
+  pair: string; // "tokenAddress:tokenAddress"
 
   method: SwapMethod;
   token0: string;

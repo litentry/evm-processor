@@ -50,7 +50,7 @@ export default async function transform(
 
 async function createModels({
   from: creator,
-  receiptContractAddress: address,
+  receiptContractAddress: _id,
   blockNumber,
   blockTimestamp: timestamp,
   input,
@@ -60,7 +60,7 @@ async function createModels({
     input,
   );
   const common = {
-    address,
+    _id,
     creator,
     blockNumber,
     timestamp,
@@ -70,7 +70,7 @@ async function createModels({
   const models: Model[] = [];
 
   if (utils.contract.isType(Types.Contract.ContractType.ERC721, input)) {
-    const data = await fetchTokenData(address, true);
+    const data = await fetchTokenData(_id, true);
     models.push({
       type: Types.Contract.ContractType.ERC721,
       data: {
@@ -84,7 +84,7 @@ async function createModels({
   }
 
   if (utils.contract.isType(Types.Contract.ContractType.ERC1155, input)) {
-    const data = await fetchTokenData(address, true);
+    const data = await fetchTokenData(_id, true);
     models.push({
       type: Types.Contract.ContractType.ERC1155,
       data: {
@@ -98,7 +98,7 @@ async function createModels({
   }
 
   if (utils.contract.isType(Types.Contract.ContractType.ERC20, input)) {
-    const data = await fetchTokenData(address);
+    const data = await fetchTokenData(_id);
     models.push({
       type: Types.Contract.ContractType.ERC20,
       data: {

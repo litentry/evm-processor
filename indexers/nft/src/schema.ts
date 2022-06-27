@@ -3,14 +3,17 @@ import { composeMongoose } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
 import { filter, repository, Types } from 'indexer-utils';
 
+// @ts-ignore
 interface ERC721TokenDocument
   extends Types.Nft.ERC721Token,
     mongoose.Document {}
+// @ts-ignore
 interface ERC1155TokenDocument
   extends Types.Nft.ERC1155Token,
     mongoose.Document {}
 
 export const ERC721TokenSchema = new mongoose.Schema<ERC721TokenDocument>({
+  _id: String,
   contract: { type: String, required: true },
   tokenId: { type: String, required: true },
   owner: { type: String, required: true },
@@ -18,21 +21,17 @@ export const ERC721TokenSchema = new mongoose.Schema<ERC721TokenDocument>({
   lastTransferedBlockTimestamp: { type: Number, required: true },
 });
 
-ERC721TokenSchema.index({ contract: 1, tokenId: 1 }, { unique: true });
-ERC721TokenSchema.index({ owner: 1 });
+ERC721TokenSchema.index({ contract: 1, tokenId: 1, owner: 1 });
 
 export const ERC1155TokenSchema = new mongoose.Schema<ERC1155TokenDocument>({
+  _id: String,
   contract: { type: String, required: true },
   tokenId: { type: String, required: true },
   owner: { type: String, required: true },
   quantity: { type: Number, required: true },
 });
 
-ERC1155TokenSchema.index(
-  { contract: 1, tokenId: 1, owner: 1 },
-  { unique: true },
-);
-ERC1155TokenSchema.index({ owner: 1 });
+ERC1155TokenSchema.index({ contract: 1, tokenId: 1, owner: 1 });
 
 export const ERC721TokenModel = mongoose.model(
   'ERC721Token',

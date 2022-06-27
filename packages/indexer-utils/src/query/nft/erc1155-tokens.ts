@@ -3,6 +3,7 @@ import { ERC1155Token } from '../../types/nft';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof ERC1155Token)[] = [
+  '_id',
   'contract',
   'tokenId',
   'owner',

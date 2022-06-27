@@ -66,7 +66,7 @@ describe('transformSwap()', () => {
         BigNumber.from(100),
       ),
     ).toStrictEqual({
-      transactionHash: 'TX_HASH',
+      _id: 'TX_HASH',
       contract: 'weth_contract',
       address: 'user',
       method: 'swapETHForExactTokens',

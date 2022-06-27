@@ -39,7 +39,7 @@ export default async function load(data: TransformResult) {
       await utils.upsertMongoModels(
         getModel(key),
         data[key as keyof TransformResult],
-        ['address'],
+        ['_id'],
       );
     }),
   );

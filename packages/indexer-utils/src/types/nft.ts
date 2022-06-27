@@ -1,4 +1,5 @@
 export interface ERC721Token {
+  _id: string;
   contract: string;
   tokenId: string;
   owner: string;
@@ -7,6 +8,7 @@ export interface ERC721Token {
 }
 
 export interface ERC1155Token {
+  _id: string;
   contract: string;
   tokenId: string;
   owner: string;

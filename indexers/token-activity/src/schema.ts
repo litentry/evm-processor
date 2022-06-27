@@ -3,18 +3,20 @@ import { composeMongoose } from 'graphql-compose-mongoose';
 import mongoose from 'mongoose';
 import { filter, repository, Types } from 'indexer-utils';
 
+// @ts-ignore
 interface DecodedContractEventDocument
   extends Types.Contract.DecodedContractEvent,
     mongoose.Document {}
 
 export const DecodedEventSchema =
   new mongoose.Schema<DecodedContractEventDocument>({
+    _id: String,
     blockNumber: { type: Number, required: true, index: true },
     contract: { type: String, required: true, index: true },
     transactionHash: { type: String, required: true, index: true },
-    blockTimestamp: { type: Number, required: true },
     signature: { type: String, required: true, index: true },
-    logIndex: { type: Number, required: true, index: true },
+    blockTimestamp: { type: Number, required: true },
+    logIndex: { type: Number, required: true },
     value1: String,
     value2: String,
     value3: String,
