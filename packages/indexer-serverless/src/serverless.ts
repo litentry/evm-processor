@@ -9,7 +9,7 @@ import { getContext } from './util/context';
 import getInfraStack from './util/get-infra-stack';
 
 const vpcOptions = async (stage: string, clusterStackName: string) => {
-  if (stage === 'production') {
+  if (stage !== 'local') {
     const infraStack = await getInfraStack(clusterStackName);
     const securityGroupIds = infraStack
       .Outputs!.filter((output) =>
