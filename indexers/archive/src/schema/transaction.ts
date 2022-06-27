@@ -79,14 +79,12 @@ const contractCreationTransactionSchema =
   );
 
 // INDEXES
-nativeTokenTransactionSchema.index({ blockNumber: 1 });
-nativeTokenTransactionSchema.index({ to: 1 });
-nativeTokenTransactionSchema.index({ from: 1 });
-contractTransactionSchema.index({ blockNumber: 1 });
-contractTransactionSchema.index({ to: 1 });
-contractTransactionSchema.index({ methodId: 1 });
-contractCreationTransactionSchema.index({ blockNumber: 1 });
-contractCreationTransactionSchema.index({ receiptContractAddress: 1 });
+// nativeTokenTransactionSchema.index({ blockNumber: 1, to: 1, from: 1 });
+// contractTransactionSchema.index({ blockNumber: 1, to: 1, methodId: 1 });
+// contractCreationTransactionSchema.index({
+//   blockNumber: 1,
+//   receiptContractAddress: 1,
+// });
 
 // MODELS
 export const NativeTokenTransactionModel = mongoose.model(

@@ -144,7 +144,9 @@ const mapTransactionBase = (
   value: BigNumber.from(tx.value).toString(),
   gasPrice: BigNumber.from(tx.gasPrice).toString(),
   gas: BigNumber.from(tx.gas).toString(),
-  receiptStatus: !!BigNumber.from(receipt.status).toNumber(),
+  receiptStatus: receipt.status
+    ? !!BigNumber.from(receipt.status).toNumber()
+    : undefined,
   receiptGasUsed: BigNumber.from(receipt.gasUsed).toString(),
   receiptCumulativeGasUsed: BigNumber.from(
     receipt.cumulativeGasUsed,

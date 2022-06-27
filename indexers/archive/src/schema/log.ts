@@ -14,10 +14,10 @@ interface LogDocument extends Types.Archive.Log, mongoose.Document {}
 const LogSchema = new mongoose.Schema<LogDocument>(
   {
     _id: String,
-    transactionId: { type: String, required: true, index: true },
-    blockNumber: { type: Number, required: true, index: true },
-    address: { type: String, required: true, index: true },
-    topic0: { type: String, required: true, index: true },
+    transactionId: { type: String, required: true },
+    blockNumber: { type: Number, required: true },
+    address: { type: String, required: true },
+    topic0: { type: String, required: true },
     topic1: String,
     topic2: String,
     topic3: String,
@@ -31,6 +31,13 @@ const LogSchema = new mongoose.Schema<LogDocument>(
     ...schemaOptions,
   },
 );
+
+// LogSchema.index({
+//   blockNumber: 1,
+//   transactionId: 1,
+//   address: 1,
+//   topic0: 1,
+// });
 
 export const LogModel = mongoose.model('Log', LogSchema);
 
