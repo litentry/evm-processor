@@ -3,7 +3,7 @@ import { Block } from '../../types/archive';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof Block)[] = [
-  'number',
+  '_id',
   'hash',
   'parentHash',
   'nonce',
@@ -45,7 +45,7 @@ export default async function blocks({
             sort: NUMBER_ASC
             filter: {
               _operators: {
-                number: {
+                _id: {
                   gte: $startBlock,
                   lte: $endBlock
                 }

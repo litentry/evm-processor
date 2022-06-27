@@ -18,10 +18,7 @@ export default async function load(
 
   const results = await Promise.allSettled(
     standards.map(async (standard, i) =>
-      utils.upsertMongoModels(getModelByStandard(standard), data[i], [
-        'logIndex',
-        'blockNumber',
-      ]),
+      utils.upsertMongoModels(getModelByStandard(standard), data[i], ['_id']),
     ),
   );
 

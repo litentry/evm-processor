@@ -32,9 +32,10 @@ describe('transform', () => {
     eventsBatch1155: [event1155Batch],
   });
 
-  it('Should product NFT (721) models', () => {
+  it('Should produce NFT (721) models', () => {
     expect(result.nfts).toStrictEqual([
       {
+        _id: '721-contract-address.721-token-id',
         contract: '721-contract-address',
         lastTransferedBlockNumber: 10,
         lastTransferedBlockTimestamp: 12345678,
@@ -44,15 +45,17 @@ describe('transform', () => {
     ]);
   });
 
-  it('Should product SFT (1155) models from transfer single events', () => {
+  it('Should produce SFT (1155) models from transfer single events', () => {
     expect(result.sfts.slice(0, 2)).toStrictEqual([
       {
+        _id: '1155-contract-address.1155-token-id.old-owner',
         contract: '1155-contract-address',
         owner: 'old-owner',
         tokenId: '1155-token-id',
         quantity: -3,
       },
       {
+        _id: '1155-contract-address.1155-token-id.new-owner',
         contract: '1155-contract-address',
         owner: 'new-owner',
         tokenId: '1155-token-id',
@@ -61,27 +64,31 @@ describe('transform', () => {
     ]);
   });
 
-  it('Should product SFT (1155) models from transfer batch events', () => {
+  it('Should produce SFT (1155) models from transfer batch events', () => {
     expect(result.sfts.slice(2, 6)).toStrictEqual([
       {
+        _id: '1155-batch-contract-address.1155-batch-token1.old-owner',
         contract: '1155-batch-contract-address',
         owner: 'old-owner',
         tokenId: '1155-batch-token1',
         quantity: -3,
       },
       {
+        _id: '1155-batch-contract-address.1155-batch-token1.new-owner',
         contract: '1155-batch-contract-address',
         owner: 'new-owner',
         tokenId: '1155-batch-token1',
         quantity: 3,
       },
       {
+        _id: '1155-batch-contract-address.1155-batch-token2.old-owner',
         contract: '1155-batch-contract-address',
         owner: 'old-owner',
         tokenId: '1155-batch-token2',
         quantity: -2,
       },
       {
+        _id: '1155-batch-contract-address.1155-batch-token2.new-owner',
         contract: '1155-batch-contract-address',
         owner: 'new-owner',
         tokenId: '1155-batch-token2',

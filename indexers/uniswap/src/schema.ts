@@ -4,10 +4,11 @@ import mongoose from 'mongoose';
 import { filter, repository } from 'indexer-utils';
 import { Swap } from './indexer/types';
 
+// @ts-ignore
 interface SwapDocument extends Swap, mongoose.Document {}
 
 export const SwapSchema = new mongoose.Schema<SwapDocument>({
-  transactionHash: { type: String, required: true, index: true, unique: true },
+  _id: String,
   address: { type: String, required: true, index: true },
   contract: { type: String, required: true, index: true },
   pair: { type: String, required: true, index: true },

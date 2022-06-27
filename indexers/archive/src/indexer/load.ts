@@ -6,7 +6,7 @@ import {
   ContractTransactionModel,
   BlockModel,
 } from '../schema';
-import { ExtractedBlock, TransformedBlock } from './types';
+import { TransformedBlock } from './types';
 
 /**
  * Try bulk insert, if error try bulk delete to avoid partial imports
@@ -22,35 +22,28 @@ const loadBlock = async ({
   logs,
   block,
 }: TransformedBlock) => {
-  try {
-    const results = await Promise.allSettled([
-      utils.upsertMongoModels(BlockModel, [block], ['hash']),
-      utils.upsertMongoModels(
-        NativeTokenTransactionModel,
-        nativeTokenTransactions,
-        ['hash'],
-      ),
-      utils.upsertMongoModels(
-        ContractCreationTransactionModel,
-        contractCreationTransactions,
-        ['hash'],
-      ),
-      utils.upsertMongoModels(ContractTransactionModel, contractTransactions, [
-        'hash',
-      ]),
-      utils.upsertMongoModels(LogModel, logs, [
-        'blockNumber',
-        'transactionHash',
-      ]),
-    ]);
+  const results = await Promise.allSettled([
+    utils.upsertMongoModels(BlockModel, [block], ['_id']),
+    utils.upsertMongoModels(
+      NativeTokenTransactionModel,
+      nativeTokenTransactions,
+      ['_id'],
+    ),
+    utils.upsertMongoModels(
+      ContractCreationTransactionModel,
+      contractCreationTransactions,
+      ['_id'],
+    ),
+    utils.upsertMongoModels(ContractTransactionModel, contractTransactions, [
+      '_id',
+    ]),
+    utils.upsertMongoModels(LogModel, logs, ['_id']),
+  ]);
 
-    const rejected = results.filter((result) => result.status === 'rejected');
-    if (rejected.length) {
-      throw rejected;
-    }
-  } catch (e) {
-    console.error('Error in block mongo loader', e);
-    throw e;
+  const rejected = results.filter((result) => result.status === 'rejected');
+  if (rejected.length) {
+    console.error('Error in the mongo load method', JSON.stringify(rejected));
+    throw rejected;
   }
 };
 

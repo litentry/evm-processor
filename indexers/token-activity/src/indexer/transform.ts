@@ -37,6 +37,7 @@ export default function transform(
         }
 
         return {
+          _id: log._id,
           contract: log.address,
           blockNumber: log.blockNumber,
           blockTimestamp: log.blockTimestamp,

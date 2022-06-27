@@ -3,24 +3,29 @@ import { schemaComposer } from 'graphql-compose';
 import { composeMongoose } from 'graphql-compose-mongoose';
 import { Types, filter, repository } from 'indexer-utils';
 
+// @ts-ignore
 interface ERC20Document
   extends Types.Contract.ERC20Contract,
     mongoose.Document {}
+// @ts-ignore
 interface ERC721Document
   extends Types.Contract.ERC721Contract,
     mongoose.Document {}
+// @ts-ignore
 interface ERC1155Document
   extends Types.Contract.ERC1155Contract,
     mongoose.Document {}
+// @ts-ignore
 interface UniswapV2Document
   extends Types.Contract.UniswapV2Contract,
     mongoose.Document {}
+// @ts-ignore
 interface UniswapV3Document
   extends Types.Contract.UniswapV3Contract,
     mongoose.Document {}
 
 const sharedSchema = {
-  address: { type: String, required: true, index: true, unique: true },
+  _id: String,
   creator: { type: String, required: true, index: true },
   blockNumber: { type: Number, required: true, index: true },
   erc165: { type: Boolean, required: true, index: true },

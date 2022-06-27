@@ -27,7 +27,7 @@ export default async function extract(
         standard,
         uniqueContractAddresses,
       );
-      const ercContractAddresses = ercContracts.map((c) => c.address);
+      const ercContractAddresses = ercContracts.map((c) => c._id);
 
       const ercLogs = rawLogs
         .flat()
@@ -48,17 +48,17 @@ async function getContractsByErcStandard(
     case 20:
       return query.contracts.erc20Contracts({
         contractAddress: uniqueContractAddresses,
-        properties: ['address'],
+        properties: ['_id'],
       });
     case 721:
       return query.contracts.erc721Contracts({
         contractAddress: uniqueContractAddresses,
-        properties: ['address'],
+        properties: ['_id'],
       });
     case 1155:
       return query.contracts.erc1155Contracts({
         contractAddress: uniqueContractAddresses,
-        properties: ['address'],
+        properties: ['_id'],
       });
     default:
       throw Error('unknown standard');

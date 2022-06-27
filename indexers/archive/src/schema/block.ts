@@ -3,17 +3,18 @@ import { composeMongoose } from 'graphql-compose-mongoose';
 import { Types, filter } from 'indexer-utils';
 import getEnvVar from 'indexer-serverless/lib/util/get-env-var';
 
+// @ts-ignore
 interface BlockDocument extends Types.Archive.Block, mongoose.Document {}
 
 const schemaOptions: mongoose.SchemaOptions = {};
 if (getEnvVar('SHARDING_ENABLED', false)) {
-  schemaOptions.shardKey = { hash: 'hashed' };
+  schemaOptions.shardKey = { _id: 'hashed' };
 }
 
 const BlockSchema = new mongoose.Schema<BlockDocument>(
   {
-    number: { type: Number, required: true, index: true },
-    hash: { type: String, required: true, unique: true },
+    _id: Number,
+    hash: { type: String, required: true },
     parentHash: { type: String, required: true },
     nonce: String,
     sha3Uncles: { type: String, required: true },
