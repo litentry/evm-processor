@@ -32,12 +32,10 @@ const LogSchema = new mongoose.Schema<LogDocument>(
   },
 );
 
-// LogSchema.index({
-//   blockNumber: 1,
-//   transactionId: 1,
-//   address: 1,
-//   topic0: 1,
-// });
+LogSchema.index({ blockNumber: 1 });
+LogSchema.index({ transactionId: 1 });
+LogSchema.index({ address: 1 });
+LogSchema.index({ topic0: 1 });
 
 export const LogModel = mongoose.model('Log', LogSchema);
 

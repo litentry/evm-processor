@@ -21,7 +21,9 @@ export const ERC721TokenSchema = new mongoose.Schema<ERC721TokenDocument>({
   lastTransferedBlockTimestamp: { type: Number, required: true },
 });
 
-ERC721TokenSchema.index({ contract: 1, tokenId: 1, owner: 1 });
+ERC721TokenSchema.index({ contract: 1 });
+ERC721TokenSchema.index({ tokenId: 1 });
+ERC721TokenSchema.index({ owner: 1 });
 
 export const ERC1155TokenSchema = new mongoose.Schema<ERC1155TokenDocument>({
   _id: String,
@@ -31,7 +33,9 @@ export const ERC1155TokenSchema = new mongoose.Schema<ERC1155TokenDocument>({
   quantity: { type: Number, required: true },
 });
 
-ERC1155TokenSchema.index({ contract: 1, tokenId: 1, owner: 1 });
+ERC1155TokenSchema.index({ contract: 1 });
+ERC1155TokenSchema.index({ tokenId: 1 });
+ERC1155TokenSchema.index({ owner: 1 });
 
 export const ERC721TokenModel = mongoose.model(
   'ERC721Token',
