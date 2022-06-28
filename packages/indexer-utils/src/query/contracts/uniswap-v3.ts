@@ -3,7 +3,7 @@ import { UniswapV3Contract } from '../../types/contract';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof UniswapV3Contract)[] = [
-  'address',
+  '_id',
   'blockNumber',
   'timestamp',
   'creator',
@@ -41,7 +41,7 @@ export default async function uniswapV3Contracts({
 
   if (contractAddress?.length) {
     contractAddressesVar = '$contractAddress: [String!], ';
-    contractAddresses = `address: {
+    contractAddresses = `_id: {
       in: $contractAddress
     }`;
   }

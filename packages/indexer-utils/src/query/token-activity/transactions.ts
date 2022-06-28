@@ -3,8 +3,8 @@ import { DecodedContractTransaction } from '../../types/contract';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof DecodedContractTransaction)[] = [
+  '_id',
   'contract',
-  'hash',
   'signer',
   'signature',
   'blockNumber',
@@ -72,7 +72,7 @@ export default async function transactions({
                 ${blockQuery}
               }
               contract: $contract
-              hash: $hash
+              _id: $hash
               signature: $signature
             }
           ) {

@@ -15,12 +15,6 @@ export interface TransformedBlock {
 
 export type ExtractBlock = (blockNumber: number) => Promise<ExtractedBlock>;
 
-export type TransformBlock = (
-  extractedBlock: ExtractedBlock,
-) => TransformedBlock;
-
-export type LoadBlock = (transformedBlock: TransformedBlock) => Promise<void>;
-
 export type RawBlock = {
   miner: string;
   difficulty: string;

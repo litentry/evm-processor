@@ -1,3 +1,5 @@
+import { Types } from 'indexer-utils';
+
 export enum SwapMethod {
   swapTokensForExactETH = 'swapTokensForExactETH',
   swapExactETHForTokens = 'swapExactETHForTokens',
@@ -8,10 +10,10 @@ export enum SwapMethod {
 }
 
 export type Swap = {
-  transactionHash: string; // index
-  address: string; // index
-  contract: string; // index
-  pair: string; // index "tokenAddress:tokenAddress"
+  _id: string;
+  address: string;
+  contract: string;
+  pair: string; // "tokenAddress:tokenAddress"
 
   method: SwapMethod;
   token0: string;
@@ -23,4 +25,12 @@ export type Swap = {
   gas: string;
   blockNumber: number;
   timestamp: number;
+};
+
+export type ExtractedData = {
+  v2: {
+    method: SwapMethod;
+    txs: Types.Archive.ContractTransactionWithLogs[];
+  }[];
+  v3: Types.Archive.ContractTransactionWithLogs[];
 };

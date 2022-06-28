@@ -1,10 +1,12 @@
-import { Types } from 'indexer-utils';
+import { Types, utils } from 'indexer-utils';
 import { ERC721TokenModel, ERC1155TokenModel } from '../schema';
 
 export default async function load(data: {
   nfts: Types.Nft.ERC721Token[];
   sfts: Types.Nft.ERC1155Token[];
 }): Promise<void> {
+  await utils.ensureShardedCollections(ERC721TokenModel, ERC1155TokenModel);
+
   await Promise.all(
     data.nfts.map(async (doc) => {
       try {
@@ -17,8 +19,7 @@ export default async function load(data: {
         ) {
           await ERC721TokenModel.findOneAndUpdate(
             {
-              contract: doc.contract,
-              tokenId: doc.tokenId,
+              _id: doc._id,
               lastTransferedBlockNumber: {
                 $lt: doc.lastTransferedBlockNumber, // TODO add tx index here in case an NFT can move twice per block
               },
@@ -45,18 +46,11 @@ export default async function load(data: {
             'E11000 duplicate key error collection',
           )
         ) {
-          await ERC1155TokenModel.findOneAndUpdate(
-            {
-              contract: doc.contract,
-              tokenId: doc.tokenId,
-              owner: doc.owner,
+          await ERC1155TokenModel.findByIdAndUpdate(doc._id, {
+            $inc: {
+              quantity: doc.quantity,
             },
-            {
-              $inc: {
-                quantity: doc.quantity,
-              },
-            },
-          );
+          });
         } else {
           throw e;
         }

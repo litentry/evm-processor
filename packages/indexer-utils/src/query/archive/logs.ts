@@ -3,6 +3,8 @@ import { Log } from '../../types/archive';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof Log)[] = [
+  '_id',
+  'transactionId',
   'blockNumber',
   'blockTimestamp',
   'transactionHash',
@@ -21,14 +23,14 @@ export default async function logs({
   endBlock,
   contractAddress,
   eventId,
-  transactionHash,
+  transactionId,
   properties = defaultProperties,
 }: {
   startBlock: number;
   endBlock: number;
   contractAddress?: string;
   eventId?: string;
-  transactionHash?: string;
+  transactionId?: string;
   properties?: (keyof Log)[];
 }) {
   try {
@@ -41,7 +43,7 @@ export default async function logs({
           endBlock,
           contractAddress,
           eventId,
-          transactionHash,
+          transactionId,
         },
         query: `
         query Logs(
@@ -49,7 +51,7 @@ export default async function logs({
           $endBlock: Float!,
           $contractAddress: String,
           $eventId: String,
-          $transactionHash: String
+          $transactionId: String
         ) {
           logs(
             filter: {
@@ -61,7 +63,7 @@ export default async function logs({
               }
               address: $contractAddress,
               topic0: $eventId,
-              transactionHash: $transactionHash
+              transactionId: $transactionId
             }
           ) {
             ${properties.join(',')}

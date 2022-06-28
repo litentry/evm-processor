@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import { BigNumber } from 'ethers';
 import { Types } from 'indexer-utils';
-import { getIntermediatePath } from './utils';
-import { SwapMethod, Swap } from './types';
+import { getIntermediatePath } from '../utils';
+import { SwapMethod, Swap } from '../types';
 
 export const TRANSFER_METHOD_ID = '0xddf252ad';
 
@@ -37,7 +37,7 @@ export default function transformSwap(
   );
 
   return {
-    transactionHash: tx.hash,
+    _id: tx._id,
     contract: tx.to.toLowerCase(),
     address: tx.from.toLowerCase(),
     method,

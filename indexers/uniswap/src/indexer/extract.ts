@@ -4,10 +4,7 @@ import { SwapMethod } from './types';
 const V2_SIGS = utils.contract.CONTRACT_SIGNATURES.UNISWAPV2.EXTRINSICS;
 const V3_SIG = utils.contract.CONTRACT_SIGNATURES.UNISWAPV3.EXTRINSICS[0]; // multicall (the rest are internal) -> todo check contracts indexed to see if we get a match on this (as internal methods might not be in op-codes)
 
-export default async function extractTransactions(
-  startBlock: number,
-  endBlock: number,
-) {
+export default async function extract(startBlock: number, endBlock: number) {
   const [v2, v3] = await Promise.all([
     fetchV2Txs(startBlock, endBlock),
     fetchV3Txs(startBlock, endBlock),
@@ -27,7 +24,7 @@ async function fetchV2Txs(startBlock: number, endBlock: number) {
         endBlock,
         methodId: sig.ID,
         transactionProperties: [
-          'hash',
+          '_id',
           'from',
           'to',
           'input',
@@ -58,7 +55,7 @@ async function fetchV3Txs(startBlock: number, endBlock: number) {
     endBlock,
     methodId: V3_SIG.ID,
     transactionProperties: [
-      'hash',
+      '_id',
       'from',
       'to',
       'input',
@@ -84,10 +81,10 @@ async function filterByContractTypeAndStatus(
   const successfulTxs = txs.filter((tx) => tx.receiptStatus);
   const validContracts = await query.contracts[method]({
     contractAddress: successfulTxs.map((tx) => tx.to),
-    properties: ['address'],
+    properties: ['_id'],
   });
 
-  const validAddresses = validContracts.map((c) => c.address);
+  const validAddresses = validContracts.map((c) => c._id);
 
   return successfulTxs.filter((tx) => validAddresses.includes(tx.to));
 }

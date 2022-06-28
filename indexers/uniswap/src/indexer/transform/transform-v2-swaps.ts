@@ -1,7 +1,7 @@
 import { Types, utils } from 'indexer-utils';
 import { BigNumber, ethers } from 'ethers';
 import transformSwap from './transform-swap';
-import { Swap, SwapMethod } from './types';
+import { Swap, SwapMethod } from '../types';
 
 function getParams(method: SwapMethod) {
   const item = utils.contract.CONTRACT_SIGNATURES.UNISWAPV2.EXTRINSICS.find(

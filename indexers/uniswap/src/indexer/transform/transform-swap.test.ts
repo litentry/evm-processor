@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import transformSwap, { TRANSFER_METHOD_ID } from './transform-swap';
-import { SwapMethod } from './types';
+import { SwapMethod } from '../types';
 
 describe('transformSwap()', () => {
   it('Converts transaction data into a Swap model', async () => {
@@ -8,7 +8,7 @@ describe('transformSwap()', () => {
       transformSwap(
         SwapMethod.swapETHForExactTokens,
         {
-          hash: 'TX_HASH',
+          _id: 'TX_HASH',
           nonce: 1,
           blockHash: '0xblock1',
           blockNumber: 1,
@@ -26,6 +26,8 @@ describe('transformSwap()', () => {
           methodId: '0xSwapETHForExactTokensHash',
           logs: [
             {
+              _id: '1.4.0',
+              transactionId: '1.4',
               blockNumber: 1,
               blockTimestamp: 1517234642,
               transactionHash: 'TX_HASH',
@@ -35,6 +37,8 @@ describe('transformSwap()', () => {
               logIndex: 0,
             },
             {
+              _id: '1.4.1',
+              transactionId: '1.4',
               blockNumber: 1,
               blockTimestamp: 1517234642,
               transactionHash: 'TX_HASH',
@@ -44,6 +48,8 @@ describe('transformSwap()', () => {
               logIndex: 1,
             },
             {
+              _id: '1.4.2',
+              transactionId: '1.4',
               blockNumber: 1,
               blockTimestamp: 1517234642,
               transactionHash: 'TX_HASH',
@@ -60,7 +66,7 @@ describe('transformSwap()', () => {
         BigNumber.from(100),
       ),
     ).toStrictEqual({
-      transactionHash: 'TX_HASH',
+      _id: 'TX_HASH',
       contract: 'weth_contract',
       address: 'user',
       method: 'swapETHForExactTokens',

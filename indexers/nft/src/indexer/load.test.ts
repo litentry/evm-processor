@@ -3,6 +3,7 @@ import { ERC1155TokenModel, ERC721TokenModel } from '../schema';
 
 const nfts = [
   {
+    _id: '721-contract-address.721-token-id',
     contract: '721-contract-address',
     lastTransferedBlockNumber: 2,
     lastTransferedBlockTimestamp: 2,
@@ -10,6 +11,7 @@ const nfts = [
     tokenId: '721-token-id',
   },
   {
+    _id: '721-contract-address.721-token-id',
     contract: '721-contract-address',
     lastTransferedBlockNumber: 3,
     lastTransferedBlockTimestamp: 3,
@@ -17,6 +19,7 @@ const nfts = [
     tokenId: '721-token-id',
   },
   {
+    _id: '721-contract-address.721-token-id',
     contract: '721-contract-address',
     lastTransferedBlockNumber: 5,
     lastTransferedBlockTimestamp: 5,
@@ -24,6 +27,7 @@ const nfts = [
     tokenId: '721-token-id',
   },
   {
+    _id: '721-contract-address.721-token-id',
     contract: '721-contract-address',
     lastTransferedBlockNumber: 4,
     lastTransferedBlockTimestamp: 4,
@@ -31,6 +35,7 @@ const nfts = [
     tokenId: '721-token-id',
   },
   {
+    _id: '721-contract-address.721-token-id',
     contract: '721-contract-address',
     lastTransferedBlockNumber: 1,
     lastTransferedBlockTimestamp: 1,
@@ -38,6 +43,7 @@ const nfts = [
     tokenId: '721-token-id',
   },
   {
+    _id: '721-contract-address.721-token-id',
     contract: '721-contract-address',
     lastTransferedBlockNumber: 6,
     lastTransferedBlockTimestamp: 6,
@@ -45,6 +51,7 @@ const nfts = [
     tokenId: '721-token-id',
   },
   {
+    _id: '721-contract-address.721-token-id',
     contract: '721-contract-address',
     lastTransferedBlockNumber: 10,
     lastTransferedBlockTimestamp: 10,
@@ -52,6 +59,7 @@ const nfts = [
     tokenId: '721-token-id',
   },
   {
+    _id: '721-contract-address.721-token-id',
     contract: '721-contract-address',
     lastTransferedBlockNumber: 9,
     lastTransferedBlockTimestamp: 9,
@@ -59,6 +67,7 @@ const nfts = [
     tokenId: '721-token-id',
   },
   {
+    _id: '721-contract-address.721-token-id',
     contract: '721-contract-address',
     lastTransferedBlockNumber: 8,
     lastTransferedBlockTimestamp: 8,
@@ -66,6 +75,7 @@ const nfts = [
     tokenId: '721-token-id',
   },
   {
+    _id: '721-contract-address.721-token-id',
     contract: '721-contract-address',
     lastTransferedBlockNumber: 7,
     lastTransferedBlockTimestamp: 7,
@@ -73,6 +83,7 @@ const nfts = [
     tokenId: '721-token-id',
   },
   {
+    _id: '721-contract-address.721-token-id-2',
     contract: '721-contract-address',
     lastTransferedBlockNumber: 7,
     lastTransferedBlockTimestamp: 7,
@@ -83,6 +94,7 @@ const nfts = [
 
 const sfts = [
   {
+    _id: '1155-contract-address.1155-token-id.0x00',
     contract: '1155-contract-address',
     lastTransferedBlockNumber: 1,
     lastTransferedBlockTimestamp: 1,
@@ -91,6 +103,7 @@ const sfts = [
     quantity: -2,
   },
   {
+    _id: '1155-contract-address.1155-token-id.a',
     contract: '1155-contract-address',
     lastTransferedBlockNumber: 1,
     lastTransferedBlockTimestamp: 1,
@@ -99,6 +112,7 @@ const sfts = [
     quantity: 2,
   },
   {
+    _id: '1155-contract-address.1155-token-id.a',
     contract: '1155-contract-address',
     lastTransferedBlockNumber: 2,
     lastTransferedBlockTimestamp: 2,
@@ -107,6 +121,7 @@ const sfts = [
     quantity: -2,
   },
   {
+    _id: '1155-contract-address.1155-token-id.b',
     contract: '1155-contract-address',
     lastTransferedBlockNumber: 2,
     lastTransferedBlockTimestamp: 2,
@@ -129,6 +144,7 @@ describe('load', () => {
 
     expect(
       results.map((doc) => ({
+        _id: doc._id,
         contract: doc.contract,
         lastTransferedBlockNumber: doc.lastTransferedBlockNumber,
         lastTransferedBlockTimestamp: doc.lastTransferedBlockTimestamp,
@@ -137,6 +153,7 @@ describe('load', () => {
       })),
     ).toStrictEqual([
       {
+        _id: '721-contract-address.721-token-id',
         contract: '721-contract-address',
         lastTransferedBlockNumber: 10,
         lastTransferedBlockTimestamp: 10,
@@ -144,6 +161,7 @@ describe('load', () => {
         tokenId: '721-token-id',
       },
       {
+        _id: '721-contract-address.721-token-id-2',
         contract: '721-contract-address',
         lastTransferedBlockNumber: 7,
         lastTransferedBlockTimestamp: 7,
@@ -166,6 +184,7 @@ describe('load', () => {
     expect(
       results
         .map((doc) => ({
+          _id: doc._id,
           contract: doc.contract,
           quantity: doc.quantity,
           owner: doc.owner,
@@ -174,18 +193,21 @@ describe('load', () => {
         .sort((a, b) => a.quantity - b.quantity),
     ).toStrictEqual([
       {
+        _id: '1155-contract-address.1155-token-id.0x00',
         contract: '1155-contract-address',
         owner: '0x00',
         tokenId: '1155-token-id',
         quantity: -2,
       },
       {
+        _id: '1155-contract-address.1155-token-id.a',
         contract: '1155-contract-address',
         owner: 'a',
         tokenId: '1155-token-id',
         quantity: 0,
       },
       {
+        _id: '1155-contract-address.1155-token-id.b',
         contract: '1155-contract-address',
         owner: 'b',
         tokenId: '1155-token-id',

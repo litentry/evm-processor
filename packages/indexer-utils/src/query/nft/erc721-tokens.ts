@@ -3,6 +3,7 @@ import { ERC721Token } from '../../types/nft';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof ERC721Token)[] = [
+  '_id',
   'contract',
   'tokenId',
   'owner',

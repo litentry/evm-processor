@@ -3,7 +3,7 @@ import { ContractCreationTransaction } from '../../types/archive';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof ContractCreationTransaction)[] = [
-  'hash',
+  '_id',
   'nonce',
   'blockHash',
   'blockNumber',

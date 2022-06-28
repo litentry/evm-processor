@@ -21,6 +21,7 @@ function map721(
   events: Types.Contract.DecodedContractEvent[],
 ): Types.Nft.ERC721Token[] {
   return events.map((event) => ({
+    _id: `${event.contract}.${event.value3}`,
     contract: event.contract,
     lastTransferedBlockNumber: event.blockNumber,
     lastTransferedBlockTimestamp: event.blockTimestamp,
@@ -34,12 +35,14 @@ function map1155Single(
 ): Types.Nft.ERC1155Token[] {
   return events.flatMap((event) => [
     {
+      _id: `${event.contract}.${event.value4}.${event.value2}`,
       contract: event.contract,
       tokenId: event.value4!,
       owner: event.value2!,
       quantity: -parseInt(event.value5!),
     },
     {
+      _id: `${event.contract}.${event.value4}.${event.value3}`,
       contract: event.contract,
       tokenId: event.value4!,
       owner: event.value3!,
@@ -54,12 +57,14 @@ function map1155Batch(
   return events.flatMap((event) =>
     event.value4!.split(',').flatMap((tokenId, index) => [
       {
+        _id: `${event.contract}.${tokenId}.${event.value2}`,
         contract: event.contract,
         tokenId,
         owner: event.value2!,
         quantity: -parseInt(event.value5!.split(',')[index]),
       },
       {
+        _id: `${event.contract}.${tokenId}.${event.value3}`,
         contract: event.contract,
         tokenId,
         owner: event.value3!,

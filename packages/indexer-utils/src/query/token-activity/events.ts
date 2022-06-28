@@ -3,6 +3,7 @@ import { DecodedContractEvent } from '../../types/contract';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof DecodedContractEvent)[] = [
+  '_id',
   'contract',
   'transactionHash',
   'signature',

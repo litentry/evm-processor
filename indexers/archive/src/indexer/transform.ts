@@ -1,13 +1,15 @@
 import { BigNumber } from 'ethers';
 import { Types } from 'indexer-utils';
-import { RawReceipt, RawTransaction, TransformBlock } from './types';
+import {
+  ExtractedBlock,
+  RawReceipt,
+  RawTransaction,
+  TransformedBlock,
+} from './types';
 
-const transformBlock: TransformBlock = ({
-  blockWithTransactions,
-  receipts,
-}) => {
+function transformBlock({ blockWithTransactions, receipts }: ExtractedBlock) {
   const block: Types.Archive.Block = {
-    number: BigNumber.from(blockWithTransactions.number).toNumber(),
+    _id: BigNumber.from(blockWithTransactions.number).toNumber(),
     hash: blockWithTransactions.hash,
     parentHash: blockWithTransactions.parentHash,
     nonce: blockWithTransactions.nonce,
@@ -57,7 +59,7 @@ const transformBlock: TransformBlock = ({
 
     const txBase = mapTransactionBase(
       block.hash,
-      block.number,
+      block._id,
       block.timestamp,
       tx,
       receipt,
@@ -94,21 +96,26 @@ const transformBlock: TransformBlock = ({
       }
     }
 
-    receipt.logs.forEach(({ address, topics, data, logIndex }) => {
-      logs.push({
-        transactionHash: tx.hash,
-        address: address?.toLowerCase(),
-        topic0: topics[0],
-        topic1: topics[1],
-        topic2: topics[2],
-        topic3: topics[3],
-        topic4: topics[4],
-        data,
-        logIndex: BigNumber.from(logIndex).toNumber(),
-        blockNumber: block.number,
-        blockTimestamp: block.timestamp,
-      });
-    });
+    receipt.logs.forEach(
+      ({ address, topics, data, logIndex: logIndexHash }) => {
+        const logIndex = BigNumber.from(logIndexHash).toNumber();
+        logs.push({
+          _id: `${tx.blockNumber}.${tx.transactionIndex}.${logIndex}`,
+          transactionId: `${tx.blockNumber}.${tx.transactionIndex}`,
+          transactionHash: tx.hash,
+          address: address?.toLowerCase(),
+          topic0: topics[0],
+          topic1: topics[1],
+          topic2: topics[2],
+          topic3: topics[3],
+          topic4: topics[4],
+          data,
+          logIndex,
+          blockNumber: block._id,
+          blockTimestamp: block.timestamp,
+        });
+      },
+    );
   });
 
   return {
@@ -118,9 +125,7 @@ const transformBlock: TransformBlock = ({
     contractTransactions,
     logs,
   };
-};
-
-export default transformBlock;
+}
 
 const mapTransactionBase = (
   blockHash: string,
@@ -129,7 +134,7 @@ const mapTransactionBase = (
   tx: RawTransaction,
   receipt: RawReceipt,
 ): Types.Archive.TransactionBase => ({
-  hash: tx.hash,
+  _id: tx.hash,
   nonce: BigNumber.from(tx.nonce).toNumber(),
   blockHash,
   blockNumber,
@@ -139,9 +144,17 @@ const mapTransactionBase = (
   value: BigNumber.from(tx.value).toString(),
   gasPrice: BigNumber.from(tx.gasPrice).toString(),
   gas: BigNumber.from(tx.gas).toString(),
-  receiptStatus: !!BigNumber.from(receipt.status).toNumber(),
+  receiptStatus: receipt.status
+    ? !!BigNumber.from(receipt.status).toNumber()
+    : undefined,
   receiptGasUsed: BigNumber.from(receipt.gasUsed).toString(),
   receiptCumulativeGasUsed: BigNumber.from(
     receipt.cumulativeGasUsed,
   ).toString(),
 });
+
+export default function transform(
+  blocks: ExtractedBlock[],
+): TransformedBlock[] {
+  return blocks.map(transformBlock);
+}
