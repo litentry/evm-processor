@@ -51,15 +51,18 @@ const clusterConfigs: { [k: string]: { [k: string]: Partial<ClusterConfig> } } =
           cpu: 4,
           memory: 30,
         },
-
-        routerInstances: 3,
-        shardInstances: 5,
+        routerInstances: 1,
+        shardInstances: 3,
         configServerInstances: 1,
-
         totalStorage: 1500,
       },
     },
     bsc: {
+      indexerDefaults: {
+        routerInstances: 3,
+        shardInstances: 5,
+        configServerInstances: 1,
+      },
       archive: {
         shard: {
           cpu: 6,
