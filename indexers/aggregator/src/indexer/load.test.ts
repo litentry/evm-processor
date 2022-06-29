@@ -1,196 +1,98 @@
+import {
+  ERC1155DailyMarketActivityModel,
+  ERC1155MonthlyMarketActivityModel,
+  ERC1155YearlyMarketActivityModel,
+} from '../schema';
 import load from './load';
-import { ERC1155TokenModel, ERC721TokenModel } from '../schema';
+import { MarketActivity } from './types';
 
-const nfts = [
-  {
-    contract: '721-contract-address',
-    lastTransferedBlockNumber: 2,
-    lastTransferedBlockTimestamp: 2,
-    owner: 'a',
-    tokenId: '721-token-id',
-  },
-  {
-    contract: '721-contract-address',
-    lastTransferedBlockNumber: 3,
-    lastTransferedBlockTimestamp: 3,
-    owner: 'b',
-    tokenId: '721-token-id',
-  },
-  {
-    contract: '721-contract-address',
-    lastTransferedBlockNumber: 5,
-    lastTransferedBlockTimestamp: 5,
-    owner: 'c',
-    tokenId: '721-token-id',
-  },
-  {
-    contract: '721-contract-address',
-    lastTransferedBlockNumber: 4,
-    lastTransferedBlockTimestamp: 4,
-    owner: 'd',
-    tokenId: '721-token-id',
-  },
-  {
-    contract: '721-contract-address',
-    lastTransferedBlockNumber: 1,
-    lastTransferedBlockTimestamp: 1,
-    owner: 'e',
-    tokenId: '721-token-id',
-  },
-  {
-    contract: '721-contract-address',
-    lastTransferedBlockNumber: 6,
-    lastTransferedBlockTimestamp: 6,
-    owner: 'f',
-    tokenId: '721-token-id',
-  },
-  {
-    contract: '721-contract-address',
-    lastTransferedBlockNumber: 10,
-    lastTransferedBlockTimestamp: 10,
-    owner: 'g',
-    tokenId: '721-token-id',
-  },
-  {
-    contract: '721-contract-address',
-    lastTransferedBlockNumber: 9,
-    lastTransferedBlockTimestamp: 9,
-    owner: 'h',
-    tokenId: '721-token-id',
-  },
-  {
-    contract: '721-contract-address',
-    lastTransferedBlockNumber: 8,
-    lastTransferedBlockTimestamp: 8,
-    owner: 'i',
-    tokenId: '721-token-id',
-  },
-  {
-    contract: '721-contract-address',
-    lastTransferedBlockNumber: 7,
-    lastTransferedBlockTimestamp: 7,
-    owner: 'j',
-    tokenId: '721-token-id',
-  },
-  {
-    contract: '721-contract-address',
-    lastTransferedBlockNumber: 7,
-    lastTransferedBlockTimestamp: 7,
-    owner: 'k',
-    tokenId: '721-token-id-2',
-  },
-];
-
-const sfts = [
-  {
-    contract: '1155-contract-address',
-    lastTransferedBlockNumber: 1,
-    lastTransferedBlockTimestamp: 1,
-    owner: '0x00',
-    tokenId: '1155-token-id',
-    quantity: -2,
-  },
-  {
-    contract: '1155-contract-address',
-    lastTransferedBlockNumber: 1,
-    lastTransferedBlockTimestamp: 1,
-    owner: 'a',
-    tokenId: '1155-token-id',
-    quantity: 2,
-  },
-  {
-    contract: '1155-contract-address',
-    lastTransferedBlockNumber: 2,
-    lastTransferedBlockTimestamp: 2,
-    owner: 'a',
-    tokenId: '1155-token-id',
-    quantity: -2,
-  },
-  {
-    contract: '1155-contract-address',
-    lastTransferedBlockNumber: 2,
-    lastTransferedBlockTimestamp: 2,
-    owner: 'b',
-    tokenId: '1155-token-id',
-    quantity: 2,
-  },
-];
+const transformed = {
+  yearly: [
+    { year: 2021, totalTransactions: 1, totalAmount: 200 },
+    { year: 2022, totalTransactions: 3, totalAmount: 800 },
+  ],
+  monthly: [
+    { year: 2021, month: 6, totalTransactions: 1, totalAmount: 200 },
+    { year: 2022, month: 6, totalTransactions: 3, totalAmount: 800 },
+  ],
+  daily: [
+    {
+      year: 2021,
+      month: 6,
+      day: 1,
+      totalTransactions: 1,
+      totalAmount: 200,
+    },
+    {
+      year: 2022,
+      month: 6,
+      day: 1,
+      totalTransactions: 1,
+      totalAmount: 300,
+    },
+    {
+      year: 2022,
+      month: 6,
+      day: 28,
+      totalTransactions: 1,
+      totalAmount: 400,
+    },
+    {
+      year: 2022,
+      month: 6,
+      day: 29,
+      totalTransactions: 1,
+      totalAmount: 100,
+    },
+  ],
+};
 
 describe('load', () => {
-  it('Ensures we only get the latest ERC721 owner', async () => {
-    await ERC721TokenModel.createIndexes();
+  it('Ensures we load the models into the DB', async () => {
+    await ERC1155DailyMarketActivityModel.createIndexes();
+    await ERC1155MonthlyMarketActivityModel.createIndexes();
+    await ERC1155YearlyMarketActivityModel.createIndexes();
 
-    await load({
-      sfts: [],
-      nfts,
-    });
+    await load(transformed);
 
-    const results = await ERC721TokenModel.find({});
-
+    const resultsYearly = await ERC1155YearlyMarketActivityModel.find({});
     expect(
-      results.map((doc) => ({
-        contract: doc.contract,
-        lastTransferedBlockNumber: doc.lastTransferedBlockNumber,
-        lastTransferedBlockTimestamp: doc.lastTransferedBlockTimestamp,
-        owner: doc.owner,
-        tokenId: doc.tokenId,
+      sort(resultsYearly).map((doc) => ({
+        year: doc.year,
+        totalTransactions: doc.totalTransactions,
+        totalAmount: doc.totalAmount,
       })),
-    ).toStrictEqual([
-      {
-        contract: '721-contract-address',
-        lastTransferedBlockNumber: 10,
-        lastTransferedBlockTimestamp: 10,
-        owner: 'g', // only the latest owner for this token
-        tokenId: '721-token-id',
-      },
-      {
-        contract: '721-contract-address',
-        lastTransferedBlockNumber: 7,
-        lastTransferedBlockTimestamp: 7,
-        owner: 'k', // only owner or this token
-        tokenId: '721-token-id-2',
-      },
-    ]);
-  });
+    ).toStrictEqual(transformed.yearly);
 
-  it('Ensures ERC1155 quantities per owner and adjusted correctly', async () => {
-    await ERC1155TokenModel.createIndexes();
-
-    await load({
-      sfts,
-      nfts: [],
-    });
-
-    const results = await ERC1155TokenModel.find({});
-
+    const resultsMonthly = await ERC1155MonthlyMarketActivityModel.find({});
     expect(
-      results
-        .map((doc) => ({
-          contract: doc.contract,
-          quantity: doc.quantity,
-          owner: doc.owner,
-          tokenId: doc.tokenId,
-        }))
-        .sort((a, b) => a.quantity - b.quantity),
-    ).toStrictEqual([
-      {
-        contract: '1155-contract-address',
-        owner: '0x00',
-        tokenId: '1155-token-id',
-        quantity: -2,
-      },
-      {
-        contract: '1155-contract-address',
-        owner: 'a',
-        tokenId: '1155-token-id',
-        quantity: 0,
-      },
-      {
-        contract: '1155-contract-address',
-        owner: 'b',
-        tokenId: '1155-token-id',
-        quantity: 2,
-      },
-    ]);
+      sort(resultsMonthly).map((doc) => ({
+        year: doc.year,
+        month: doc.month,
+        totalTransactions: doc.totalTransactions,
+        totalAmount: doc.totalAmount,
+      })),
+    ).toStrictEqual(transformed.monthly);
+
+    const resultsDaily = await ERC1155DailyMarketActivityModel.find({});
+    expect(
+      sort(resultsDaily).map((doc) => ({
+        year: doc.year,
+        month: doc.month,
+        day: doc.day,
+        totalTransactions: doc.totalTransactions,
+        totalAmount: doc.totalAmount,
+      })),
+    ).toStrictEqual(transformed.daily);
   });
 });
+
+function sort(arr: MarketActivity[]) {
+  return arr.sort((a, b) => {
+    return (
+      a.year - b.year ||
+      (a.month && b.month ? a.month - b.month : 0) ||
+      (a.day && b.day ? a.day - b.day : 0)
+    );
+  });
+}

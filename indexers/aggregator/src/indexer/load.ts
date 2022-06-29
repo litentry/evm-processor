@@ -17,7 +17,7 @@ export default async function load(data: {
     ERC1155YearlyMarketActivityModel,
   );
 
-  await Promise.all([
+  await Promise.all(
     data.yearly.map(async (doc) => {
       try {
         await ERC1155YearlyMarketActivityModel.create(doc);
@@ -43,6 +43,8 @@ export default async function load(data: {
         }
       }
     }),
+  );
+  await Promise.all(
     data.monthly.map(async (doc) => {
       try {
         await ERC1155MonthlyMarketActivityModel.create(doc);
@@ -69,6 +71,8 @@ export default async function load(data: {
         }
       }
     }),
+  );
+  await Promise.all(
     data.daily.map(async (doc) => {
       try {
         await ERC1155DailyMarketActivityModel.create(doc);
@@ -96,5 +100,5 @@ export default async function load(data: {
         }
       }
     }),
-  ]);
+  );
 }
