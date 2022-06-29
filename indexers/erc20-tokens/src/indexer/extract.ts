@@ -35,9 +35,9 @@ export default async function extract(
   const erc20ContractAddresses = erc20Contracts.map((c) => c._id);
 
   // filter logs with no matching contract
-  const transferLogs = filteredLogs
-    .flat()
-    .filter((log) => erc20ContractAddresses.includes(log.address));
+  const transferLogs = filteredLogs.filter((log) =>
+    erc20ContractAddresses.includes(log.address),
+  );
 
   return {
     transferLogs,
