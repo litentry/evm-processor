@@ -6,15 +6,7 @@ export default function transform({
   transferLogs,
   erc20Contracts,
 }: ExtractedData): ERC20Transfer[] {
-  const filteredLogs = transferLogs.filter((log) => {
-    /*
-    ERC721 contracts can also be matched ERC20 contracts, they have matching signatures,
-    but for ERC721 the last param (token) is indexed, whereas it is the unindexed amount
-    for ERC20. When indexed it appears as topic3, when unindexed it appears as data.
-    */
-    return !log.topic3;
-  });
-  const transfers = filteredLogs.map((log) => {
+  const transfers = transferLogs.map((log) => {
     const { to, from, amount } = decodeTransfer(log.data, [
       log.topic0,
       log.topic1!,

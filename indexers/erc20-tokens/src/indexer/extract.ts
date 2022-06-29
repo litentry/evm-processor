@@ -15,10 +15,18 @@ export default async function extract(
     endBlock,
     eventId: `0x${signature.ID}`,
   });
+  const filteredLogs = logs.filter((log) => {
+    /*
+    ERC721 contracts can also be matched ERC20 contracts, they have matching signatures,
+    but for ERC721 the last param (token) is indexed, whereas it is the unindexed amount
+    for ERC20. When indexed it appears as topic3, when unindexed it appears as data.
+    */
+    return !log.topic3;
+  });
 
   // get matching erc20 contracts
   const uniqueContractAddresses = [
-    ...new Set(logs.flat().map((log) => log.address)),
+    ...new Set(filteredLogs.flat().map((log) => log.address)),
   ];
   const erc20Contracts = await query.contracts.erc20Contracts({
     contractAddress: uniqueContractAddresses,
@@ -27,7 +35,7 @@ export default async function extract(
   const erc20ContractAddresses = erc20Contracts.map((c) => c._id);
 
   // filter logs with no matching contract
-  const transferLogs = logs
+  const transferLogs = filteredLogs
     .flat()
     .filter((log) => erc20ContractAddresses.includes(log.address));
 
