@@ -8,6 +8,7 @@ export interface ERC20Transfer extends ERC20Balance {
   blockNumber: number;
   blockTimestamp: number;
   transactionHash: string;
+  transactionId: string;
 }
 
 export type ERC20Balance = {

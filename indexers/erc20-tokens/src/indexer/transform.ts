@@ -40,6 +40,7 @@ export default function transform({
       blockNumber: log.blockNumber,
       blockTimestamp: log.blockTimestamp,
       transactionHash: log.transactionHash,
+      transactionId: log.transactionId,
     };
 
     return transfer;

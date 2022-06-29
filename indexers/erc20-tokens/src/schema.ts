@@ -17,6 +17,7 @@ export const ERC20TransferSchema = new mongoose.Schema<ERC20TransferDocument>({
   blockNumber: { type: Number, required: true },
   blockTimestamp: { type: Number, required: true },
   transactionHash: { type: String, required: true },
+  transactionId: { type: String, required: true },
 });
 
 ERC20TransferSchema.index({ contract: 1 });
