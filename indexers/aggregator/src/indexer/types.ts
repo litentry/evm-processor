@@ -1,14 +1,8 @@
-export type BaseAggregator = {
-  lastAggregatedBlockNumber: number;
-  lastAggregatedAt: Date;
-};
-
-export type ERC721MarketActivity = {};
-
-export type ERC1155MarketActivity = {};
-
 export type MarketActivity = {
+  year: number;
+  month?: number;
+  day?: number;
   totalTransactions: number;
-  totalPrice: number;
+  totalAmount: number;
   // totalGas: number;
 };

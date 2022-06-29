@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {
-  ContractTransactionWithLogs,
   ContractTransaction,
+  ContractTransactionWithLogs,
   Log,
 } from '../../types/archive';
 import endpoint from './endpoint';
