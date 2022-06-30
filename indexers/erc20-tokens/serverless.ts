@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { serverless, Chain } from 'indexer-serverless';
 
 module.exports = serverless({
-  serviceName: 'token-activity',
+  serviceName: 'erc20-tokens',
   chain: <Chain>process.env.CHAIN!,
   version: process.env.DEPLOY_VERSION!,
   rpcEndpoint: process.env.RPC_ENDPOINT,
