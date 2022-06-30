@@ -11,7 +11,10 @@ export default async function worker(
   try {
     monitoring.markStart(metrics.lambdaWorkerSuccess);
 
-    await mongoose.connect(process.env.MONGO_URI!);
+    await mongoose.connect(process.env.MONGO_URI!, {
+      minPoolSize: 0,
+      maxPoolSize: 10,
+    });
 
     const failedMessages: SQSBatchItemFailure[] = await awsUtils.lambdaHandler(
       event,

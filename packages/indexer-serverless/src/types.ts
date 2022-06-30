@@ -14,6 +14,7 @@ export type Params = {
   maxWorkers: number;
   chain: Chain;
   version: string;
+  indexer: string;
 };
 
 export type ProducerConfig = {

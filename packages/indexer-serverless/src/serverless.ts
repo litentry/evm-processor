@@ -60,6 +60,7 @@ const getConfig = async (config: Config) => {
     maxWorkers: config.maxWorkers,
     chain: config.chain,
     version: config.version,
+    indexer: config.serviceName,
   };
 
   const context = getContext();
@@ -141,7 +142,7 @@ const getConfig = async (config: Config) => {
             FifoQueue: true,
           },
         },
-        ...containerResources(context.options.stage, params).Resources,
+        ...(await containerResources(context.options.stage, params)).Resources,
       },
     },
     functions: {
