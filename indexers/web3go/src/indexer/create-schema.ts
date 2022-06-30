@@ -146,53 +146,6 @@ export async function createSchema(client: Client) {
       erc1155MetadataURI boolean
     )`,
   );
-
-  for (const ercType of [20, 721, 1155]) {
-    await client.query(
-      `CREATE TABLE IF NOT EXISTS evm_token_activity_event_erc${ercType} (
-        id SERIAL PRIMARY KEY,    
-        contract varchar(100),
-        transactionHash varchar(100),
-        signature varchar(100),
-        signatureHash varchar(100),
-        blockNumber bigint,
-        blockTimestamp timestamp(6),
-        value1 varchar(100),
-        value2 varchar(100),
-        value3 varchar(100),
-        value4 varchar(100),
-        type1 varchar(100),
-        type2 varchar(100),
-        type3 varchar(100),
-        type4 varchar(100)
-      )`,
-    );
-
-    await client.query(
-      `CREATE TABLE IF NOT EXISTS evm_token_activity_transaction_erc${ercType} (
-        id SERIAL PRIMARY KEY,    
-        hash varchar(100),
-        contract varchar(100),
-        signer varchar(100),
-        signature varchar(100),
-        signatureHash varchar(100),
-        blockNumber bigint,
-        blockTimestamp timestamp(6),
-        value1 varchar(100),
-        value2 varchar(100),
-        value3 varchar(100),
-        value4 varchar(100),
-        value5 varchar(100),
-        value6 varchar(100),
-        type1 varchar(100),
-        type2 varchar(100),
-        type3 varchar(100),
-        type4 varchar(100),
-        type5 varchar(100),
-        type6 varchar(100)
-      )`,
-    );
-  }
 }
 
 export default createSchema;
