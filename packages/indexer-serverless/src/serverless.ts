@@ -9,7 +9,7 @@ import { getContext } from './util/context';
 import getInfraStack from './util/get-infra-stack';
 
 const vpcOptions = async (stage: string, clusterStackName: string) => {
-  if (stage === 'production') {
+  if (stage !== 'local') {
     const infraStack = await getInfraStack(clusterStackName);
     const securityGroupIds = infraStack
       .Outputs!.filter((output) =>
@@ -60,6 +60,7 @@ const getConfig = async (config: Config) => {
     maxWorkers: config.maxWorkers,
     chain: config.chain,
     version: config.version,
+    indexer: config.serviceName,
   };
 
   const context = getContext();
@@ -141,7 +142,7 @@ const getConfig = async (config: Config) => {
             FifoQueue: true,
           },
         },
-        ...containerResources(context.options.stage, params).Resources,
+        ...(await containerResources(context.options.stage, params)).Resources,
       },
     },
     functions: {

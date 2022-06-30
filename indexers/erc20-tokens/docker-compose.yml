@@ -6,9 +6,9 @@ volumes:
 services:
   mongodb:
     image: mongo:latest
-    container_name: mongo-token-activity
+    container_name: mongo-erc20-tokens
     volumes:
-      - ../../../mongodb/token-activity/:/data/db/
+      - ../../../mongodb/erc20-tokens/:/data/db/
     ports:
       - '27017:27017'
 

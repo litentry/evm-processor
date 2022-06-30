@@ -15,7 +15,7 @@ export type ContractSignatureItem = {
 };
 
 export interface ERC20Contract {
-  address: string;
+  _id: string;
   creator: string;
   blockNumber: number;
   timestamp: number;
@@ -28,7 +28,7 @@ export interface ERC20Contract {
 }
 
 export interface ERC721Contract {
-  address: string;
+  _id: string;
   creator: string;
   blockNumber: number;
   timestamp: number;
@@ -42,7 +42,7 @@ export interface ERC721Contract {
 }
 
 export interface ERC1155Contract {
-  address: string;
+  _id: string;
   creator: string;
   blockNumber: number;
   timestamp: number;
@@ -55,7 +55,7 @@ export interface ERC1155Contract {
 }
 
 export interface UniswapV2Contract {
-  address: string;
+  _id: string;
   creator: string;
   blockNumber: number;
   timestamp: number;
@@ -63,7 +63,7 @@ export interface UniswapV2Contract {
 }
 
 export interface UniswapV3Contract {
-  address: string;
+  _id: string;
   creator: string;
   blockNumber: number;
   timestamp: number;
@@ -71,7 +71,7 @@ export interface UniswapV3Contract {
 }
 
 export interface DecodedContractTransaction {
-  hash: string;
+  _id: string;
   contract: string;
   signer: string;
   signature: string;
@@ -93,6 +93,7 @@ export interface DecodedContractTransaction {
 }
 
 export interface DecodedContractEvent {
+  _id: string;
   contract: string;
   transactionHash: string;
   signature: string;

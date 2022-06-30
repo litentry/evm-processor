@@ -1,90 +1,210 @@
-import type { Chain, Params } from '../types';
+import type { Params } from '../types';
 import getEnvVar from '../util/get-env-var';
+import getSpecifiedOutputs from '../util/get-specified-outputs';
 
 const ecsMultiplier = 1024; // 1 vCPU or 1 GiB memory
 
+interface ECSCapacityGroup {
+  groupName: string;
+  instanceType: string;
+  cpu: number;
+  memory: number;
+  min: number;
+  max: number;
+  weight: number;
+}
+
+interface BaseConfig {
+  cpu: number;
+  memory: number;
+}
+
 interface ClusterConfig {
-  routerCpu: number;
-  routerMemory: number;
-  configServerCpu: number;
-  configServerMemory: number;
-  shardCpu: number;
-  shardMemory: number;
+  router: BaseConfig;
+  configServer: BaseConfig;
+  shard: BaseConfig;
+
   routerInstances: number;
   shardInstances: number;
   configServerInstances: number;
+
+  totalStorage: number;
 }
 
-const clusterConfigs: { [k: string]: ClusterConfig } = {
-  bsc: {
-    routerCpu: 1,
-    routerMemory: 4,
-    configServerCpu: 0.5,
-    configServerMemory: 1,
-    shardCpu: 6,
-    shardMemory: 60,
+interface StandaloneConfig extends BaseConfig {
+  totalStorage: number;
+}
 
-    routerInstances: 3,
-    shardInstances: 5,
-    configServerInstances: 1,
+const clusterConfigs: { [k: string]: { [k: string]: Partial<ClusterConfig> } } =
+  {
+    chainDefaults: {
+      indexerDefaults: {
+        router: {
+          cpu: 1,
+          memory: 4,
+        },
+        configServer: {
+          cpu: 0.5,
+          memory: 1,
+        },
+        shard: {
+          cpu: 4,
+          memory: 15,
+        },
+        routerInstances: 1,
+        shardInstances: 3,
+        configServerInstances: 1,
+        totalStorage: 1500,
+      },
+    },
+    bsc: {
+      indexerDefaults: {
+        routerInstances: 3,
+        shardInstances: 6,
+        configServerInstances: 1,
+      },
+      archive: {
+        shard: {
+          cpu: 8,
+          memory: 15,
+        },
+        totalStorage: 4000,
+      },
+    },
+  };
+
+const standaloneConfigs: {
+  [k: string]: { [k: string]: Partial<StandaloneConfig> };
+} = {
+  chainDefaults: {
+    indexerDefaults: {
+      cpu: 1,
+      memory: 8,
+      totalStorage: 100,
+    },
+  },
+  ethereum: {
+    indexerDefaults: {
+      cpu: 6,
+      memory: 32,
+      totalStorage: 1500,
+    },
+    archive: {
+      cpu: 6,
+      memory: 32,
+      totalStorage: 1500,
+    },
+    contracts: {
+      cpu: 1,
+      memory: 4,
+      totalStorage: 100,
+    },
+    'token-activity': {
+      cpu: 6,
+      memory: 32,
+      totalStorage: 1500,
+    },
   },
 };
 
-/**
- * Returns the number of vCPUs required for a chain
- * @param chain
- */
-function getCpuUnits(chain: Chain): number {
-  switch (chain) {
-    case 'ethereum':
-      return 4;
-    default:
-      return 2;
-  }
+function getClusterConfig(chain: string, indexer: string) {
+  return {
+    ...clusterConfigs.chainDefaults.indexerDefaults,
+    ...clusterConfigs[chain].indexerDefaults,
+    ...clusterConfigs[chain][indexer],
+  };
 }
 
-/**
- * Returns the number of GiB of memory required for a chain
- * @param chain
- */
-function getMemoryUnits(chain: Chain): number {
-  switch (chain) {
-    case 'ethereum':
-      return 12;
-    default:
-      return 3;
-  }
+function getStandaloneConfig(chain: string, indexer: string) {
+  return {
+    ...standaloneConfigs.chainDefaults.indexerDefaults,
+    ...standaloneConfigs[chain].indexerDefaults,
+    ...standaloneConfigs[chain][indexer],
+  };
 }
 
-/**
- * Returns the number of GiB of storage required for a chain
- * @param chain
- */
-function getStorageUnits(chain: Chain): number {
-  switch (chain) {
-    case 'ethereum':
-      return 1000;
-    default:
-      return 100;
-  }
-}
+export default async function (stage: string, params: Params) {
+  async function getCapacityProvider(
+    name: string,
+    config: BaseConfig,
+  ): Promise<string> {
+    const { capacityProviders, cluster } = await getSpecifiedOutputs<{
+      capacityProviders: string;
+      cluster: string;
+    }>(params.clusterStackName, {
+      capacityProviders: 'CapacityProviders',
+      cluster: 'EcsCluster',
+    });
 
-export default function (stage: string, params: Params) {
-  const getMongoConfiguration = (chain: string) => {
+    const ecsCapacityGroups: ECSCapacityGroup[] = (<ECSCapacityGroup[]>(
+      JSON.parse(capacityProviders)
+    )).sort((a, b) => {
+      if (a.cpu < b.cpu) {
+        return -1;
+      } else if (a.cpu > b.cpu) {
+        return 1;
+      }
+
+      if (a.memory < b.memory) {
+        return -1;
+      } else if (a.memory > b.memory) {
+        return 1;
+      }
+      return 0;
+    });
+    let maxProviderCpu = 0;
+    let maxProviderMemory = 0;
+    for (const capacityGroup of ecsCapacityGroups) {
+      maxProviderCpu = Math.max(
+        maxProviderCpu,
+        capacityGroup.cpu * ecsMultiplier,
+      );
+      maxProviderMemory = Math.max(
+        maxProviderMemory,
+        capacityGroup.memory * ecsMultiplier,
+      );
+      if (
+        capacityGroup.cpu >= config.cpu * ecsMultiplier &&
+        capacityGroup.memory >= config.memory * ecsMultiplier
+      ) {
+        return `${cluster}-${capacityGroup.groupName}`;
+      }
+    }
+    throw new Error(
+      `Unable to map service ${name} to a currently enabled capacity provider (requested cpu=${
+        config.cpu * ecsMultiplier
+      }, memory=${
+        config.memory * ecsMultiplier
+      } vs. max cpu=${maxProviderCpu}, memory=${maxProviderMemory})`,
+    );
+  }
+
+  async function getMongoConfiguration(chain: string, indexer: string) {
     const isSharded = getEnvVar('SHARDING_ENABLED', true) === 'true';
 
     if (isSharded) {
       const {
-        routerCpu,
-        routerMemory,
-        configServerCpu,
-        configServerMemory,
-        shardCpu,
-        shardMemory,
+        router,
+        shard,
+        configServer,
         configServerInstances,
         routerInstances,
         shardInstances,
-      } = clusterConfigs[chain];
+        totalStorage,
+      } = <ClusterConfig>getClusterConfig(chain, indexer);
+
+      const shardCapacityProvider = await getCapacityProvider(
+        'shard',
+        <BaseConfig>getClusterConfig(chain, indexer).shard,
+      );
+      const routerCapacityProvider = await getCapacityProvider(
+        'router',
+        <BaseConfig>getClusterConfig(chain, indexer).router,
+      );
+      const configServerCapacityProvider = await getCapacityProvider(
+        'configServer',
+        <BaseConfig>getClusterConfig(chain, indexer).configServer,
+      );
 
       const configServiceDiscovery = Array(configServerInstances)
         .fill(0)
@@ -217,8 +337,8 @@ export default function (stage: string, params: Params) {
                     PseudoTerminal: 'false',
                   },
                 ],
-                Cpu: configServerCpu * ecsMultiplier,
-                Memory: configServerMemory * ecsMultiplier,
+                Cpu: configServer.cpu * ecsMultiplier,
+                Memory: configServer.memory * ecsMultiplier,
                 NetworkMode: 'awsvpc',
                 RequiresCompatibilities: ['EC2'],
                 TaskRoleArn: {
@@ -254,6 +374,13 @@ export default function (stage: string, params: Params) {
                   {
                     Type: 'binpack',
                     Field: 'memory',
+                  },
+                ],
+                CapacityProviderStrategy: [
+                  {
+                    Base: 0,
+                    CapacityProvider: configServerCapacityProvider,
+                    Weight: 1,
                   },
                 ],
                 ServiceRegistries: [
@@ -328,8 +455,8 @@ export default function (stage: string, params: Params) {
                   PseudoTerminal: 'false',
                 },
               ],
-              Cpu: routerCpu * ecsMultiplier,
-              Memory: routerMemory * ecsMultiplier,
+              Cpu: router.cpu * ecsMultiplier,
+              Memory: router.memory * ecsMultiplier,
               NetworkMode: 'awsvpc',
               RequiresCompatibilities: ['EC2'],
               TaskRoleArn: {
@@ -351,6 +478,13 @@ export default function (stage: string, params: Params) {
                 {
                   Type: 'binpack',
                   Field: 'memory',
+                },
+              ],
+              CapacityProviderStrategy: [
+                {
+                  Base: 0,
+                  CapacityProvider: routerCapacityProvider,
+                  Weight: 1,
                 },
               ],
               ServiceRegistries: [
@@ -411,7 +545,7 @@ export default function (stage: string, params: Params) {
                       {
                         Name: 'MONGODB_EXTRA_FLAGS',
                         Value: `--wiredTigerCacheSizeGB=${Math.floor(
-                          shardMemory / 2,
+                          shard.memory / 2,
                         )} --slowOpSampleRate 0.001 --quiet`,
                       },
                       {
@@ -439,8 +573,8 @@ export default function (stage: string, params: Params) {
                     PseudoTerminal: 'false',
                   },
                 ],
-                Cpu: shardCpu * ecsMultiplier,
-                Memory: shardMemory * ecsMultiplier,
+                Cpu: shard.cpu * ecsMultiplier,
+                Memory: shard.memory * ecsMultiplier,
                 NetworkMode: 'awsvpc',
                 RequiresCompatibilities: ['EC2'],
                 TaskRoleArn: {
@@ -455,7 +589,7 @@ export default function (stage: string, params: Params) {
                       Driver: 'rexray/ebs',
                       DriverOpts: {
                         volumetype: 'gp3',
-                        size: 100,
+                        size: Math.ceil(totalStorage / shardInstances),
                       },
                       Scope: 'shared',
                     },
@@ -476,6 +610,13 @@ export default function (stage: string, params: Params) {
                   {
                     Type: 'binpack',
                     Field: 'memory',
+                  },
+                ],
+                CapacityProviderStrategy: [
+                  {
+                    Base: 0,
+                    CapacityProvider: shardCapacityProvider,
+                    Weight: 1,
                   },
                 ],
                 ServiceRegistries: [
@@ -515,6 +656,10 @@ export default function (stage: string, params: Params) {
         ...shards,
       };
     } else {
+      const { cpu, memory, totalStorage } = <StandaloneConfig>(
+        getStandaloneConfig(chain, indexer)
+      );
+
       return {
         MongoServiceDiscovery: {
           Type: 'AWS::ServiceDiscovery::Service',
@@ -543,7 +688,10 @@ export default function (stage: string, params: Params) {
                 Command: [
                   'mongod',
                   '--wiredTigerCacheSizeGB',
-                  `${getMemoryUnits(params.chain) / 2}`,
+                  `${memory / 2}`,
+                  `--slowOpSampleRate`,
+                  `0.001`,
+                  `--quiet`,
                 ],
                 Essential: 'true',
                 Image: `mongo:${params.mongoImageVersion}`,
@@ -565,8 +713,8 @@ export default function (stage: string, params: Params) {
                 PseudoTerminal: 'false',
               },
             ],
-            Cpu: getCpuUnits(<Chain>params.chain) * ecsMultiplier,
-            Memory: getMemoryUnits(<Chain>params.chain) * ecsMultiplier,
+            Cpu: cpu * ecsMultiplier,
+            Memory: memory * ecsMultiplier,
             NetworkMode: 'awsvpc',
             RequiresCompatibilities: ['EC2'],
             TaskRoleArn: {
@@ -581,7 +729,7 @@ export default function (stage: string, params: Params) {
                   Driver: 'rexray/ebs',
                   DriverOpts: {
                     volumetype: 'gp3',
-                    size: getStorageUnits(<Chain>params.chain),
+                    size: totalStorage,
                   },
                   Scope: 'shared',
                 },
@@ -602,6 +750,16 @@ export default function (stage: string, params: Params) {
               {
                 Type: 'binpack',
                 Field: 'memory',
+              },
+            ],
+            CapacityProviderStrategy: [
+              {
+                Base: 0,
+                CapacityProvider: await getCapacityProvider(
+                  'configServer',
+                  <StandaloneConfig>getStandaloneConfig(chain, indexer),
+                ),
+                Weight: 1,
               },
             ],
             ServiceRegistries: [
@@ -630,7 +788,7 @@ export default function (stage: string, params: Params) {
         },
       };
     }
-  };
+  }
 
   if (stage === 'production') {
     return {
@@ -642,7 +800,7 @@ export default function (stage: string, params: Params) {
             RetentionInDays: 1,
           },
         },
-        ...getMongoConfiguration(params.chain),
+        ...(await getMongoConfiguration(params.chain, params.indexer)),
       },
     };
   }

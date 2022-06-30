@@ -8,8 +8,6 @@ import {
   NativeTokenTransaction,
 } from 'indexer-utils/lib/types/archive';
 import {
-  DecodedContractEvent,
-  DecodedContractTransaction,
   ERC1155Contract,
   ERC20Contract,
   ERC721Contract,
@@ -49,8 +47,6 @@ export default async function indexer(startBlock: number, endBlock: number) {
     }
     return data;
   };
-  // required to match the allowed ERC contract types
-  const ercTypes = <(20 | 721 | 1155)[]>[20, 721, 1155];
 
   async function inTransaction(fn: () => Promise<void>) {
     await client.query('START TRANSACTION');
@@ -67,7 +63,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
     const querySql = blocks
       .map(
         (block: Block) => `(
-          ${wrap(block.number)},
+          ${wrap(block._id)},
           ${wrap(block.hash)},
           ${wrap(block.parentHash)},
           ${wrap(block.nonce)},
@@ -172,7 +168,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
       .map(
         (tx: ContractCreationTransaction) => `(
           ${wrap(`${tx.blockNumber}-${tx.transactionIndex}`)},
-          ${wrap(tx.hash)},
+          ${wrap(tx._id)},
           ${wrap(tx.nonce)},
           ${wrap(tx.blockHash)},
           ${wrap(tx.blockNumber)},
@@ -230,7 +226,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
       .map(
         (tx: ContractTransaction) => `(
           ${wrap(`${tx.blockNumber}-${tx.transactionIndex}`)},
-          ${wrap(tx.hash)},
+          ${wrap(tx._id)},
           ${wrap(tx.nonce)},
           ${wrap(tx.blockHash)},
           ${wrap(tx.blockNumber)},
@@ -279,7 +275,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
       startBlock,
       endBlock,
       properties: [
-        'hash',
+        '_id',
         'nonce',
         'blockHash',
         'blockNumber',
@@ -304,7 +300,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
       .map(
         (tx: NativeTokenTransaction) => `(
           ${wrap(`${tx.blockNumber}-${tx.transactionIndex}`)},
-          ${wrap(tx.hash)},
+          ${wrap(tx._id)},
           ${wrap(tx.nonce)},
           ${wrap(tx.blockHash)},
           ${wrap(tx.blockNumber)},
@@ -351,7 +347,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
         end: endBlock,
       },
       properties: [
-        'address',
+        '_id',
         'creator',
         'blockNumber',
         'timestamp',
@@ -369,7 +365,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
     const querySql = transactions
       .map(
         (tx: ERC20Contract) => `(
-          ${wrap(tx.address)},
+          ${wrap(tx._id)},
           ${wrap(tx.creator)},
           ${wrap(tx.blockNumber)},
           to_timestamp(${wrap(tx.timestamp)}),
@@ -403,7 +399,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
         end: endBlock,
       },
       properties: [
-        'address',
+        '_id',
         'creator',
         'blockNumber',
         'timestamp',
@@ -422,7 +418,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
     const querySql = transactions
       .map(
         (tx: ERC721Contract) => `(
-          ${wrap(tx.address)},
+          ${wrap(tx._id)},
           ${wrap(tx.creator)},
           ${wrap(tx.blockNumber)},
           to_timestamp(${wrap(tx.timestamp)}),
@@ -458,7 +454,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
         end: endBlock,
       },
       properties: [
-        'address',
+        '_id',
         'creator',
         'blockNumber',
         'timestamp',
@@ -476,7 +472,7 @@ export default async function indexer(startBlock: number, endBlock: number) {
     const querySql = transactions
       .map(
         (tx: ERC1155Contract) => `(
-          ${wrap(tx.address)},
+          ${wrap(tx._id)},
           ${wrap(tx.creator)},
           ${wrap(tx.blockNumber)},
           to_timestamp(${wrap(tx.timestamp)}),
@@ -503,131 +499,6 @@ export default async function indexer(startBlock: number, endBlock: number) {
     await q(sql);
   }
 
-  async function allTokenActivityEvents() {
-    for (const ercType of ercTypes) {
-      const events: DecodedContractEvent[] = await query.tokenActivity.events({
-        blockRange: {
-          start: startBlock,
-          end: endBlock,
-        },
-        ercType,
-      });
-
-      if (!events.length) {
-        return;
-      }
-
-      const querySql = events
-        .map(
-          (event: DecodedContractEvent) => `(
-          ${wrap(event.contract)},
-          ${wrap(event.transactionHash)},
-          ${wrap(event.signature)},
-          ${wrap(event.signatureHash)},
-          ${wrap(event.blockNumber)},
-          to_timestamp(${wrap(event.blockTimestamp)}),
-          ${wrap(event.value1)},
-          ${wrap(event.value2)},
-          ${wrap(event.value3)},
-          ${wrap(event.value4)},
-          ${wrap(event.type1)},
-          ${wrap(event.type2)},
-          ${wrap(event.type3)},
-          ${wrap(event.type4)}
-        )`,
-        )
-        .join(',');
-
-      const sql = `INSERT INTO evm_token_activity_event_erc${ercType} (
-            contract,
-            transactionHash,
-            signature,
-            signatureHash,
-            blockNumber,
-            blockTimestamp,
-            value1,
-            value2,
-            value3,
-            value4,
-            type1,
-            type2,
-            type3,
-            type4
-          )
-          VALUES ${querySql}`;
-
-      await q(sql);
-    }
-  }
-
-  async function allTokenActivityTransactions() {
-    for (const ercType of ercTypes) {
-      const transactions: DecodedContractTransaction[] =
-        await query.tokenActivity.transactions({
-          blockRange: {
-            start: startBlock,
-            end: endBlock,
-          },
-          ercType,
-        });
-
-      if (!transactions.length) {
-        return;
-      }
-
-      const querySql = transactions
-        .map(
-          (tx: DecodedContractTransaction) => `(
-            ${wrap(tx.hash)},
-            ${wrap(tx.contract)},
-            ${wrap(tx.signer)},
-            ${wrap(tx.signature)},
-            ${wrap(tx.signatureHash)},
-            ${wrap(tx.blockNumber)},
-            to_timestamp(${wrap(tx.blockTimestamp)}),
-            ${wrap(tx.value1)},
-            ${wrap(tx.value2)},
-            ${wrap(tx.value3)},
-            ${wrap(tx.value4)},
-            ${wrap(tx.value5)},
-            ${wrap(tx.value6)},
-            ${wrap(tx.type1)},
-            ${wrap(tx.type2)},
-            ${wrap(tx.type3)},
-            ${wrap(tx.type4)},
-            ${wrap(tx.type5)},
-            ${wrap(tx.type6)}
-          )`,
-        )
-        .join(',');
-
-      const sql = `INSERT INTO evm_token_activity_transaction_erc${ercType} (
-            hash,
-            contract,
-            signer,
-            signature,
-            signatureHash,
-            blockNumber,
-            blockTimestamp,
-            value1,
-            value2,
-            value3,
-            value4,
-            value5,
-            value6,
-            type1,
-            type2,
-            type3,
-            type4,
-            type5,
-            type6
-          )
-          VALUES ${querySql}`;
-
-      await q(sql);
-    }
-  }
-
   await inTransaction(async () => {
     await blocks();
     await logs();
@@ -638,8 +509,5 @@ export default async function indexer(startBlock: number, endBlock: number) {
     await erc20Contracts();
     await erc721Contracts();
     await erc1155Contracts();
-
-    await allTokenActivityEvents();
-    await allTokenActivityTransactions();
   });
 }

@@ -4,18 +4,21 @@ import { composeMongoose } from 'graphql-compose-mongoose';
 import { LogTC, LogModel } from './log';
 import getEnvVar from 'indexer-serverless/lib/util/get-env-var';
 
+// @ts-ignore
 interface NativeTokenTransactionDocument
   extends Types.Archive.NativeTokenTransaction,
     mongoose.Document {}
+// @ts-ignore
 interface ContractTransactionDocument
   extends Types.Archive.ContractTransaction,
     mongoose.Document {}
+// @ts-ignore
 interface ContractCreationTransactionDocument
   extends Types.Archive.ContractCreationTransaction,
     mongoose.Document {}
 
 const sharedSchema = {
-  hash: { type: String, required: true, unique: true },
+  _id: String,
   nonce: { type: Number, required: true },
   blockHash: { type: String, required: true },
   blockNumber: { type: Number, required: true },
@@ -32,7 +35,7 @@ const sharedSchema = {
 
 const sharedSchemaOptions: mongoose.SchemaOptions = {};
 if (getEnvVar('SHARDING_ENABLED', false)) {
-  sharedSchemaOptions.shardKey = { hash: 'hashed' };
+  sharedSchemaOptions.shardKey = { _id: 'hashed' };
 }
 
 // no input/method, no contract created, must have a receiver (to)
@@ -79,7 +82,6 @@ const contractCreationTransactionSchema =
 nativeTokenTransactionSchema.index({ blockNumber: 1 });
 nativeTokenTransactionSchema.index({ to: 1 });
 nativeTokenTransactionSchema.index({ from: 1 });
-nativeTokenTransactionSchema.index({ value: 1 });
 contractTransactionSchema.index({ blockNumber: 1 });
 contractTransactionSchema.index({ to: 1 });
 contractTransactionSchema.index({ methodId: 1 });
@@ -111,7 +113,11 @@ ContractTransactionTC.addFields({
   logs: {
     type: [LogTC],
     resolve: async (transaction) =>
-      LogModel.find({ transactionHash: transaction.hash }),
+      LogModel.find({
+        transactionId: `0x${transaction.blockNumber.toString(
+          16,
+        )}.0x${transaction.transactionIndex.toString(16)}`,
+      }),
   },
 });
 

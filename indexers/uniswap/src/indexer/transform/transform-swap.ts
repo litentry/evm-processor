@@ -37,7 +37,7 @@ export default function transformSwap(
   );
 
   return {
-    transactionHash: tx.hash,
+    _id: tx._id,
     contract: tx.to.toLowerCase(),
     address: tx.from.toLowerCase(),
     method,

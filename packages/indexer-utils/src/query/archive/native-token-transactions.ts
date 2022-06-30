@@ -3,7 +3,7 @@ import { NativeTokenTransaction } from '../../types/archive';
 import endpoint from './endpoint';
 
 const defaultProperties: (keyof NativeTokenTransaction)[] = [
-  'hash',
+  '_id',
   'nonce',
   'blockHash',
   'blockNumber',
