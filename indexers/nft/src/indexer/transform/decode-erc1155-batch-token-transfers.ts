@@ -18,8 +18,8 @@ export default function decodeErc1155BatchTokenTransfers(
       const shared = {
         _id: log._id,
         contract: log.address,
-        from: decoded[1].toLowerCase() as string,
-        to: decoded[2].toLowerCase() as string,
+        from: (decoded[1] as string).toLowerCase(),
+        to: (decoded[2] as string).toLowerCase(),
         transactionHash: log.transactionHash,
         transactionId: log.transactionId,
         blockNumber: log.blockNumber,

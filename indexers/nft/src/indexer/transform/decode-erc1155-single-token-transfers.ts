@@ -16,8 +16,8 @@ export default function decodeErc1155SingleTokenTransfers(
     const transfer: Types.Nft.ERC1155TokenTransfer = {
       _id: log._id,
       contract: log.address,
-      from: decoded[1].toLowerCase() as string,
-      to: decoded[2].toLowerCase() as string,
+      from: (decoded[1] as string).toLowerCase(),
+      to: (decoded[2] as string).toLowerCase(),
       tokenId: (decoded[3] as BigNumber).toString(),
       quantity: (decoded[4] as BigNumber).toNumber(),
       transactionHash: log.transactionHash,
