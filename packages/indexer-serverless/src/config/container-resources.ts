@@ -49,7 +49,7 @@ const clusterConfigs: { [k: string]: { [k: string]: Partial<ClusterConfig> } } =
         },
         shard: {
           cpu: 4,
-          memory: 30,
+          memory: 15,
         },
         routerInstances: 1,
         shardInstances: 3,
@@ -60,13 +60,13 @@ const clusterConfigs: { [k: string]: { [k: string]: Partial<ClusterConfig> } } =
     bsc: {
       indexerDefaults: {
         routerInstances: 3,
-        shardInstances: 5,
+        shardInstances: 6,
         configServerInstances: 1,
       },
       archive: {
         shard: {
-          cpu: 6,
-          memory: 60,
+          cpu: 8,
+          memory: 15,
         },
         totalStorage: 4000,
       },
@@ -136,7 +136,22 @@ export default async function (stage: string, params: Params) {
       cluster: 'EcsCluster',
     });
 
-    const ecsCapacityGroups: ECSCapacityGroup[] = JSON.parse(capacityProviders);
+    const ecsCapacityGroups: ECSCapacityGroup[] = (<ECSCapacityGroup[]>(
+      JSON.parse(capacityProviders)
+    )).sort((a, b) => {
+      if (a.cpu < b.cpu) {
+        return -1;
+      } else if (a.cpu > b.cpu) {
+        return 1;
+      }
+
+      if (a.memory < b.memory) {
+        return -1;
+      } else if (a.memory > b.memory) {
+        return 1;
+      }
+      return 0;
+    });
     let maxProviderCpu = 0;
     let maxProviderMemory = 0;
     for (const capacityGroup of ecsCapacityGroups) {
