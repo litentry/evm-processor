@@ -2,7 +2,7 @@ import { Types } from 'indexer-utils';
 import { MarketActivity } from './types';
 
 export default function transform(
-  transactions: Types.Archive.ContractTransactionWithLogs[],
+  transactions: Types.Archive.ContractTransaction[],
 ): {
   yearly: MarketActivity[];
   monthly: MarketActivity[];
@@ -20,7 +20,7 @@ export default function transform(
 }
 
 function batch(
-  transactions: Types.Archive.ContractTransactionWithLogs[],
+  transactions: Types.Archive.ContractTransaction[],
 ): MarketActivity[] {
   return transactions.map((t) => {
     const blockDate = new Date(t.blockTimestamp * 1000);
