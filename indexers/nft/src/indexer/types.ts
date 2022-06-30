@@ -1,6 +1,6 @@
 import { Types } from 'indexer-utils';
 
-export type ExtractedData = {
+export type ExtractedNFTData = {
   erc721TransferEvents: Types.Archive.Log[];
   erc1155TransferSingleEvents: Types.Archive.Log[];
   erc1155TransferBatchEvents: Types.Archive.Log[];
@@ -8,7 +8,7 @@ export type ExtractedData = {
   erc1155Contracts: Types.Contract.ERC1155Contract[];
 };
 
-export type TransformedData = {
+export type TransformedNFTData = {
   erc721Tokens: Types.Nft.ERC721Token[];
   erc1155Tokens: Types.Nft.ERC1155Token[];
   erc721TokenTransfers: Types.Nft.ERC721TokenTransfer[];

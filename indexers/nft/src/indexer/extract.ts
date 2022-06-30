@@ -1,5 +1,5 @@
 import { utils, query } from 'indexer-utils';
-import { ExtractedData } from './types';
+import { ExtractedNFTData } from './types';
 
 const TRANSFER_721 = utils.contract.CONTRACT_SIGNATURES.ERC721.EVENTS.find(
   (ex) => ex.SIGNATURE === 'Transfer(address,address,uint256)',
@@ -18,7 +18,7 @@ const TRANSFER_1155_BATCH =
 export default async function extract(
   startBlock: number,
   endBlock: number,
-): Promise<ExtractedData> {
+): Promise<ExtractedNFTData> {
   // fetch event logs
   const [
     erc721TransferEvents,

@@ -5,9 +5,9 @@ import {
   ERC721TokenTransferModel,
   ERC1155TokenTransferModel,
 } from '../schema';
-import { TransformedData } from './types';
+import { TransformedNFTData } from './types';
 
-export default async function load(data: TransformedData): Promise<void> {
+export default async function load(data: TransformedNFTData): Promise<void> {
   await utils.ensureShardedCollections(
     ERC721TokenModel,
     ERC1155TokenModel,
