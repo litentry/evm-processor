@@ -61,7 +61,7 @@ schemaComposer.Query.addFields({
             outputs: [
               {
                 internalType: 'uint256',
-                name: '',
+                name: 'balance',
                 type: 'uint256',
               },
             ],
