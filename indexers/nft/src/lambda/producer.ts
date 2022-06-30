@@ -3,6 +3,6 @@ import { producer } from 'indexer-serverless';
 import { query } from 'indexer-utils';
 
 const lambda: Handler = async (event: any, context: Context) =>
-  producer(event, query.tokenActivity.latestBlock);
+  producer(event, query.contracts.latestBlock);
 
 export default lambda;

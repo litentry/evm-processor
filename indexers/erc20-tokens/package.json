@@ -1,6 +1,6 @@
 {
-  "name": "token-activity",
-  "description": "Indexes ERC20, ERC721 & ERC1155 activity",
+  "name": "erc20-tokens",
+  "description": "Indexes ERC20 transfers and returns balances",
   "version": "0.0.1",
   "scripts": {
     "build": "rm -rf lib && tsc",

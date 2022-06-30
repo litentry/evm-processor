@@ -114,7 +114,9 @@ ContractTransactionTC.addFields({
     type: [LogTC],
     resolve: async (transaction) =>
       LogModel.find({
-        transactionId: `${transaction.blockNumber}.${transaction.transactionIndex}`,
+        transactionId: `0x${transaction.blockNumber.toString(
+          16,
+        )}.0x${transaction.transactionIndex.toString(16)}`,
       }),
   },
 });
