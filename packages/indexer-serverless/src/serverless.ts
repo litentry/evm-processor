@@ -69,7 +69,11 @@ const getConfig = async (config: Config) => {
   const serverlessConfiguration: AWS = {
     service: `${config.chain}-${config.serviceName}-${config.version}`,
     frameworkVersion: '3',
-    plugins: ['serverless-esbuild', 'serverless-localstack'],
+    plugins: [
+      'serverless-esbuild',
+      'serverless-localstack',
+      'serverless-domain-manager',
+    ],
     provider: {
       name: 'aws',
       runtime: 'nodejs14.x',
@@ -165,6 +169,14 @@ const getConfig = async (config: Config) => {
         define: { 'require.resolve': undefined },
         platform: 'node',
         concurrency: 10,
+      },
+      customDomain: {
+        domainName: `${params.chain}-${params.indexer}-${params.version}.graph.eng.litentry.io`,
+        createRoute53Record: true,
+        endpointType: 'regional',
+        securityPolicy: 'tls_1_2',
+        apiType: 'rest',
+        autoDomain: true,
       },
     },
   };
