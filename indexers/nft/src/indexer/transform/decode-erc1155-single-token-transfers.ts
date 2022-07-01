@@ -1,6 +1,6 @@
+import ERC1155 from '@openzeppelin/contracts/build/contracts/ERC1155.json';
 import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
-import ERC1155 from '@openzeppelin/contracts/build/contracts/ERC1155.json';
 import { Types } from 'indexer-utils';
 
 export default function decodeErc1155SingleTokenTransfers(
@@ -11,7 +11,7 @@ export default function decodeErc1155SingleTokenTransfers(
     const decoded = new ethers.utils.Interface(ERC1155.abi).decodeEventLog(
       'TransferSingle(address,address,address,uint256,uint256)',
       log.data,
-      [log.topic0, log.topic1!, log.topic2!, log.topic3!, log.topic4!],
+      [log.topic0, log.topic1!, log.topic2!, log.topic3!],
     );
     const transfer: Types.Nft.ERC1155TokenTransfer = {
       _id: log._id,
