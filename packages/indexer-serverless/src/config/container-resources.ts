@@ -382,6 +382,10 @@ export default async function (stage: string, params: Params) {
               Type: 'AWS::ECS::Service',
               Properties: {
                 ServiceName: `${params.mongoDnsName}-config${index}`,
+                DeploymentConfiguration: {
+                  MaximumPercent: 100,
+                  MinimumHealthyPercent: 0,
+                },
                 TaskDefinition: {
                   Ref: `MongoTaskConfig${index}`,
                 },
@@ -486,6 +490,10 @@ export default async function (stage: string, params: Params) {
             Type: 'AWS::ECS::Service',
             Properties: {
               ServiceName: `${params.mongoDnsName}-router-primary`,
+              DeploymentConfiguration: {
+                MaximumPercent: 100,
+                MinimumHealthyPercent: 0,
+              },
               TaskDefinition: {
                 Ref: `MongoTaskRouter`,
               },
@@ -535,6 +543,10 @@ export default async function (stage: string, params: Params) {
             Type: 'AWS::ECS::Service',
             Properties: {
               ServiceName: `${params.mongoDnsName}-router-secondary`,
+              DeploymentConfiguration: {
+                MaximumPercent: 100,
+                MinimumHealthyPercent: 0,
+              },
               TaskDefinition: {
                 Ref: `MongoTaskRouter`,
               },
@@ -667,6 +679,10 @@ export default async function (stage: string, params: Params) {
               Type: 'AWS::ECS::Service',
               Properties: {
                 ServiceName: `${params.mongoDnsName}-shard${index}`,
+                DeploymentConfiguration: {
+                  MaximumPercent: 100,
+                  MinimumHealthyPercent: 0,
+                },
                 TaskDefinition: {
                   Ref: `MongoTaskShard${index}`,
                 },
@@ -807,6 +823,10 @@ export default async function (stage: string, params: Params) {
           Type: 'AWS::ECS::Service',
           Properties: {
             ServiceName: params.mongoDnsName,
+            DeploymentConfiguration: {
+              MaximumPercent: 100,
+              MinimumHealthyPercent: 0,
+            },
             TaskDefinition: {
               Ref: 'MongoTask',
             },
