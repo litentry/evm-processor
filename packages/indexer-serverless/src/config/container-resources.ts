@@ -110,16 +110,16 @@ const standaloneConfigs: {
 function getClusterConfig(chain: string, indexer: string) {
   return {
     ...clusterConfigs.chainDefaults.indexerDefaults,
-    ...clusterConfigs[chain].indexerDefaults,
-    ...clusterConfigs[chain][indexer],
+    ...(clusterConfigs[chain] || {}).indexerDefaults,
+    ...(clusterConfigs[chain] || {})[indexer],
   };
 }
 
 function getStandaloneConfig(chain: string, indexer: string) {
   return {
     ...standaloneConfigs.chainDefaults.indexerDefaults,
-    ...standaloneConfigs[chain].indexerDefaults,
-    ...standaloneConfigs[chain][indexer],
+    ...(standaloneConfigs[chain] || {}).indexerDefaults,
+    ...(standaloneConfigs[chain] || {})[indexer],
   };
 }
 
@@ -236,7 +236,7 @@ export default async function (stage: string, params: Params) {
         .reduce((config, value, index) => {
           return {
             ...config,
-            [`MongoRouterServiceDiscovery${index}`]: {
+            [`MongoPrimaryRouterServiceDiscovery${index}`]: {
               Type: 'AWS::ServiceDiscovery::Service',
               Properties: {
                 Description: 'Mongo router server for archive indexer',
@@ -249,7 +249,24 @@ export default async function (stage: string, params: Params) {
                   ],
                   RoutingPolicy: 'MULTIVALUE',
                 },
-                Name: `router${index}.${params.mongoDnsName}`,
+                Name: `router-primary.${params.mongoDnsName}`,
+                NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`,
+              },
+            },
+            [`MongoAllRouterServiceDiscovery${index}`]: {
+              Type: 'AWS::ServiceDiscovery::Service',
+              Properties: {
+                Description: 'Mongo router server for archive indexer',
+                DnsConfig: {
+                  DnsRecords: [
+                    {
+                      Type: 'A',
+                      TTL: 10,
+                    },
+                  ],
+                  RoutingPolicy: 'MULTIVALUE',
+                },
+                Name: `routers.${params.mongoDnsName}`,
                 NamespaceId: `\${cf:${params.clusterStackName}.ServiceRegistryNamespace}`,
               },
             },
@@ -416,7 +433,7 @@ export default async function (stage: string, params: Params) {
       const routers = [0].reduce((config, value, index) => {
         return {
           ...config,
-          [`MongoTaskRouter${index}`]: {
+          [`MongoTaskRouter`]: {
             Type: 'AWS::ECS::TaskDefinition',
             Properties: {
               Family: `${params.mongoDnsName}-router${index}`,
@@ -437,7 +454,7 @@ export default async function (stage: string, params: Params) {
                     { Name: 'MONGODB_REPLICA_SET_KEY', Value: 'replicakey' },
                     {
                       Name: 'MONGODB_ADVERTISED_HOSTNAME',
-                      Value: `router${index}.${params.mongoDnsName}.${params.org}`,
+                      Value: `router-primary.${params.mongoDnsName}.${params.org}`,
                     },
                   ],
                   Essential: 'true',
@@ -465,12 +482,61 @@ export default async function (stage: string, params: Params) {
               },
             },
           },
-          [`MongoServiceRouter${index}`]: {
+          [`MongoServiceRouterPrimary`]: {
             Type: 'AWS::ECS::Service',
             Properties: {
-              ServiceName: `${params.mongoDnsName}-router${index}`,
+              ServiceName: `${params.mongoDnsName}-router-primary`,
               TaskDefinition: {
-                Ref: `MongoTaskRouter${index}`,
+                Ref: `MongoTaskRouter`,
+              },
+              Cluster: `\${cf:${params.clusterStackName}.EcsCluster}`,
+              DesiredCount: 1,
+              PlacementStrategies: [
+                {
+                  Type: 'binpack',
+                  Field: 'memory',
+                },
+              ],
+              CapacityProviderStrategy: [
+                {
+                  Base: 0,
+                  CapacityProvider: routerCapacityProvider,
+                  Weight: 1,
+                },
+              ],
+              ServiceRegistries: [
+                {
+                  RegistryArn: {
+                    'Fn::GetAtt': [
+                      `MongoPrimaryRouterServiceDiscovery${index}`,
+                      'Arn',
+                    ],
+                  },
+                },
+              ],
+              NetworkConfiguration: {
+                AwsvpcConfiguration: {
+                  SecurityGroups: [
+                    `\${cf:${params.clusterStackName}.SecurityGroupUniversal}`,
+                  ],
+                  Subnets: {
+                    'Fn::Split': [
+                      ',',
+                      `\${cf:${params.clusterStackName}.PrivateSubnets}`,
+                    ],
+                  },
+                },
+              },
+              EnableECSManagedTags: true,
+              EnableExecuteCommand: true,
+            },
+          },
+          [`MongoServiceRouterSecondary`]: {
+            Type: 'AWS::ECS::Service',
+            Properties: {
+              ServiceName: `${params.mongoDnsName}-router-secondary`,
+              TaskDefinition: {
+                Ref: `MongoTaskRouter`,
               },
               Cluster: `\${cf:${params.clusterStackName}.EcsCluster}`,
               DesiredCount: routerInstances,
@@ -491,7 +557,7 @@ export default async function (stage: string, params: Params) {
                 {
                   RegistryArn: {
                     'Fn::GetAtt': [
-                      `MongoRouterServiceDiscovery${index}`,
+                      `MongoAllRouterServiceDiscovery${index}`,
                       'Arn',
                     ],
                   },
@@ -534,7 +600,7 @@ export default async function (stage: string, params: Params) {
                       { Name: 'MONGODB_ROOT_PASSWORD', Value: 'password123' },
                       {
                         Name: 'MONGODB_MONGOS_HOST',
-                        Value: `router0.${params.mongoDnsName}.${params.org}`,
+                        Value: `router-primary.${params.mongoDnsName}.${params.org}`,
                       },
                       { Name: 'MONGODB_REPLICA_SET_MODE', Value: `primary` },
                       {
