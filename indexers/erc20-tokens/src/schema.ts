@@ -14,6 +14,11 @@ export const ERC20TransferSchema = new mongoose.Schema<ERC20TransferDocument>({
   contract: { type: String, required: true },
   from: { type: String, required: true },
   to: { type: String, required: true },
+  amount: { type: String, required: true },
+  amountFormatted: String,
+  name: String,
+  symbol: String,
+  decimals: Number,
   blockNumber: { type: Number, required: true },
   blockTimestamp: { type: Number, required: true },
   transactionHash: { type: String, required: true },
@@ -44,9 +49,9 @@ schemaComposer.Query.addFields({
     }`,
     args: {
       contract: 'String!',
-      account: 'String!',
+      address: 'String!',
     },
-    resolve: async ({ args }): Promise<ERC20Balance> => {
+    resolve: async (_, args): Promise<ERC20Balance> => {
       const contract = new (web3() as Web3).eth.Contract(
         [
           {
@@ -82,7 +87,7 @@ schemaComposer.Query.addFields({
       const { decimals, symbol, name } = contractData[0] || {};
 
       let amountFormatted;
-      if (decimals) {
+      if (typeof decimals === 'number') {
         amountFormatted = new BN(amount).shiftedBy(-decimals).toString();
       }
 
