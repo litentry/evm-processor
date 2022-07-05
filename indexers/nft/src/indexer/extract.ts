@@ -29,7 +29,7 @@ export default async function extract(
       await query.archive.logs({
         startBlock,
         endBlock,
-        eventId: `0x${TRANSFER_721.SIGNATURE}`,
+        eventId: `0x${TRANSFER_721.ID}`,
       })
     ).filter((log) => {
       /*
@@ -42,12 +42,12 @@ export default async function extract(
     query.archive.logs({
       startBlock,
       endBlock,
-      eventId: `0x${TRANSFER_1155.SIGNATURE}`,
+      eventId: `0x${TRANSFER_1155.ID}`,
     }),
     query.archive.logs({
       startBlock,
       endBlock,
-      eventId: `0x${TRANSFER_1155_BATCH.SIGNATURE}`,
+      eventId: `0x${TRANSFER_1155_BATCH.ID}`,
     }),
   ]);
 

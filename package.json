@@ -20,6 +20,7 @@
     "lodash": "^4.17.21",
     "mongoose": "^6.2.11",
     "prom-client": "^14.0.1",
+    "serverless-domain-manager": "^6.0.3",
     "web3": "^v3.0.0-rc.5"
   },
   "devDependencies": {
