@@ -1,4 +1,3 @@
-import BN from 'bignumber.js';
 import { ERC20Transfer, ExtractedData } from './types';
 import { decodeTransfer, TRANSFER_EVENT_SIGNATURE } from './utils';
 
@@ -24,9 +23,6 @@ export default function transform({
         from,
         to,
         amount: amount.toString(),
-        amountFormatted: contract.decimals
-          ? new BN(amount.toString()).shiftedBy(-contract.decimals).toString()
-          : undefined,
         decimals: contract.decimals,
         name: contract.name,
         symbol: contract.symbol,
