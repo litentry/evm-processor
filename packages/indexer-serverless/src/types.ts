@@ -36,4 +36,7 @@ export type Config = {
   maxWorkers: number;
   targetTotalQueuedBlocks?: number;
   extractionSource?: ExtractionSource;
+  vpcId?: string;
+  vpcEndpointId?: string;
+  mongoUri?: string;
 };

@@ -7,6 +7,8 @@ import worker from './functions/worker';
 import { Config, Params } from './types';
 import { getContext } from './util/context';
 import getInfraStack from './util/get-infra-stack';
+import addPrivateApiGateway from './util/add-private-api-gateway';
+import getSpecifiedOutputs from './util/get-specified-outputs';
 
 const vpcOptions = async (stage: string, clusterStackName: string) => {
   if (stage !== 'local') {
@@ -35,17 +37,22 @@ const vpcOptions = async (stage: string, clusterStackName: string) => {
   return {};
 };
 
-const augmentEnvVars = async (stage: string, params: Params): Promise<void> => {
-  if (stage === 'production') {
-    const infraStack = await getInfraStack(params.clusterStackName);
-    if (!process.env.MONGO_URI) {
-      const serviceDiscoveryDomain = infraStack.Outputs!.find(
-        (output) => output.OutputKey === 'RealmDNSZone',
-      )!.OutputValue!;
-
-      process.env.MONGO_URI = `mongodb://${params.mongoDnsName}.${serviceDiscoveryDomain}:27017/db`;
-    }
+const getParamsFromExternalStack = async (
+  stage: string,
+  params: Params,
+): Promise<Partial<Config>> => {
+  if (stage !== 'local') {
+    const outputs = await getSpecifiedOutputs(params.clusterStackName, {
+      vpcId: 'VPC',
+      vpcEndpointId: 'PrivateEndpointAPIGateway',
+      realmZone: 'RealmDNSZone',
+    });
+    return {
+      ...outputs,
+      mongoUri: `mongodb://${params.mongoDnsName}.${outputs.vpcId}:27017/db`,
+    };
   }
+  return {};
 };
 
 const getConfig = async (config: Config) => {
@@ -64,7 +71,16 @@ const getConfig = async (config: Config) => {
   };
 
   const context = getContext();
-  await augmentEnvVars(context.options.stage, params);
+  const stackParams = await getParamsFromExternalStack(
+    context.options.stage,
+    params,
+  );
+  process.env.MONGO_URI = process.env.MONGO_URI || stackParams.mongoUri;
+
+  const contextSpecificPlugins = [];
+  if (context.options.stage !== 'local') {
+    contextSpecificPlugins.push('serverless-domain-manager');
+  }
 
   const serverlessConfiguration: AWS = {
     service: `${config.chain}-${config.serviceName}-${config.version}`,
@@ -72,10 +88,11 @@ const getConfig = async (config: Config) => {
     plugins: [
       'serverless-esbuild',
       'serverless-localstack',
-      'serverless-domain-manager',
+      ...contextSpecificPlugins,
     ],
     provider: {
       name: 'aws',
+      stage: context.options.stage,
       runtime: 'nodejs14.x',
       region: params.region,
       apiGateway: {
@@ -180,6 +197,14 @@ const getConfig = async (config: Config) => {
       },
     },
   };
+
+  if (context.options.stage !== 'local') {
+    return addPrivateApiGateway(
+      serverlessConfiguration,
+      stackParams.vpcId!,
+      stackParams.vpcEndpointId!,
+    );
+  }
 
   return serverlessConfiguration;
 };
