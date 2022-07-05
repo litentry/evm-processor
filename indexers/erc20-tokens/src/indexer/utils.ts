@@ -1,5 +1,8 @@
-import { ethers } from 'ethers';
 import ERC20 from '@openzeppelin/contracts/build/contracts/ERC20.json';
+import { ethers } from 'ethers';
+
+export const TRANSFER_EVENT_SIGNATURE =
+  '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
 export function decodeTransfer(data: string, topics: string[]) {
   const decoded = new ethers.utils.Interface(ERC20.abi).decodeEventLog(

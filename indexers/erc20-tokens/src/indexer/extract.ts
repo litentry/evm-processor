@@ -1,9 +1,6 @@
-import { query, utils } from 'indexer-utils';
+import { query } from 'indexer-utils';
 import { ExtractedData } from './types';
-
-const signature = utils.contract.CONTRACT_SIGNATURES.ERC20.EVENTS.find(
-  (item) => item.SIGNATURE === 'Transfer(address,address,uint256)',
-)!;
+import { TRANSFER_EVENT_SIGNATURE } from './utils';
 
 export default async function extract(
   startBlock: number,
@@ -13,7 +10,19 @@ export default async function extract(
   const logs = await query.archive.logs({
     startBlock,
     endBlock,
-    eventId: `0x${signature.ID}`,
+    eventId: TRANSFER_EVENT_SIGNATURE,
+    properties: [
+      '_id',
+      'address',
+      'topic1',
+      'topic2',
+      'topic3',
+      'data',
+      'blockNumber',
+      'blockTimestamp',
+      'transactionHash',
+      'transactionId',
+    ],
   });
   const filteredLogs = logs.filter((log) => {
     /*
