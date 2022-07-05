@@ -1,9 +1,9 @@
-import { Types, utils } from 'indexer-utils';
+import { utils } from 'indexer-utils';
 import {
-  ERC721TokenModel,
   ERC1155TokenModel,
-  ERC721TokenTransferModel,
   ERC1155TokenTransferModel,
+  ERC721TokenModel,
+  ERC721TokenTransferModel,
 } from '../schema';
 import { TransformedNFTData } from './types';
 
