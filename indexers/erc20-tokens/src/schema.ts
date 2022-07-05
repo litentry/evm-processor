@@ -1,10 +1,10 @@
-import Web3 from 'web3';
 import BN from 'bignumber.js';
 import { schemaComposer } from 'graphql-compose';
 import { composeMongoose } from 'graphql-compose-mongoose';
+import { filter, query, repository, web3 } from 'indexer-utils';
 import mongoose from 'mongoose';
-import { filter, repository, web3, query } from 'indexer-utils';
-import { ERC20Transfer, ERC20Balance } from './indexer/types';
+import Web3 from 'web3';
+import { ERC20Balance, ERC20Transfer } from './indexer/types';
 
 // @ts-ignore
 interface ERC20TransferDocument extends ERC20Transfer, mongoose.Document {}
@@ -15,7 +15,6 @@ export const ERC20TransferSchema = new mongoose.Schema<ERC20TransferDocument>({
   from: { type: String, required: true },
   to: { type: String, required: true },
   amount: { type: String, required: true },
-  amountFormatted: String,
   name: String,
   symbol: String,
   decimals: Number,
