@@ -18,10 +18,12 @@ export const Model = mongoose.model(
 export const save = (startBlock: number, endBlock: number) =>
   Model.create({ startBlock, endBlock });
 
-export const get = (): Promise<IndexedBlockRangeDocument[]> =>
-  Model.find({}).sort('startBlock').exec();
+export const get = (limit: number): Promise<IndexedBlockRangeDocument[]> =>
+  Model.find({}).sort('startBlock').limit(limit).exec();
 
 export const remove = (indexedBlockRanges: IndexedBlockRangeDocument[]) =>
-  Promise.all(
-    indexedBlockRanges.map((indexedBlockRange) => indexedBlockRange.delete()),
-  );
+  Model.deleteMany({
+    _id: {
+      $in: indexedBlockRanges.map((indexedBlockRange) => indexedBlockRange._id),
+    },
+  });
