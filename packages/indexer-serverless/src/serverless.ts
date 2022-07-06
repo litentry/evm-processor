@@ -49,7 +49,7 @@ const getParamsFromExternalStack = async (
     });
     return {
       ...outputs,
-      mongoUri: `mongodb://${params.mongoDnsName}.${outputs.vpcId}:27017/db`,
+      mongoUri: `mongodb://${params.mongoDnsName}.${outputs.realmZone}:27017/db`,
     };
   }
   return {};
