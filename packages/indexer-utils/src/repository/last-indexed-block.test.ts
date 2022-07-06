@@ -32,4 +32,23 @@ describe('Indexed block range repository', () => {
 
     expect(await repository.get()).toStrictEqual(30);
   });
+
+  it('Should calculate lastIndexedBlock through ranges and update using limit', async () => {
+    indexedBlockRangeRepository.save(11, 20);
+    indexedBlockRangeRepository.save(21, 30);
+    indexedBlockRangeRepository.save(41, 50);
+    indexedBlockRangeRepository.save(100, 20300);
+
+    await repository.calculateAndUpdate(1);
+
+    expect(await repository.get()).toStrictEqual(20);
+
+    await repository.calculateAndUpdate(1);
+
+    expect(await repository.get()).toStrictEqual(30);
+
+    await repository.calculateAndUpdate(1);
+
+    expect(await repository.get()).toStrictEqual(30);
+  });
 });

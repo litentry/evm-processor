@@ -35,10 +35,14 @@ export const save = async (lastIndexedBlock: number): Promise<void> => {
   await currentValue.updateOne({ lastIndexedBlock });
 };
 
-export const calculateAndUpdate = async (): Promise<number> => {
+export const calculateAndUpdate = async (
+  maxNumberOfPendingRanges?: number,
+): Promise<number> => {
   let lastIndexedBlock = await get();
   const processedIndexedBlockRanges: IndexedBlockRangeDocument[] = [];
-  const pendingIndexedBlockRanges = await getIndexedBlockRanges(500);
+  const pendingIndexedBlockRanges = await getIndexedBlockRanges(
+    maxNumberOfPendingRanges || 500,
+  );
 
   pendingIndexedBlockRanges.forEach((pendingIndexedBlockRange) => {
     if ((lastIndexedBlock || 0) + 1 < pendingIndexedBlockRange.startBlock) {
