@@ -5,7 +5,7 @@ type InputMap<T> = {
 };
 
 export async function getSpecifiedOutputs<
-  OutputType extends { [k: string]: any },
+  OutputType extends { [k: string]: string | number },
 >(
   stackName: string,
   desiredOutputs: InputMap<Partial<OutputType>>,
