@@ -237,6 +237,37 @@ export function addPrivateApiGateway(
           },
         },
       },
+      Outputs: {
+        ...serverlessConfiguration.resources?.Outputs,
+        ...{
+          PrivateServiceEndpoint: {
+            Description: 'URL of the private service endpoint',
+            Value: {
+              'Fn::Join': [
+                '',
+                [
+                  'https://',
+                  {
+                    Ref: 'PrivateApiGatewayRestApi',
+                  },
+                  '.execute-api.',
+                  {
+                    Ref: 'AWS::Region',
+                  },
+                  '.',
+                  {
+                    Ref: 'AWS::URLSuffix',
+                  },
+                  '/production',
+                ],
+              ],
+            },
+            Export: {
+              Name: `sls-${serverlessConfiguration.service}-${serverlessConfiguration.provider.stage}-PrivateServiceEndpoint`,
+            },
+          },
+        },
+      },
     },
   };
 }
