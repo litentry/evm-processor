@@ -1,6 +1,6 @@
 import { Types } from 'indexer-utils';
 
-export interface ERC20Transfer extends ERC20Balance {
+export type ERC20Transfer = {
   _id: string;
   contract: string;
   from: string;
@@ -9,7 +9,11 @@ export interface ERC20Transfer extends ERC20Balance {
   blockTimestamp: number;
   transactionHash: string;
   transactionId: string;
-}
+  amount: string;
+  name?: string;
+  symbol?: string;
+  decimals?: number;
+};
 
 export type ERC20Balance = {
   amount: string;

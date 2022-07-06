@@ -86,6 +86,8 @@ export default async function contractTransactionsWithLogs({
               methodId: $methodId
             }
           ) {
+            transactionIndex
+            blockNumber
             ${transactionProperties.join(',')}
             logs {
               ${logProperties.join(',')}
@@ -96,7 +98,7 @@ export default async function contractTransactionsWithLogs({
       },
     });
     return response.data.data
-      .contractTransactionsWithLogs as ContractTransactionWithLogs[];
+      .contractTransactions as ContractTransactionWithLogs[];
   } catch (e: any) {
     console.log(JSON.stringify(e.response.data.errors, null, 2));
     throw new Error(e.message);
