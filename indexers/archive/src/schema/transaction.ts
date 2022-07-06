@@ -1,8 +1,8 @@
-import mongoose from 'mongoose';
-import { filter, Types } from 'indexer-utils';
 import { composeMongoose } from 'graphql-compose-mongoose';
-import { LogTC, LogModel } from './log';
 import getEnvVar from 'indexer-serverless/lib/util/get-env-var';
+import { filter, Types } from 'indexer-utils';
+import mongoose from 'mongoose';
+import { LogModel, LogTC } from './log';
 
 // @ts-ignore
 interface NativeTokenTransactionDocument
@@ -112,12 +112,19 @@ const ContractCreationTransactionTC = composeMongoose(
 ContractTransactionTC.addFields({
   logs: {
     type: [LogTC],
-    resolve: async (transaction) =>
-      LogModel.find({
+    resolve: async (transaction) => {
+      if (!transaction.blockNumber || !transaction.transactionIndex) {
+        throw Error(
+          'transaction.blockNumber & transaction.transactionIndex are required to query logs',
+        );
+      }
+
+      return LogModel.find({
         transactionId: `0x${transaction.blockNumber.toString(
           16,
         )}.0x${transaction.transactionIndex.toString(16)}`,
-      }),
+      });
+    },
   },
 });
 
