@@ -1,6 +1,5 @@
-import BN from 'bignumber.js';
 import { ERC20Transfer, ExtractedData } from './types';
-import { decodeTransfer } from './utils';
+import { decodeTransfer, TRANSFER_EVENT_SIGNATURE } from './utils';
 
 export default function transform({
   transferLogs,
@@ -9,7 +8,7 @@ export default function transform({
   const transfers = transferLogs.reduce((prev, log) => {
     try {
       const { to, from, amount } = decodeTransfer(log.data, [
-        log.topic0,
+        TRANSFER_EVENT_SIGNATURE,
         log.topic1!,
         log.topic2!,
       ]);
@@ -23,10 +22,7 @@ export default function transform({
         contract: log.address,
         from,
         to,
-        amount,
-        amountFormatted: contract.decimals
-          ? new BN(amount).shiftedBy(-contract.decimals).toString()
-          : undefined,
+        amount: amount.toString(),
         decimals: contract.decimals,
         name: contract.name,
         symbol: contract.symbol,
