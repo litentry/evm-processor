@@ -1,9 +1,8 @@
-import _ from 'lodash';
 import { BigNumber, ethers } from 'ethers';
 import { Types, utils } from 'indexer-utils';
 import { Swap, SwapMethod } from '../types';
+import { filterCalls, findMethodsInInput, getMethodIdFromCall } from '../utils';
 import transformSwap from './transform-swap';
-import { findMethodsInInput, filterCalls, getMethodIdFromCall } from '../utils';
 
 const EXTRINSICS = utils.contract.CONTRACT_SIGNATURES.UNISWAPV3.EXTRINSICS;
 
@@ -49,37 +48,37 @@ export default function transformMulticall(
     switch (decodedCalls[i].methodName) {
       case SwapMethod.swapTokensForExactETH: {
         return swapTokensForExactETH(
-          tx,
+          { ...tx, _id: `${tx._id}.${i}` },
           deadline,
         )(decodedCalls[i].decoded as [BigNumber, BigNumber, string[], string]);
       }
       case SwapMethod.swapExactETHForTokens: {
         return swapExactETHForTokens(
-          tx,
+          { ...tx, _id: `${tx._id}.${i}` },
           deadline,
         )(decodedCalls[i].decoded as [BigNumber, string[], string]);
       }
       case SwapMethod.swapTokensForExactTokens: {
         return swapTokensForExactTokens(
-          tx,
+          { ...tx, _id: `${tx._id}.${i}` },
           deadline,
         )(decodedCalls[i].decoded as [BigNumber, BigNumber, string[], string]);
       }
       case SwapMethod.swapExactTokensForTokens: {
         return swapExactTokensForTokens(
-          tx,
+          { ...tx, _id: `${tx._id}.${i}` },
           deadline,
         )(decodedCalls[i].decoded as [BigNumber, BigNumber, string[], string]);
       }
       case SwapMethod.swapExactTokensForETH: {
         return swapExactTokensForETH(
-          tx,
+          { ...tx, _id: `${tx._id}.${i}` },
           deadline,
         )(decodedCalls[i].decoded as [BigNumber, BigNumber, string[], string]);
       }
       case SwapMethod.swapETHForExactTokens: {
         return swapETHForExactTokens(
-          tx,
+          { ...tx, _id: `${tx._id}.${i}` },
           deadline,
         )(decodedCalls[i].decoded as [BigNumber, string[], string]);
       }
