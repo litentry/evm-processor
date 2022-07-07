@@ -5,7 +5,7 @@ export interface BaseAggregator {
 
 export interface MarketActivity {
   totalTransactions: number;
-  totalAmount: number;
+  // totalAmount: number;
   // totalGas: number;
 }
 

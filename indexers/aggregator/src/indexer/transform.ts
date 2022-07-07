@@ -1,27 +1,39 @@
-import { Types } from 'indexer-utils';
-import { MarketActivity } from './types';
+import {
+  ExtractedData,
+  ExtractedTransfers,
+  MarketActivity,
+  TransformedTransfers,
+} from './types';
 
 export default function transform(
-  transactions: Types.Archive.ContractTransaction[],
-): {
-  yearly: MarketActivity[];
-  monthly: MarketActivity[];
-  daily: MarketActivity[];
-} {
-  const data = batch(transactions);
+  transactions: ExtractedTransfers,
+): TransformedTransfers {
+  const dataErc721 = batch(transactions.erc721);
+  const dataErc1155 = batch(transactions.erc1155);
 
   return {
-    yearly: groupBy(['year'], data).map(({ month, day, ...yearly }) => yearly),
-    monthly: groupBy(['year', 'month'], data).map(
-      ({ day, ...monthly }) => monthly,
-    ),
-    daily: groupBy(['year', 'month', 'day'], data),
+    erc721: {
+      yearly: groupBy(['year'], dataErc721).map(
+        ({ month, day, ...yearly }) => yearly,
+      ),
+      monthly: groupBy(['year', 'month'], dataErc721).map(
+        ({ day, ...monthly }) => monthly,
+      ),
+      daily: groupBy(['year', 'month', 'day'], dataErc721),
+    },
+    erc1155: {
+      yearly: groupBy(['year'], dataErc1155).map(
+        ({ month, day, ...yearly }) => yearly,
+      ),
+      monthly: groupBy(['year', 'month'], dataErc1155).map(
+        ({ day, ...monthly }) => monthly,
+      ),
+      daily: groupBy(['year', 'month', 'day'], dataErc1155),
+    },
   };
 }
 
-function batch(
-  transactions: Types.Archive.ContractTransaction[],
-): MarketActivity[] {
+function batch(transactions: ExtractedData[]): MarketActivity[] {
   return transactions.map((t) => {
     const blockDate = new Date(t.blockTimestamp * 1000);
 
@@ -29,8 +41,7 @@ function batch(
       year: blockDate.getUTCFullYear(),
       month: blockDate.getUTCMonth() + 1,
       day: blockDate.getUTCDate(),
-      totalTransactions: 1,
-      totalAmount: parseInt(t.value), // I know it's not this, just to prove a point
+      totalTransactions: t.totalTransactions,
     };
   });
 }
@@ -52,7 +63,6 @@ function groupBy(
       map.set(index, {
         ...current,
         totalTransactions: t.totalTransactions + current.totalTransactions,
-        totalAmount: t.totalAmount + current.totalAmount,
       });
       return;
     }

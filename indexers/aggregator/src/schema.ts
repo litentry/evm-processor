@@ -5,49 +5,49 @@ import mongoose from 'mongoose';
 /**
  * Base Aggregator
  */
-interface BaseAggregatorDocument
-  extends Types.Aggregator.BaseAggregator,
-    mongoose.Document {}
+// interface BaseAggregatorDocument
+//   extends Types.Aggregator.BaseAggregator,
+//     mongoose.Document {}
 
-export const BaseAggregatorSchema = new mongoose.Schema<BaseAggregatorDocument>(
-  {
-    lastAggregatedBlockNumber: { type: Number, required: true },
-    lastAggregatedAt: { type: Date, required: true },
-  },
-);
+// export const BaseAggregatorSchema = new mongoose.Schema<BaseAggregatorDocument>(
+//   {
+//     lastAggregatedBlockNumber: { type: Number, required: true },
+//     lastAggregatedAt: { type: Date, required: true },
+//   },
+// );
 
-export const BaseAggregatorModel = mongoose.model(
-  'baseAggregator',
-  BaseAggregatorSchema,
-);
+// export const BaseAggregatorModel = mongoose.model(
+//   'baseAggregator',
+//   BaseAggregatorSchema,
+// );
 
-export const get =
-  async (): Promise<Types.Aggregator.BaseAggregator | null> => {
-    const currentValue = await BaseAggregatorModel.findOne({}).exec();
-    if (!currentValue) {
-      return null;
-    }
-    return currentValue.get(
-      'baseAggregator',
-    ) as Types.Aggregator.BaseAggregator;
-  };
+// export const get =
+//   async (): Promise<Types.Aggregator.BaseAggregator | null> => {
+//     const currentValue = await BaseAggregatorModel.findOne({}).exec();
+//     if (!currentValue) {
+//       return null;
+//     }
+//     return currentValue.get(
+//       'baseAggregator',
+//     ) as Types.Aggregator.BaseAggregator;
+//   };
 
-export const save = async (
-  lastAggregatedBlockNumber: number,
-  lastAggregatedAt: Date,
-): Promise<void> => {
-  const currentValue = await BaseAggregatorModel.findOne().exec();
+// export const save = async (
+//   lastAggregatedBlockNumber: number,
+//   lastAggregatedAt: Date,
+// ): Promise<void> => {
+//   const currentValue = await BaseAggregatorModel.findOne().exec();
 
-  if (!currentValue) {
-    await BaseAggregatorModel.create({
-      lastAggregatedBlockNumber,
-      lastAggregatedAt,
-    });
-    return;
-  }
+//   if (!currentValue) {
+//     await BaseAggregatorModel.create({
+//       lastAggregatedBlockNumber,
+//       lastAggregatedAt,
+//     });
+//     return;
+//   }
 
-  await currentValue.updateOne({ lastAggregatedBlockNumber, lastAggregatedAt });
-};
+//   await currentValue.updateOne({ lastAggregatedBlockNumber, lastAggregatedAt });
+// };
 
 /**
  * ERC 721
@@ -68,20 +68,17 @@ export const ERC721DailyMarketActivitySchema =
     month: { type: Number, required: true, index: true },
     day: { type: Number, required: true, index: true },
     totalTransactions: { type: Number, required: true },
-    totalAmount: { type: Number, required: true },
   });
 export const ERC721MonthlyMarketActivitySchema =
   new mongoose.Schema<ERC721MonthlyMarketActivityDocument>({
     year: { type: Number, required: true, index: true },
     month: { type: Number, required: true, index: true },
     totalTransactions: { type: Number, required: true },
-    totalAmount: { type: Number, required: true },
   });
 export const ERC721YearlyMarketActivitySchema =
   new mongoose.Schema<ERC721YearlyMarketActivityDocument>({
     year: { type: Number, required: true, index: true },
     totalTransactions: { type: Number, required: true },
-    totalAmount: { type: Number, required: true },
   });
 
 export const ERC721DailyMarketActivityModel = mongoose.model(
@@ -118,20 +115,17 @@ export const ERC1155DailyMarketActivitySchema =
     month: { type: Number, required: true, index: true },
     day: { type: Number, required: true, index: true },
     totalTransactions: { type: Number, required: true },
-    totalAmount: { type: Number, required: true },
   });
 export const ERC1155MonthlyMarketActivitySchema =
   new mongoose.Schema<ERC1155MonthlyMarketActivityDocument>({
     year: { type: Number, required: true, index: true },
     month: { type: Number, required: true, index: true },
     totalTransactions: { type: Number, required: true },
-    totalAmount: { type: Number, required: true },
   });
 export const ERC1155YearlyMarketActivitySchema =
   new mongoose.Schema<ERC1155YearlyMarketActivityDocument>({
     year: { type: Number, required: true, index: true },
     totalTransactions: { type: Number, required: true },
-    totalAmount: { type: Number, required: true },
   });
 
 export const ERC1155DailyMarketActivityModel = mongoose.model(

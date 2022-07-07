@@ -1,20 +1,34 @@
-import { query, Types, utils } from 'indexer-utils';
+import { query } from 'indexer-utils';
+import { ExtractedTransfers } from './types';
 
 export default async function extract(
-  startBlock: number,
-  endBlock: number,
-): Promise<Types.Archive.ContractTransaction[]> {
-  const batches = utils.createBatches(startBlock, endBlock, 20);
+  start: number,
+  end: number,
+): Promise<ExtractedTransfers> {
+  const erc721Transfers = await query.nft.erc721TokenTransfers({
+    blockRange: {
+      start,
+      end,
+    },
+    properties: ['blockTimestamp'],
+  });
 
-  const results = await Promise.all(
-    batches.map(async (batch) => {
-      return query.archive.contractTransactions({
-        startBlock: batch.startBlock,
-        endBlock: batch.endBlock,
-        properties: ['blockNumber', 'blockTimestamp', 'gas', 'value'],
-      });
-    }),
-  );
+  const erc1155Transfers = await query.nft.erc1155TokenTransfers({
+    blockRange: {
+      start,
+      end,
+    },
+    properties: ['blockTimestamp', 'quantity'],
+  });
 
-  return results.flatMap((txArr) => txArr);
+  return {
+    erc721: erc721Transfers.map((t) => ({
+      blockTimestamp: t.blockTimestamp,
+      totalTransactions: 1,
+    })),
+    erc1155: erc1155Transfers.map((t) => ({
+      blockTimestamp: t.blockTimestamp,
+      totalTransactions: t.quantity,
+    })),
+  };
 }
