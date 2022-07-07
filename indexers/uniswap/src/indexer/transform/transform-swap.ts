@@ -1,10 +1,10 @@
-import _ from 'lodash';
 import { BigNumber } from 'ethers';
 import { Types } from 'indexer-utils';
+import { Swap, SwapMethod } from '../types';
 import { getIntermediatePath } from '../utils';
-import { SwapMethod, Swap } from '../types';
 
-export const TRANSFER_METHOD_ID = '0xddf252ad';
+export const TRANSFER_METHOD_ID =
+  '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
 export default function transformSwap(
   method: SwapMethod,
@@ -27,7 +27,7 @@ export default function transformSwap(
   const transferLogs = tx.logs.filter(
     (log) =>
       log.address.toLowerCase() === tokenAddressOfMissingAmount &&
-      log.topic0.startsWith(TRANSFER_METHOD_ID),
+      log.topic0 === TRANSFER_METHOD_ID,
   );
 
   // sum the transfer events for the missing token - it's not always a single transfer as some token contracts have special cases
