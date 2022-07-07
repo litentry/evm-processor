@@ -1,4 +1,4 @@
-import { utils, query, Types } from 'indexer-utils';
+import { query, Types, utils } from 'indexer-utils';
 import { SwapMethod } from './types';
 
 const V2_SIGS = utils.contract.CONTRACT_SIGNATURES.UNISWAPV2.EXTRINSICS;
@@ -34,7 +34,7 @@ async function fetchV2Txs(startBlock: number, endBlock: number) {
           'blockNumber',
           'blockTimestamp',
         ],
-        logProperties: ['address', 'topic0'],
+        logProperties: ['address', 'topic0', 'data'],
       });
 
       const filtered = await filterByContractTypeAndStatus('v2', txs);
@@ -65,7 +65,7 @@ async function fetchV3Txs(startBlock: number, endBlock: number) {
       'blockNumber',
       'blockTimestamp',
     ],
-    logProperties: ['address', 'topic0'],
+    logProperties: ['address', 'topic0', 'data'],
   });
   const filtered = await filterByContractTypeAndStatus('v3', txs);
 
