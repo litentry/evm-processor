@@ -1,6 +1,6 @@
 export default {
   lean: true,
-  filter: { onlyIndexed: false },
+  filter: { onlyIndexed: true },
   limit: {
     defaultValue: 10000,
   },
