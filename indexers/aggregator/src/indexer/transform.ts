@@ -34,15 +34,15 @@ export default function transform(
 }
 
 function batch(transactions: ExtractedData[]): MarketActivity[] {
-  return transactions.map((t) => {
-    const blockDate = new Date(t.blockTimestamp * 1000);
+  return transactions.map((transaction) => {
+    const blockDate = new Date(transaction.blockTimestamp * 1000);
 
     return {
       year: blockDate.getUTCFullYear(),
       month: blockDate.getUTCMonth() + 1,
       day: blockDate.getUTCDate(),
-      totalTransactions: t.totalTransactions,
-      totalTokens: t.totalTokens,
+      totalTransactions: transaction.totalTransactions,
+      totalTokens: transaction.totalTokens,
     };
   });
 }
@@ -52,24 +52,25 @@ function groupBy(
   data: MarketActivity[],
 ): MarketActivity[] {
   const map = new Map();
-  data.forEach((t) => {
+  data.forEach((transaction) => {
     const index = groupByFields.reduce((acc, f) => {
-      if (t[f as keyof MarketActivity] === undefined) {
+      if (transaction[f as keyof MarketActivity] === undefined) {
         return acc;
       }
-      return `${acc}.${t[f as keyof MarketActivity]}`;
+      return `${acc}.${transaction[f as keyof MarketActivity]}`;
     }, '');
     const current = map.get(index);
     if (current) {
       map.set(index, {
         ...current,
-        totalTransactions: t.totalTransactions + current.totalTransactions,
-        totalTokens: t.totalTokens + current.totalTokens,
+        totalTransactions:
+          transaction.totalTransactions + current.totalTransactions,
+        totalTokens: transaction.totalTokens + current.totalTokens,
       });
       return;
     }
 
-    map.set(index, t);
+    map.set(index, transaction);
   });
 
   return Array.from(map.values());

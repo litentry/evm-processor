@@ -5,10 +5,6 @@ import transform from './transform';
 import { ExtractedTransfers, TransformedTransfers } from './types';
 
 export default async function handler(startBlock: number, endBlock: number) {
-  console.log('starting');
-  const data = await extract(startBlock, endBlock);
-  console.log(data);
-
   return indexer<ExtractedTransfers, TransformedTransfers>(
     startBlock,
     endBlock,
