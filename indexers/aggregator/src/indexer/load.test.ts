@@ -2,49 +2,53 @@ import {
   ERC1155DailyMarketActivityModel,
   ERC1155MonthlyMarketActivityModel,
   ERC1155YearlyMarketActivityModel,
+  ERC721DailyMarketActivityModel,
+  ERC721MonthlyMarketActivityModel,
+  ERC721YearlyMarketActivityModel,
 } from '../schema';
 import load from './load';
 import { MarketActivity } from './types';
 
 const transformed = {
-  yearly: [
-    { year: 2021, totalTransactions: 1, totalAmount: 200 },
-    { year: 2022, totalTransactions: 3, totalAmount: 800 },
-  ],
-  monthly: [
-    { year: 2021, month: 6, totalTransactions: 1, totalAmount: 200 },
-    { year: 2022, month: 6, totalTransactions: 3, totalAmount: 800 },
-  ],
-  daily: [
-    {
-      year: 2021,
-      month: 6,
-      day: 1,
-      totalTransactions: 1,
-      totalAmount: 200,
-    },
-    {
-      year: 2022,
-      month: 6,
-      day: 1,
-      totalTransactions: 1,
-      totalAmount: 300,
-    },
-    {
-      year: 2022,
-      month: 6,
-      day: 28,
-      totalTransactions: 1,
-      totalAmount: 400,
-    },
-    {
-      year: 2022,
-      month: 6,
-      day: 29,
-      totalTransactions: 1,
-      totalAmount: 100,
-    },
-  ],
+  erc721: {
+    yearly: [
+      { year: 2021, totalTransactions: 2, totalTokens: 2 },
+      { year: 2022, totalTransactions: 1, totalTokens: 1 },
+    ],
+    monthly: [
+      { year: 2021, month: 6, totalTransactions: 2, totalTokens: 2 },
+      { year: 2022, month: 6, totalTransactions: 1, totalTokens: 1 },
+    ],
+    daily: [
+      {
+        year: 2021,
+        month: 6,
+        day: 1,
+        totalTransactions: 2,
+        totalTokens: 2,
+      },
+      {
+        year: 2022,
+        month: 6,
+        day: 29,
+        totalTransactions: 1,
+        totalTokens: 1,
+      },
+    ],
+  },
+  erc1155: {
+    yearly: [{ year: 2021, totalTransactions: 2, totalTokens: 6 }],
+    monthly: [{ year: 2021, month: 6, totalTransactions: 2, totalTokens: 6 }],
+    daily: [
+      {
+        year: 2021,
+        month: 6,
+        day: 1,
+        totalTransactions: 2,
+        totalTokens: 6,
+      },
+    ],
+  },
 };
 
 describe('load', () => {
@@ -52,38 +56,73 @@ describe('load', () => {
     await ERC1155DailyMarketActivityModel.createIndexes();
     await ERC1155MonthlyMarketActivityModel.createIndexes();
     await ERC1155YearlyMarketActivityModel.createIndexes();
+    await ERC721DailyMarketActivityModel.createIndexes();
+    await ERC721MonthlyMarketActivityModel.createIndexes();
+    await ERC721YearlyMarketActivityModel.createIndexes();
 
     await load(transformed);
 
-    const resultsYearly = await ERC1155YearlyMarketActivityModel.find({});
+    const resultsErc721Yearly = await ERC721YearlyMarketActivityModel.find({});
     expect(
-      sort(resultsYearly).map((doc) => ({
+      sort(resultsErc721Yearly).map((doc) => ({
         year: doc.year,
         totalTransactions: doc.totalTransactions,
-        totalAmount: doc.totalAmount,
+        totalTokens: doc.totalTokens,
       })),
-    ).toStrictEqual(transformed.yearly);
+    ).toStrictEqual(transformed.erc721.yearly);
 
-    const resultsMonthly = await ERC1155MonthlyMarketActivityModel.find({});
+    const resultsErc721Monthly = await ERC721MonthlyMarketActivityModel.find(
+      {},
+    );
     expect(
-      sort(resultsMonthly).map((doc) => ({
+      sort(resultsErc721Monthly).map((doc) => ({
         year: doc.year,
         month: doc.month,
         totalTransactions: doc.totalTransactions,
-        totalAmount: doc.totalAmount,
+        totalTokens: doc.totalTokens,
       })),
-    ).toStrictEqual(transformed.monthly);
+    ).toStrictEqual(transformed.erc721.monthly);
 
-    const resultsDaily = await ERC1155DailyMarketActivityModel.find({});
+    const resultsErc721Daily = await ERC721DailyMarketActivityModel.find({});
     expect(
-      sort(resultsDaily).map((doc) => ({
+      sort(resultsErc721Daily).map((doc) => ({
         year: doc.year,
         month: doc.month,
         day: doc.day,
         totalTransactions: doc.totalTransactions,
-        totalAmount: doc.totalAmount,
+        totalTokens: doc.totalTokens,
       })),
-    ).toStrictEqual(transformed.daily);
+    ).toStrictEqual(transformed.erc721.daily);
+
+    const results1155Yearly = await ERC1155YearlyMarketActivityModel.find({});
+    expect(
+      sort(results1155Yearly).map((doc) => ({
+        year: doc.year,
+        totalTransactions: doc.totalTransactions,
+        totalTokens: doc.totalTokens,
+      })),
+    ).toStrictEqual(transformed.erc1155.yearly);
+
+    const results1155Monthly = await ERC1155MonthlyMarketActivityModel.find({});
+    expect(
+      sort(results1155Monthly).map((doc) => ({
+        year: doc.year,
+        month: doc.month,
+        totalTransactions: doc.totalTransactions,
+        totalTokens: doc.totalTokens,
+      })),
+    ).toStrictEqual(transformed.erc1155.monthly);
+
+    const results1155Daily = await ERC1155DailyMarketActivityModel.find({});
+    expect(
+      sort(results1155Daily).map((doc) => ({
+        year: doc.year,
+        month: doc.month,
+        day: doc.day,
+        totalTransactions: doc.totalTransactions,
+        totalTokens: doc.totalTokens,
+      })),
+    ).toStrictEqual(transformed.erc1155.daily);
   });
 });
 

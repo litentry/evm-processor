@@ -25,10 +25,12 @@ export default async function extract(
     erc721: erc721Transfers.map((t) => ({
       blockTimestamp: t.blockTimestamp,
       totalTransactions: 1,
+      totalTokens: 1,
     })),
     erc1155: erc1155Transfers.map((t) => ({
       blockTimestamp: t.blockTimestamp,
-      totalTransactions: t.quantity,
+      totalTransactions: 1,
+      totalTokens: t.quantity,
     })),
   };
 }

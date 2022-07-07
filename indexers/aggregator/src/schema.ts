@@ -68,17 +68,20 @@ export const ERC721DailyMarketActivitySchema =
     month: { type: Number, required: true, index: true },
     day: { type: Number, required: true, index: true },
     totalTransactions: { type: Number, required: true },
+    totalTokens: { type: Number, required: true },
   });
 export const ERC721MonthlyMarketActivitySchema =
   new mongoose.Schema<ERC721MonthlyMarketActivityDocument>({
     year: { type: Number, required: true, index: true },
     month: { type: Number, required: true, index: true },
     totalTransactions: { type: Number, required: true },
+    totalTokens: { type: Number, required: true },
   });
 export const ERC721YearlyMarketActivitySchema =
   new mongoose.Schema<ERC721YearlyMarketActivityDocument>({
     year: { type: Number, required: true, index: true },
     totalTransactions: { type: Number, required: true },
+    totalTokens: { type: Number, required: true },
   });
 
 export const ERC721DailyMarketActivityModel = mongoose.model(
@@ -115,17 +118,20 @@ export const ERC1155DailyMarketActivitySchema =
     month: { type: Number, required: true, index: true },
     day: { type: Number, required: true, index: true },
     totalTransactions: { type: Number, required: true },
+    totalTokens: { type: Number, required: true },
   });
 export const ERC1155MonthlyMarketActivitySchema =
   new mongoose.Schema<ERC1155MonthlyMarketActivityDocument>({
     year: { type: Number, required: true, index: true },
     month: { type: Number, required: true, index: true },
     totalTransactions: { type: Number, required: true },
+    totalTokens: { type: Number, required: true },
   });
 export const ERC1155YearlyMarketActivitySchema =
   new mongoose.Schema<ERC1155YearlyMarketActivityDocument>({
     year: { type: Number, required: true, index: true },
     totalTransactions: { type: Number, required: true },
+    totalTokens: { type: Number, required: true },
   });
 
 export const ERC1155DailyMarketActivityModel = mongoose.model(

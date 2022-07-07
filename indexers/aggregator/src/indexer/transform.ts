@@ -42,6 +42,7 @@ function batch(transactions: ExtractedData[]): MarketActivity[] {
       month: blockDate.getUTCMonth() + 1,
       day: blockDate.getUTCDate(),
       totalTransactions: t.totalTransactions,
+      totalTokens: t.totalTokens,
     };
   });
 }
@@ -63,6 +64,7 @@ function groupBy(
       map.set(index, {
         ...current,
         totalTransactions: t.totalTransactions + current.totalTransactions,
+        totalTokens: t.totalTokens + current.totalTokens,
       });
       return;
     }

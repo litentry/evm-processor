@@ -3,12 +3,14 @@ export type MarketActivity = {
   month?: number;
   day?: number;
   totalTransactions: number;
+  totalTokens: number;
   // totalAmount: number;
   // totalGas: number;
 };
 
 export type ExtractedData = {
   totalTransactions: number;
+  totalTokens: number;
   // totalAmount: number;
   blockTimestamp: number;
 };
