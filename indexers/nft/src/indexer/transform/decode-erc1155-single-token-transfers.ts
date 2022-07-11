@@ -31,7 +31,7 @@ export default function decodeErc1155SingleTokenTransfers(
       from: (decoded[1] as string).toLowerCase(),
       to: (decoded[2] as string).toLowerCase(),
       tokenId: (decoded[3] as BigNumber).toString(),
-      quantity: (decoded[4] as BigNumber).toNumber(),
+      quantity: (decoded[4] as BigNumber).toString(),
       transactionHash: log.transactionHash,
       transactionId: log.transactionId,
       blockNumber: log.blockNumber,

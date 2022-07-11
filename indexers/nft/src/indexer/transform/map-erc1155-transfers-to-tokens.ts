@@ -9,7 +9,7 @@ export default function mapErc1155TransfersToTokens(
       contract: transfer.contract,
       tokenId: transfer.tokenId,
       owner: transfer.from,
-      quantity: -transfer.quantity,
+      quantity: `-${transfer.quantity}`,
       collectionName: transfer.collectionName,
     },
     {

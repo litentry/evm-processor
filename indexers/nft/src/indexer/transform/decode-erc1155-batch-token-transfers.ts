@@ -44,7 +44,7 @@ export default function decodeErc1155BatchTokenTransfers(
     const transfers = (decoded[3] as BigNumber[]).map((tokenId, i) => {
       const transfer: Types.Nft.ERC1155TokenTransfer = {
         tokenId: tokenId.toString(),
-        quantity: (decoded[4][i] as BigNumber).toNumber(),
+        quantity: (decoded[4][i] as BigNumber).toString(),
         ...shared,
       };
       return transfer;

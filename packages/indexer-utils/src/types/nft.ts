@@ -13,8 +13,9 @@ export interface ERC1155Token {
   contract: string;
   tokenId: string;
   owner: string;
-  quantity: number;
+  quantity: string;
   collectionName?: string;
+  lockedUntil?: number;
 }
 
 export interface ERC721TokenTransfer {
@@ -36,7 +37,7 @@ export interface ERC1155TokenTransfer {
   to: string;
   contract: string;
   tokenId: string;
-  quantity: number;
+  quantity: string;
   collectionName?: string;
   blockNumber: number;
   blockTimestamp: number;
