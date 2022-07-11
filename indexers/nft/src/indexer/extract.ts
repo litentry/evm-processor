@@ -1,4 +1,4 @@
-import { utils, query } from 'indexer-utils';
+import { query, utils } from 'indexer-utils';
 import { ExtractedNFTData } from './types';
 
 const TRANSFER_721 = utils.contract.CONTRACT_SIGNATURES.ERC721.EVENTS.find(
@@ -30,6 +30,18 @@ export default async function extract(
         startBlock,
         endBlock,
         eventId: `0x${TRANSFER_721.ID}`,
+        properties: [
+          'address',
+          'topic1',
+          'topic2',
+          'topic3',
+          'data',
+          '_id',
+          'transactionHash',
+          'transactionId',
+          'blockNumber',
+          'blockTimestamp',
+        ],
       })
     ).filter((log) => {
       /*
@@ -43,11 +55,37 @@ export default async function extract(
       startBlock,
       endBlock,
       eventId: `0x${TRANSFER_1155.ID}`,
+      properties: [
+        'address',
+        'topic1',
+        'topic2',
+        'topic3',
+        'topic4',
+        'data',
+        '_id',
+        'transactionHash',
+        'transactionId',
+        'blockNumber',
+        'blockTimestamp',
+      ],
     }),
     query.archive.logs({
       startBlock,
       endBlock,
       eventId: `0x${TRANSFER_1155_BATCH.ID}`,
+      properties: [
+        'address',
+        'topic1',
+        'topic2',
+        'topic3',
+        'topic4',
+        'data',
+        '_id',
+        'transactionHash',
+        'transactionId',
+        'blockNumber',
+        'blockTimestamp',
+      ],
     }),
   ]);
 
