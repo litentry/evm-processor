@@ -19,74 +19,39 @@ export default async function extract(
   startBlock: number,
   endBlock: number,
 ): Promise<ExtractedNFTData> {
+  const data: ExtractedNFTData = {
+    erc721TransferEvents: [],
+    erc1155TransferSingleEvents: [],
+    erc1155TransferBatchEvents: [],
+    erc721Contracts: [],
+    erc1155Contracts: [],
+  };
+  // payloads can be too bit for api gateway, so no matter batch size we query a block at a time
+  let block = startBlock;
+  while (block <= endBlock) {
+    const _data = await extractBlock(block);
+
+    data.erc721TransferEvents.push(..._data.erc721TransferEvents);
+    data.erc1155TransferSingleEvents.push(..._data.erc1155TransferSingleEvents);
+    data.erc1155TransferBatchEvents.push(..._data.erc1155TransferBatchEvents);
+    data.erc721Contracts.push(..._data.erc721Contracts);
+    data.erc1155Contracts.push(..._data.erc1155Contracts);
+
+    block++;
+  }
+  return data;
+}
+
+async function extractBlock(block: number): Promise<ExtractedNFTData> {
   // fetch event logs
   const [
     erc721TransferEvents,
     erc1155TransferSingleEvents,
     erc1155TransferBatchEvents,
   ] = await Promise.all([
-    (
-      await query.archive.logs({
-        startBlock,
-        endBlock,
-        eventId: `0x${TRANSFER_721.ID}`,
-        properties: [
-          'address',
-          'topic1',
-          'topic2',
-          'topic3',
-          'data',
-          '_id',
-          'transactionHash',
-          'transactionId',
-          'blockNumber',
-          'blockTimestamp',
-        ],
-      })
-    ).filter((log) => {
-      /*
-      ERC721 contracts can also be matched ERC20 contracts, they have matching signatures,
-      but for ERC721 the last param (token) is indexed, whereas it is the unindexed amount
-      for ERC20. When indexed it appears as topic3, when unindexed it appears as data.
-      */
-      return !!log.topic3;
-    }),
-    query.archive.logs({
-      startBlock,
-      endBlock,
-      eventId: `0x${TRANSFER_1155.ID}`,
-      properties: [
-        'address',
-        'topic1',
-        'topic2',
-        'topic3',
-        'topic4',
-        'data',
-        '_id',
-        'transactionHash',
-        'transactionId',
-        'blockNumber',
-        'blockTimestamp',
-      ],
-    }),
-    query.archive.logs({
-      startBlock,
-      endBlock,
-      eventId: `0x${TRANSFER_1155_BATCH.ID}`,
-      properties: [
-        'address',
-        'topic1',
-        'topic2',
-        'topic3',
-        'topic4',
-        'data',
-        '_id',
-        'transactionHash',
-        'transactionId',
-        'blockNumber',
-        'blockTimestamp',
-      ],
-    }),
+    getErc721TransferEvents(block),
+    getErc1155TransferEvents(block, `0x${TRANSFER_1155.ID}`),
+    getErc1155TransferEvents(block, `0x${TRANSFER_1155_BATCH.ID}`),
   ]);
 
   // fetch contracts
@@ -124,4 +89,73 @@ export default async function extract(
     erc721Contracts,
     erc1155Contracts,
   };
+}
+
+async function getErc721TransferEvents(block: number) {
+  const _logs1 = await query.archive.logs({
+    startBlock: block,
+    endBlock: block,
+    eventId: `0x${TRANSFER_721.ID}`,
+    properties: ['address', 'topic1', 'topic2', 'topic3', 'data', '_id'],
+  });
+
+  const logs1 = _logs1.filter((log) => {
+    /*
+    ERC721 contracts can also be matched ERC20 contracts, they have matching signatures,
+    but for ERC721 the last param (token) is indexed, whereas it is the unindexed amount
+    for ERC20. When indexed it appears as topic3, when unindexed it appears as data.
+    */
+    return !!log.topic3;
+  });
+
+  const logs2 = await query.archive.logs({
+    startBlock: block,
+    endBlock: block,
+    eventId: `0x${TRANSFER_721.ID}`,
+    properties: [
+      '_id',
+      'transactionHash',
+      'transactionId',
+      'blockNumber',
+      'blockTimestamp',
+    ],
+  });
+
+  return logs1.map((log) => {
+    const matchingLog = logs2.find((l) => l._id === log._id)!;
+    return {
+      ...log,
+      ...matchingLog,
+    };
+  });
+}
+
+async function getErc1155TransferEvents(block: number, eventId: string) {
+  const logs1 = await query.archive.logs({
+    startBlock: block,
+    endBlock: block,
+    eventId,
+    properties: ['topic1', 'topic2', 'topic3', 'topic4', 'data', '_id'],
+  });
+  const logs2 = await query.archive.logs({
+    startBlock: block,
+    endBlock: block,
+    eventId,
+    properties: [
+      'address',
+      'transactionHash',
+      'transactionId',
+      'blockNumber',
+      'blockTimestamp',
+      '_id',
+    ],
+  });
+
+  return logs1.map((log) => {
+    const matchingLog = logs2.find((l) => l._id === log._id)!;
+    return {
+      ...log,
+      ...matchingLog,
+    };
+  });
 }
