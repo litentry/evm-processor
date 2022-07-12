@@ -118,6 +118,7 @@ async function getErc721TransferEvents(block: number) {
       'transactionId',
       'blockNumber',
       'blockTimestamp',
+      'logIndex',
     ],
   });
 
@@ -147,6 +148,7 @@ async function getErc1155TransferEvents(block: number, eventId: string) {
       'transactionId',
       'blockNumber',
       'blockTimestamp',
+      'logIndex',
       '_id',
     ],
   });
