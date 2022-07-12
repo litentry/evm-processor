@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
 import { composeMongoose } from 'graphql-compose-mongoose';
-import { Types, filter } from 'indexer-utils';
 import getEnvVar from 'indexer-serverless/lib/util/get-env-var';
+import { filter, Types } from 'indexer-utils';
+import mongoose from 'mongoose';
 
 const schemaOptions: mongoose.SchemaOptions = {};
 if (getEnvVar('SHARDING_ENABLED', false)) {
@@ -36,6 +36,7 @@ LogSchema.index({ blockNumber: 1 });
 LogSchema.index({ transactionId: 1 });
 LogSchema.index({ address: 1 });
 LogSchema.index({ topic0: 1 });
+LogSchema.index({ topic3: 1 }); // https://github.com/litentry/evm-processor/issues/133
 
 export const LogModel = mongoose.model('Log', LogSchema);
 
