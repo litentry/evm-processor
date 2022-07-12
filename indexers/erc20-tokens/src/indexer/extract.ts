@@ -1,4 +1,4 @@
-import { query } from 'indexer-utils';
+import { query, Types } from 'indexer-utils';
 import { ExtractedData } from './types';
 import { TRANSFER_EVENT_SIGNATURE } from './utils';
 
@@ -6,24 +6,7 @@ export default async function extract(
   startBlock: number,
   endBlock: number,
 ): Promise<ExtractedData> {
-  // get logs
-  const logs = await query.archive.logs({
-    startBlock,
-    endBlock,
-    eventId: TRANSFER_EVENT_SIGNATURE,
-    hasTopic3: false,
-    properties: [
-      '_id',
-      'address',
-      'topic1',
-      'topic2',
-      'data',
-      'blockNumber',
-      'blockTimestamp',
-      'transactionHash',
-      'transactionId',
-    ],
-  });
+  const logs = await getLogs(startBlock, endBlock);
 
   // get matching erc20 contracts
   const uniqueContractAddresses = [...new Set(logs.map((log) => log.address))];
@@ -42,4 +25,54 @@ export default async function extract(
     transferLogs,
     erc20Contracts,
   };
+}
+
+async function getLogs(startBlock: number, endBlock: number) {
+  try {
+    return query.archive.logs({
+      startBlock,
+      endBlock,
+      eventId: TRANSFER_EVENT_SIGNATURE,
+      hasTopic3: false,
+      properties: [
+        '_id',
+        'address',
+        'topic1',
+        'topic2',
+        'data',
+        'blockNumber',
+        'blockTimestamp',
+        'transactionHash',
+        'transactionId',
+      ],
+    });
+  } catch (e) {
+    const logs: Types.Archive.Log[] = [];
+
+    let block = startBlock;
+    while (block <= endBlock) {
+      const _logs = await query.archive.logs({
+        startBlock: block,
+        endBlock: block,
+        eventId: TRANSFER_EVENT_SIGNATURE,
+        hasTopic3: false,
+        properties: [
+          '_id',
+          'address',
+          'topic1',
+          'topic2',
+          'data',
+          'blockNumber',
+          'blockTimestamp',
+          'transactionHash',
+          'transactionId',
+        ],
+      });
+      logs.push(..._logs);
+
+      block++;
+    }
+
+    return logs;
+  }
 }
