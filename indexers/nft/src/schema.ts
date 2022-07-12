@@ -48,12 +48,12 @@ export const ERC721TokenTransferSchema =
     collectionName: String,
   });
 
-ERC721TokenSchema.index({ from: 1 });
-ERC721TokenSchema.index({ to: 1 });
-ERC721TokenSchema.index({ contract: 1 });
-ERC721TokenSchema.index({ tokenId: 1 });
-ERC721TokenSchema.index({ transactionId: 1 });
-ERC721TokenSchema.index({ blockNumber: 1 });
+ERC721TokenTransferSchema.index({ from: 1 });
+ERC721TokenTransferSchema.index({ to: 1 });
+ERC721TokenTransferSchema.index({ contract: 1 });
+ERC721TokenTransferSchema.index({ tokenId: 1 });
+ERC721TokenTransferSchema.index({ transactionId: 1 });
+ERC721TokenTransferSchema.index({ blockNumber: 1 });
 
 export const ERC1155TokenSchema = new mongoose.Schema<ERC1155TokenDocument>({
   _id: String,
@@ -86,12 +86,12 @@ export const ERC1155TokenTransferSchema =
     collectionName: String,
   });
 
-ERC1155TokenSchema.index({ from: 1 });
-ERC1155TokenSchema.index({ to: 1 });
-ERC1155TokenSchema.index({ contract: 1 });
-ERC1155TokenSchema.index({ tokenId: 1 });
-ERC1155TokenSchema.index({ transactionId: 1 });
-ERC1155TokenSchema.index({ blockNumber: 1 });
+ERC1155TokenTransferSchema.index({ from: 1 });
+ERC1155TokenTransferSchema.index({ to: 1 });
+ERC1155TokenTransferSchema.index({ contract: 1 });
+ERC1155TokenTransferSchema.index({ tokenId: 1 });
+ERC1155TokenTransferSchema.index({ transactionId: 1 });
+ERC1155TokenTransferSchema.index({ blockNumber: 1 });
 
 export const ERC721TokenModel = mongoose.model(
   'ERC721Token',
