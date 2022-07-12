@@ -85,27 +85,28 @@ async function extractBlock(block: number): Promise<ExtractedNFTData> {
 }
 
 async function getErc721TransferEvents(block: number) {
-  const logs1 = await query.archive.logs({
-    startBlock: block,
-    endBlock: block,
-    eventId: TRANSFER_721,
-    hasTopic3: true,
-    properties: ['address', 'topic1', 'topic2', 'topic3', 'data', '_id'],
-  });
-
-  const logs2 = await query.archive.logs({
-    startBlock: block,
-    endBlock: block,
-    eventId: TRANSFER_721,
-    properties: [
-      '_id',
-      'transactionHash',
-      'transactionId',
-      'blockNumber',
-      'blockTimestamp',
-      'logIndex',
-    ],
-  });
+  const [logs1, logs2] = await Promise.all([
+    query.archive.logs({
+      startBlock: block,
+      endBlock: block,
+      eventId: TRANSFER_721,
+      hasTopic3: true,
+      properties: ['address', 'topic1', 'topic2', 'topic3', 'data', '_id'],
+    }),
+    query.archive.logs({
+      startBlock: block,
+      endBlock: block,
+      eventId: TRANSFER_721,
+      properties: [
+        '_id',
+        'transactionHash',
+        'transactionId',
+        'blockNumber',
+        'blockTimestamp',
+        'logIndex',
+      ],
+    }),
+  ]);
 
   return logs1.map((log) => {
     const matchingLog = logs2.find((l) => l._id === log._id)!;
@@ -117,26 +118,28 @@ async function getErc721TransferEvents(block: number) {
 }
 
 async function getErc1155TransferEvents(block: number, eventId: string) {
-  const logs1 = await query.archive.logs({
-    startBlock: block,
-    endBlock: block,
-    eventId,
-    properties: ['topic1', 'topic2', 'topic3', 'topic4', 'data', '_id'],
-  });
-  const logs2 = await query.archive.logs({
-    startBlock: block,
-    endBlock: block,
-    eventId,
-    properties: [
-      'address',
-      'transactionHash',
-      'transactionId',
-      'blockNumber',
-      'blockTimestamp',
-      'logIndex',
-      '_id',
-    ],
-  });
+  const [logs1, logs2] = await Promise.all([
+    query.archive.logs({
+      startBlock: block,
+      endBlock: block,
+      eventId,
+      properties: ['topic1', 'topic2', 'topic3', 'topic4', 'data', '_id'],
+    }),
+    query.archive.logs({
+      startBlock: block,
+      endBlock: block,
+      eventId,
+      properties: [
+        'address',
+        'transactionHash',
+        'transactionId',
+        'blockNumber',
+        'blockTimestamp',
+        'logIndex',
+        '_id',
+      ],
+    }),
+  ]);
 
   return logs1.map((log) => {
     const matchingLog = logs2.find((l) => l._id === log._id)!;
