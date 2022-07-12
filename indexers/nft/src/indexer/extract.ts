@@ -85,20 +85,12 @@ async function extractBlock(block: number): Promise<ExtractedNFTData> {
 }
 
 async function getErc721TransferEvents(block: number) {
-  const _logs1 = await query.archive.logs({
+  const logs1 = await query.archive.logs({
     startBlock: block,
     endBlock: block,
     eventId: TRANSFER_721,
+    hasTopic3: true,
     properties: ['address', 'topic1', 'topic2', 'topic3', 'data', '_id'],
-  });
-
-  const logs1 = _logs1.filter((log) => {
-    /*
-    ERC721 contracts can also be matched ERC20 contracts, they have matching signatures,
-    but for ERC721 the last param (token) is indexed, whereas it is the unindexed amount
-    for ERC20. When indexed it appears as topic3, when unindexed it appears as data.
-    */
-    return !!log.topic3;
   });
 
   const logs2 = await query.archive.logs({
