@@ -1,4 +1,5 @@
-import { utils } from 'indexer-utils';
+import BigNumber from 'bignumber.js';
+import { Types, utils } from 'indexer-utils';
 import {
   ERC1155TokenModel,
   ERC1155TokenTransferModel,
@@ -40,7 +41,7 @@ export default async function load(data: TransformedNFTData): Promise<void> {
               {
                 _id: doc._id,
                 lastTransferedBlockNumber: {
-                  $lt: doc.lastTransferedBlockNumber, // TODO add tx index here in case an NFT can move twice per block
+                  $lt: doc.lastTransferedBlockNumber,
                 },
               },
               {
@@ -65,10 +66,10 @@ export default async function load(data: TransformedNFTData): Promise<void> {
               'E11000 duplicate key error collection',
             )
           ) {
+            const quantity = await getLockedQuantity(doc._id);
             await ERC1155TokenModel.findByIdAndUpdate(doc._id, {
-              $inc: {
-                quantity: doc.quantity,
-              },
+              quantity: new BigNumber(quantity).plus(doc.quantity).toString(),
+              lockedUntil: null,
             });
           } else {
             throw e;
@@ -77,4 +78,35 @@ export default async function load(data: TransformedNFTData): Promise<void> {
       }),
     ),
   ]);
+}
+
+// Poll every second for an unlocked document, then lock it (atomically)
+async function getLockedQuantity(_id: string) {
+  let doc: Types.Nft.ERC1155Token | null = null;
+
+  while (!doc) {
+    doc = await ERC1155TokenModel.findOneAndUpdate(
+      {
+        _id,
+        $or: [
+          {
+            lockedUntil: {
+              $lt: new Date().getTime(),
+            },
+          },
+          {
+            lockedUntil: null, // this will match undefined too
+          },
+        ],
+      },
+      {
+        lockedUntil: new Date().getTime() + 60000,
+      },
+    );
+    if (!doc) {
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+  }
+
+  return doc.quantity;
 }

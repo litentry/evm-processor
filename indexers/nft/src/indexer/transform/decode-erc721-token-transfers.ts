@@ -1,6 +1,7 @@
 import ERC721 from '@openzeppelin/contracts/build/contracts/ERC721.json';
 import { BigNumber, ethers } from 'ethers';
 import { Types } from 'indexer-utils';
+import { TRANSFER_721 } from '../constants';
 
 type Decoded = [string, string, BigNumber];
 
@@ -15,7 +16,7 @@ export default function decodeErc721TokenTransfers(
       decoded = new ethers.utils.Interface(ERC721.abi).decodeEventLog(
         'Transfer(address,address,uint256)',
         log.data,
-        [log.topic0, log.topic1!, log.topic2!, log.topic3!],
+        [TRANSFER_721, log.topic1!, log.topic2!, log.topic3!],
       ) as Decoded;
     } catch (e) {
       console.error(

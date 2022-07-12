@@ -2,6 +2,7 @@ import ERC1155 from '@openzeppelin/contracts/build/contracts/ERC1155.json';
 import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
 import { Types } from 'indexer-utils';
+import { TRANSFER_1155 } from '../constants';
 
 type Decoded = [string, string, string, BigNumber, BigNumber];
 
@@ -16,7 +17,7 @@ export default function decodeErc1155SingleTokenTransfers(
       decoded = new ethers.utils.Interface(ERC1155.abi).decodeEventLog(
         'TransferSingle(address,address,address,uint256,uint256)',
         log.data,
-        [log.topic0, log.topic1!, log.topic2!, log.topic3!],
+        [TRANSFER_1155, log.topic1!, log.topic2!, log.topic3!],
       ) as Decoded;
     } catch (e) {
       console.error(
@@ -31,7 +32,7 @@ export default function decodeErc1155SingleTokenTransfers(
       from: (decoded[1] as string).toLowerCase(),
       to: (decoded[2] as string).toLowerCase(),
       tokenId: (decoded[3] as BigNumber).toString(),
-      quantity: (decoded[4] as BigNumber).toNumber(),
+      quantity: (decoded[4] as BigNumber).toString(),
       transactionHash: log.transactionHash,
       transactionId: log.transactionId,
       blockNumber: log.blockNumber,

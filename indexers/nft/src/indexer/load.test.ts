@@ -1,11 +1,11 @@
-import load from './load';
+import { Types } from 'indexer-utils';
 import {
   ERC1155TokenModel,
   ERC1155TokenTransferModel,
   ERC721TokenModel,
   ERC721TokenTransferModel,
 } from '../schema';
-import { Types } from 'indexer-utils';
+import load from './load';
 
 const transactionHash = '0x123';
 const transactionId = '1.1';
@@ -206,7 +206,7 @@ describe('load', () => {
     const erc1155TokenTransfers: Types.Nft.ERC1155TokenTransfer[] = [
       {
         _id: '1',
-        quantity: 2,
+        quantity: '2',
         from: '0x00',
         to: 'a',
         contract: contract_1155,
@@ -218,7 +218,7 @@ describe('load', () => {
       },
       {
         _id: '2',
-        quantity: 2,
+        quantity: '2',
         from: 'a',
         to: 'b',
         contract: contract_1155,
@@ -236,28 +236,28 @@ describe('load', () => {
         contract: contract_1155,
         owner: '0x00',
         tokenId: tokenId_1155,
-        quantity: -2,
+        quantity: '-2',
       },
       {
         _id: `${contract_1155}.${tokenId_1155}.a`,
         contract: contract_1155,
         owner: 'a',
         tokenId: tokenId_1155,
-        quantity: 2,
+        quantity: '2',
       },
       {
         _id: `${contract_1155}.${tokenId_1155}.a`,
         contract: contract_1155,
         owner: 'a',
         tokenId: tokenId_1155,
-        quantity: -2,
+        quantity: '-2',
       },
       {
         _id: `${contract_1155}.${tokenId_1155}.b`,
         contract: contract_1155,
         owner: 'b',
         tokenId: tokenId_1155,
-        quantity: 2,
+        quantity: '2',
       },
     ];
 
@@ -298,28 +298,28 @@ describe('load', () => {
           owner: doc.owner,
           tokenId: doc.tokenId,
         }))
-        .sort((a, b) => a.quantity - b.quantity),
+        .sort((a, b) => parseInt(a.quantity) - parseInt(b.quantity)),
     ).toStrictEqual([
       {
         _id: `${contract_1155}.${tokenId_1155}.0x00`,
         contract: contract_1155,
         owner: '0x00',
         tokenId: tokenId_1155,
-        quantity: -2,
+        quantity: '-2',
       },
       {
         _id: `${contract_1155}.${tokenId_1155}.a`,
         contract: contract_1155,
         owner: 'a',
         tokenId: tokenId_1155,
-        quantity: 0,
+        quantity: '0',
       },
       {
         _id: `${contract_1155}.${tokenId_1155}.b`,
         contract: contract_1155,
         owner: 'b',
         tokenId: tokenId_1155,
-        quantity: 2,
+        quantity: '2',
       },
     ]);
   });

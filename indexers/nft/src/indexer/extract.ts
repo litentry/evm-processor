@@ -1,54 +1,50 @@
-import { utils, query } from 'indexer-utils';
+import { query } from 'indexer-utils';
+import { TRANSFER_1155, TRANSFER_1155_BATCH, TRANSFER_721 } from './constants';
 import { ExtractedNFTData } from './types';
-
-const TRANSFER_721 = utils.contract.CONTRACT_SIGNATURES.ERC721.EVENTS.find(
-  (ex) => ex.SIGNATURE === 'Transfer(address,address,uint256)',
-)!;
-const TRANSFER_1155 = utils.contract.CONTRACT_SIGNATURES.ERC1155.EVENTS.find(
-  (ex) =>
-    ex.SIGNATURE === 'TransferSingle(address,address,address,uint256,uint256)',
-)!;
-const TRANSFER_1155_BATCH =
-  utils.contract.CONTRACT_SIGNATURES.ERC1155.EVENTS.find(
-    (ex) =>
-      ex.SIGNATURE ===
-      'TransferBatch(address,address,address,uint256[],uint256[])',
-  )!;
 
 export default async function extract(
   startBlock: number,
   endBlock: number,
 ): Promise<ExtractedNFTData> {
+  const data: ExtractedNFTData = {
+    erc721TransferEvents: [],
+    erc1155TransferSingleEvents: [],
+    erc1155TransferBatchEvents: [],
+    erc721Contracts: [],
+    erc1155Contracts: [],
+  };
+  // payloads can be too bit for api gateway, so no matter batch size we query a block at a time
+  const blocks: number[] = [];
+  for (let block = startBlock; block <= endBlock; block++) {
+    blocks.push(block);
+  }
+  const _data = await Promise.all(blocks.map(extractBlock));
+
+  _data.forEach((response) => {
+    data.erc721TransferEvents.push(...response.erc721TransferEvents);
+    data.erc1155TransferSingleEvents.push(
+      ...response.erc1155TransferSingleEvents,
+    );
+    data.erc1155TransferBatchEvents.push(
+      ...response.erc1155TransferBatchEvents,
+    );
+    data.erc721Contracts.push(...response.erc721Contracts);
+    data.erc1155Contracts.push(...response.erc1155Contracts);
+  });
+
+  return data;
+}
+
+async function extractBlock(block: number): Promise<ExtractedNFTData> {
   // fetch event logs
   const [
     erc721TransferEvents,
     erc1155TransferSingleEvents,
     erc1155TransferBatchEvents,
   ] = await Promise.all([
-    (
-      await query.archive.logs({
-        startBlock,
-        endBlock,
-        eventId: `0x${TRANSFER_721.ID}`,
-      })
-    ).filter((log) => {
-      /*
-      ERC721 contracts can also be matched ERC20 contracts, they have matching signatures,
-      but for ERC721 the last param (token) is indexed, whereas it is the unindexed amount
-      for ERC20. When indexed it appears as topic3, when unindexed it appears as data.
-      */
-      return !!log.topic3;
-    }),
-    query.archive.logs({
-      startBlock,
-      endBlock,
-      eventId: `0x${TRANSFER_1155.ID}`,
-    }),
-    query.archive.logs({
-      startBlock,
-      endBlock,
-      eventId: `0x${TRANSFER_1155_BATCH.ID}`,
-    }),
+    getErc721TransferEvents(block),
+    getErc1155TransferEvents(block, TRANSFER_1155),
+    getErc1155TransferEvents(block, TRANSFER_1155_BATCH),
   ]);
 
   // fetch contracts
@@ -86,4 +82,75 @@ export default async function extract(
     erc721Contracts,
     erc1155Contracts,
   };
+}
+
+async function getErc721TransferEvents(block: number) {
+  const _logs1 = await query.archive.logs({
+    startBlock: block,
+    endBlock: block,
+    eventId: TRANSFER_721,
+    properties: ['address', 'topic1', 'topic2', 'topic3', 'data', '_id'],
+  });
+
+  const logs1 = _logs1.filter((log) => {
+    /*
+    ERC721 contracts can also be matched ERC20 contracts, they have matching signatures,
+    but for ERC721 the last param (token) is indexed, whereas it is the unindexed amount
+    for ERC20. When indexed it appears as topic3, when unindexed it appears as data.
+    */
+    return !!log.topic3;
+  });
+
+  const logs2 = await query.archive.logs({
+    startBlock: block,
+    endBlock: block,
+    eventId: TRANSFER_721,
+    properties: [
+      '_id',
+      'transactionHash',
+      'transactionId',
+      'blockNumber',
+      'blockTimestamp',
+      'logIndex',
+    ],
+  });
+
+  return logs1.map((log) => {
+    const matchingLog = logs2.find((l) => l._id === log._id)!;
+    return {
+      ...log,
+      ...matchingLog,
+    };
+  });
+}
+
+async function getErc1155TransferEvents(block: number, eventId: string) {
+  const logs1 = await query.archive.logs({
+    startBlock: block,
+    endBlock: block,
+    eventId,
+    properties: ['topic1', 'topic2', 'topic3', 'topic4', 'data', '_id'],
+  });
+  const logs2 = await query.archive.logs({
+    startBlock: block,
+    endBlock: block,
+    eventId,
+    properties: [
+      'address',
+      'transactionHash',
+      'transactionId',
+      'blockNumber',
+      'blockTimestamp',
+      'logIndex',
+      '_id',
+    ],
+  });
+
+  return logs1.map((log) => {
+    const matchingLog = logs2.find((l) => l._id === log._id)!;
+    return {
+      ...log,
+      ...matchingLog,
+    };
+  });
 }

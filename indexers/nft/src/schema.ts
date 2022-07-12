@@ -1,7 +1,7 @@
 import { schemaComposer } from 'graphql-compose';
 import { composeMongoose } from 'graphql-compose-mongoose';
-import mongoose from 'mongoose';
 import { filter, repository, Types } from 'indexer-utils';
+import mongoose from 'mongoose';
 
 // @ts-ignore
 interface ERC721TokenTransferDocument
@@ -48,20 +48,22 @@ export const ERC721TokenTransferSchema =
     collectionName: String,
   });
 
-ERC721TokenSchema.index({ from: 1 });
-ERC721TokenSchema.index({ to: 1 });
-ERC721TokenSchema.index({ contract: 1 });
-ERC721TokenSchema.index({ tokenId: 1 });
-ERC721TokenSchema.index({ transactionId: 1 });
-ERC721TokenSchema.index({ blockNumber: 1 });
+ERC721TokenTransferSchema.index({ from: 1 });
+ERC721TokenTransferSchema.index({ to: 1 });
+ERC721TokenTransferSchema.index({ contract: 1 });
+ERC721TokenTransferSchema.index({ tokenId: 1 });
+ERC721TokenTransferSchema.index({ transactionId: 1 });
+ERC721TokenTransferSchema.index({ blockNumber: 1 });
 
 export const ERC1155TokenSchema = new mongoose.Schema<ERC1155TokenDocument>({
   _id: String,
   contract: { type: String, required: true },
   tokenId: { type: String, required: true },
   owner: { type: String, required: true },
-  quantity: { type: Number, required: true },
+  quantity: { type: String, required: true },
   collectionName: String,
+  // @ts-ignore
+  lockedUntil: Number,
 });
 
 ERC1155TokenSchema.index({ contract: 1 });
@@ -76,7 +78,7 @@ export const ERC1155TokenTransferSchema =
     to: { type: String, required: true },
     contract: { type: String, required: true },
     tokenId: { type: String, required: true },
-    quantity: { type: Number, required: true },
+    quantity: { type: String, required: true },
     transactionHash: { type: String, required: true },
     transactionId: { type: String, required: true },
     blockNumber: { type: Number, required: true },
@@ -84,12 +86,12 @@ export const ERC1155TokenTransferSchema =
     collectionName: String,
   });
 
-ERC1155TokenSchema.index({ from: 1 });
-ERC1155TokenSchema.index({ to: 1 });
-ERC1155TokenSchema.index({ contract: 1 });
-ERC1155TokenSchema.index({ tokenId: 1 });
-ERC1155TokenSchema.index({ transactionId: 1 });
-ERC1155TokenSchema.index({ blockNumber: 1 });
+ERC1155TokenTransferSchema.index({ from: 1 });
+ERC1155TokenTransferSchema.index({ to: 1 });
+ERC1155TokenTransferSchema.index({ contract: 1 });
+ERC1155TokenTransferSchema.index({ tokenId: 1 });
+ERC1155TokenTransferSchema.index({ transactionId: 1 });
+ERC1155TokenTransferSchema.index({ blockNumber: 1 });
 
 export const ERC721TokenModel = mongoose.model(
   'ERC721Token',
@@ -115,6 +117,8 @@ const ERC721TokenTC = composeMongoose(ERC721TokenModel);
 const ERC721TokenTransferTC = composeMongoose(ERC721TokenTransferModel);
 const ERC1155TokenTC = composeMongoose(ERC1155TokenModel);
 const ERC1155TokenTransferTC = composeMongoose(ERC1155TokenTransferModel);
+
+ERC1155TokenTC.removeField('lockedUntil');
 
 schemaComposer.Query.addFields({
   nftLatestBlock: repository.lastIndexedBlock.query.latestBlock,
