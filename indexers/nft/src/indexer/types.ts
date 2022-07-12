@@ -1,9 +1,9 @@
 import { Types } from 'indexer-utils';
 
 export type ExtractedNFTData = {
-  erc721TransferEvents: Types.Archive.Log[];
-  erc1155TransferSingleEvents: Types.Archive.Log[];
-  erc1155TransferBatchEvents: Types.Archive.Log[];
+  erc721TransferLogs: Types.Archive.Log[];
+  erc1155TransferSingleLogs: Types.Archive.Log[];
+  erc1155TransferBatchLogs: Types.Archive.Log[];
   erc721Contracts: Types.Contract.ERC721Contract[];
   erc1155Contracts: Types.Contract.ERC1155Contract[];
 };

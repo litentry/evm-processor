@@ -8,15 +8,15 @@ import mapErc721TransfersToTokens from './map-erc721-transfers-to-tokens';
 export default function transform(data: ExtractedNFTData): TransformedNFTData {
   // decode transfers
   const erc721TokenTransfers = decodeErc721TokenTransfers(
-    data.erc721TransferEvents,
+    data.erc721TransferLogs,
     data.erc721Contracts,
   );
   const singleErc1155TokenTransfers = decodeErc1155SingleTokenTransfers(
-    data.erc1155TransferSingleEvents,
+    data.erc1155TransferSingleLogs,
     data.erc1155Contracts,
   );
   const batchErc1155TokenTransfers = decodeErc1155BatchTokenTransfers(
-    data.erc1155TransferBatchEvents,
+    data.erc1155TransferBatchLogs,
     data.erc1155Contracts,
   );
   const erc1155TokenTransfers = [
