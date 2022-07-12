@@ -1,9 +1,9 @@
 import { ExtractedNFTData, TransformedNFTData } from '../types';
-import decodeErc721TokenTransfers from './decode-erc721-token-transfers';
-import decodeErc1155SingleTokenTransfers from './decode-erc1155-single-token-transfers';
 import decodeErc1155BatchTokenTransfers from './decode-erc1155-batch-token-transfers';
-import mapErc721TransfersToTokens from './map-erc721-transfers-to-tokens';
+import decodeErc1155SingleTokenTransfers from './decode-erc1155-single-token-transfers';
+import decodeErc721TokenTransfers from './decode-erc721-token-transfers';
 import mapErc1155TransfersToTokens from './map-erc1155-transfers-to-tokens';
+import mapErc721TransfersToTokens from './map-erc721-transfers-to-tokens';
 
 export default function transform(data: ExtractedNFTData): TransformedNFTData {
   // decode transfers

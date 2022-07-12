@@ -1,19 +1,6 @@
-import { query, utils } from 'indexer-utils';
+import { query } from 'indexer-utils';
+import { TRANSFER_1155, TRANSFER_1155_BATCH, TRANSFER_721 } from './constants';
 import { ExtractedNFTData } from './types';
-
-const TRANSFER_721 = utils.contract.CONTRACT_SIGNATURES.ERC721.EVENTS.find(
-  (ex) => ex.SIGNATURE === 'Transfer(address,address,uint256)',
-)!;
-const TRANSFER_1155 = utils.contract.CONTRACT_SIGNATURES.ERC1155.EVENTS.find(
-  (ex) =>
-    ex.SIGNATURE === 'TransferSingle(address,address,address,uint256,uint256)',
-)!;
-const TRANSFER_1155_BATCH =
-  utils.contract.CONTRACT_SIGNATURES.ERC1155.EVENTS.find(
-    (ex) =>
-      ex.SIGNATURE ===
-      'TransferBatch(address,address,address,uint256[],uint256[])',
-  )!;
 
 export default async function extract(
   startBlock: number,
@@ -27,18 +14,24 @@ export default async function extract(
     erc1155Contracts: [],
   };
   // payloads can be too bit for api gateway, so no matter batch size we query a block at a time
-  let block = startBlock;
-  while (block <= endBlock) {
-    const _data = await extractBlock(block);
-
-    data.erc721TransferEvents.push(..._data.erc721TransferEvents);
-    data.erc1155TransferSingleEvents.push(..._data.erc1155TransferSingleEvents);
-    data.erc1155TransferBatchEvents.push(..._data.erc1155TransferBatchEvents);
-    data.erc721Contracts.push(..._data.erc721Contracts);
-    data.erc1155Contracts.push(..._data.erc1155Contracts);
-
-    block++;
+  const blocks: number[] = [];
+  for (let block = startBlock; block <= endBlock; block++) {
+    blocks.push(block);
   }
+  const _data = await Promise.all(blocks.map(extractBlock));
+
+  _data.forEach((response) => {
+    data.erc721TransferEvents.push(...response.erc721TransferEvents);
+    data.erc1155TransferSingleEvents.push(
+      ...response.erc1155TransferSingleEvents,
+    );
+    data.erc1155TransferBatchEvents.push(
+      ...response.erc1155TransferBatchEvents,
+    );
+    data.erc721Contracts.push(...response.erc721Contracts);
+    data.erc1155Contracts.push(...response.erc1155Contracts);
+  });
+
   return data;
 }
 
@@ -50,8 +43,8 @@ async function extractBlock(block: number): Promise<ExtractedNFTData> {
     erc1155TransferBatchEvents,
   ] = await Promise.all([
     getErc721TransferEvents(block),
-    getErc1155TransferEvents(block, `0x${TRANSFER_1155.ID}`),
-    getErc1155TransferEvents(block, `0x${TRANSFER_1155_BATCH.ID}`),
+    getErc1155TransferEvents(block, TRANSFER_1155),
+    getErc1155TransferEvents(block, TRANSFER_1155_BATCH),
   ]);
 
   // fetch contracts
@@ -95,7 +88,7 @@ async function getErc721TransferEvents(block: number) {
   const _logs1 = await query.archive.logs({
     startBlock: block,
     endBlock: block,
-    eventId: `0x${TRANSFER_721.ID}`,
+    eventId: TRANSFER_721,
     properties: ['address', 'topic1', 'topic2', 'topic3', 'data', '_id'],
   });
 
@@ -111,7 +104,7 @@ async function getErc721TransferEvents(block: number) {
   const logs2 = await query.archive.logs({
     startBlock: block,
     endBlock: block,
-    eventId: `0x${TRANSFER_721.ID}`,
+    eventId: TRANSFER_721,
     properties: [
       '_id',
       'transactionHash',
