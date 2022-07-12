@@ -11,6 +11,8 @@ global.console = {
   error: jest.fn(),
 };
 
+jest.setTimeout(30000);
+
 beforeAll(async () => {
   process.env.BATCH_SIZE = '10';
   process.env.END_BLOCK = 'undefined';
