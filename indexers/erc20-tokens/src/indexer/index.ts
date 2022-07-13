@@ -1,11 +1,11 @@
-import { indexer } from 'indexer-utils';
+import { indexer, Types } from 'indexer-utils';
 import extract from './extract';
-import transform from './transform';
 import load from './load';
-import { ERC20Transfer, ExtractedData } from './types';
+import transform from './transform';
+import { ExtractedData } from './types';
 
 export default async function handler(startBlock: number, endBlock: number) {
-  return indexer<ExtractedData, ERC20Transfer[]>(
+  return indexer<ExtractedData, Types.Erc20.Transfer[]>(
     startBlock,
     endBlock,
     extract,

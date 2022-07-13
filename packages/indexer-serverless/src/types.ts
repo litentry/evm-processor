@@ -32,7 +32,8 @@ export type Config = {
   lastBlockRpcEndpoint?: string;
   archiveGraph?: string;
   contractGraph?: string;
-  tokenActivityGraph?: string;
+  nftGraph?: string;
+  erc20Graph?: string;
   maxWorkers: number;
   targetTotalQueuedBlocks?: number;
   extractionSource?: ExtractionSource;

@@ -29,7 +29,7 @@ export default async function extract(
 
 async function getLogs(startBlock: number, endBlock: number) {
   try {
-    return query.archive.logs({
+    const logs = await query.archive.logs({
       startBlock,
       endBlock,
       eventId: TRANSFER_EVENT_SIGNATURE,
@@ -46,6 +46,7 @@ async function getLogs(startBlock: number, endBlock: number) {
         'transactionId',
       ],
     });
+    return logs;
   } catch (e) {
     const logs: Types.Archive.Log[] = [];
 
