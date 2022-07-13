@@ -1,13 +1,14 @@
 import BN from 'bignumber.js';
 import { schemaComposer } from 'graphql-compose';
 import { composeMongoose } from 'graphql-compose-mongoose';
-import { filter, query, repository, web3 } from 'indexer-utils';
+import { filter, query, repository, Types, web3 } from 'indexer-utils';
 import mongoose from 'mongoose';
 import Web3 from 'web3';
-import { ERC20Balance, ERC20Transfer } from './indexer/types';
 
 // @ts-ignore
-interface ERC20TransferDocument extends ERC20Transfer, mongoose.Document {}
+interface ERC20TransferDocument
+  extends Types.Erc20.Transfer,
+    mongoose.Document {}
 
 export const ERC20TransferSchema = new mongoose.Schema<ERC20TransferDocument>({
   _id: String,
@@ -51,7 +52,7 @@ schemaComposer.Query.addFields({
       contract: 'String!',
       address: 'String!',
     },
-    resolve: async (_, args): Promise<ERC20Balance> => {
+    resolve: async (_, args): Promise<Types.Erc20.Balance> => {
       const contract = new (web3() as Web3).eth.Contract(
         [
           {

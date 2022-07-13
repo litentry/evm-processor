@@ -1,8 +1,9 @@
-import { utils } from 'indexer-utils';
+import { Types, utils } from 'indexer-utils';
 import { ERC20TransferModel } from '../schema';
-import { ERC20Transfer } from './types';
 
-export default async function load(data: ERC20Transfer[]): Promise<void> {
+export default async function load(
+  data: Types.Erc20.Transfer[],
+): Promise<void> {
   await utils.ensureShardedCollections(ERC20TransferModel);
   await utils.upsertMongoModels(ERC20TransferModel, data, ['_id']);
 }

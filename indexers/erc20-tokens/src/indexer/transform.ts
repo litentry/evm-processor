@@ -1,10 +1,11 @@
-import { ERC20Transfer, ExtractedData } from './types';
+import { Types } from 'indexer-utils';
+import { ExtractedData } from './types';
 import { decodeTransfer, TRANSFER_EVENT_SIGNATURE } from './utils';
 
 export default function transform({
   transferLogs,
   erc20Contracts,
-}: ExtractedData): ERC20Transfer[] {
+}: ExtractedData): Types.Erc20.Transfer[] {
   const transfers = transferLogs.reduce((prev, log) => {
     try {
       const { to, from, amount } = decodeTransfer(log.data, [
@@ -17,7 +18,7 @@ export default function transform({
         (contract) => contract._id === log.address,
       )!;
 
-      const transfer: ERC20Transfer = {
+      const transfer: Types.Erc20.Transfer = {
         _id: log._id,
         contract: log.address,
         from,
@@ -42,7 +43,7 @@ export default function transform({
       */
       return prev;
     }
-  }, [] as ERC20Transfer[]);
+  }, [] as Types.Erc20.Transfer[]);
 
   return transfers;
 }

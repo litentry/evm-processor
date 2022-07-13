@@ -55,7 +55,7 @@ export default async function getLogs(startBlock: number, endBlock: number) {
 
 async function getErc721TransferLogs(startBlock: number, endBlock: number) {
   try {
-    return query.archive.logs({
+    const logs = await query.archive.logs({
       startBlock,
       endBlock,
       eventId: TRANSFER_721,
@@ -74,6 +74,7 @@ async function getErc721TransferLogs(startBlock: number, endBlock: number) {
         'logIndex',
       ],
     });
+    return logs;
   } catch (e) {
     const [logs1, logs2] = await Promise.all([
       query.archive.logs({
@@ -114,7 +115,7 @@ async function getErc1155TransferLogs(
   eventId: string,
 ) {
   try {
-    return query.archive.logs({
+    const logs = await query.archive.logs({
       startBlock,
       endBlock,
       eventId,
@@ -133,6 +134,7 @@ async function getErc1155TransferLogs(
         '_id',
       ],
     });
+    return logs;
   } catch (e) {
     const [logs1, logs2] = await Promise.all([
       query.archive.logs({
