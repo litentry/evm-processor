@@ -5,7 +5,7 @@ import decodeOpenseaSales from './decode-opensea-sales';
 describe('decodeOpenseaSales', () => {
   it('Decodes the logs and transforms the data into Sale models', () => {
     const result = decodeOpenseaSales(
-      extractedBlock14000004 as unknown as ExtractedNFTPriceData,
+      extractedBlock14000004 as unknown as ExtractedNFTPriceData['opensea'],
     );
 
     expect(result).toStrictEqual({
