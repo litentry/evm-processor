@@ -42,7 +42,7 @@ export default async function erc20Contracts({
     }`;
   }
 
-  if (contractAddress?.length) {
+  if (contractAddress) {
     contractAddressesVar = '$contractAddress: [String!], ';
     contractAddresses = `_id: {
       in: $contractAddress

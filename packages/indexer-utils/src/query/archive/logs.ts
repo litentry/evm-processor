@@ -24,6 +24,7 @@ export default async function logs({
   contractAddress,
   eventId,
   transactionId,
+  transactionIds,
   hasTopic3,
   properties = defaultProperties,
 }: {
@@ -32,9 +33,19 @@ export default async function logs({
   contractAddress?: string;
   eventId?: string;
   transactionId?: string;
+  transactionIds?: string[];
   hasTopic3?: boolean;
   properties?: (keyof Log)[];
 }) {
+  let transactionIdQuery = '';
+  let transactionIdQueryVar = '';
+  if (transactionIds) {
+    transactionIdQueryVar = '$transactionIds: [String!],';
+    transactionIdQuery = `transactionId: {
+      in: $transactionIds
+    }`;
+  }
+
   /*
     ERC721 contracts can also be matched ERC20 contracts, they have matching signatures,
     but for ERC721 the last param (token) is indexed, whereas it is the unindexed amount
@@ -43,11 +54,12 @@ export default async function logs({
   let topic3Query = '';
   let topic3QueryVar = '';
   if (hasTopic3 !== undefined) {
-    topic3QueryVar = '$hasTopic3: Boolean,\n';
+    topic3QueryVar = '$hasTopic3: Boolean,';
     topic3Query = `topic3: {
-      exists: $hasTopic3,
+      exists: $hasTopic3
     }`;
   }
+
   try {
     const response = await axios({
       url: endpoint(),
@@ -59,6 +71,7 @@ export default async function logs({
           contractAddress,
           eventId,
           transactionId,
+          transactionIds,
           hasTopic3,
         },
         query: `
@@ -68,6 +81,7 @@ export default async function logs({
           $contractAddress: String,
           $eventId: String,
           ${topic3QueryVar}
+          ${transactionIdQueryVar}
           $transactionId: String
         ) {
           logs(
@@ -78,6 +92,7 @@ export default async function logs({
                   lte: $endBlock
                 }
                 ${topic3Query}
+                ${transactionIdQuery}
               }
               address: $contractAddress,
               topic0: $eventId,

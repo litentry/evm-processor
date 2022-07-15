@@ -44,3 +44,25 @@ export interface ERC1155TokenTransfer {
   transactionHash: string;
   transactionId: string;
 }
+
+// one record per token transferred, not per sale event
+export interface Sale {
+  _id: string; // log ID of the transfer
+  from: string;
+  to: string;
+  price: string;
+  contract: string;
+  tokenId: string;
+  quantity?: string; // ERC1155
+  collectionName?: string;
+  blockNumber: number;
+  blockTimestamp: number;
+  transactionHash: string;
+  transactionId: string;
+
+  // present if price not in ETH
+  erc20Contract?: string;
+  erc20Symbol?: string;
+  erc20Name?: string;
+  erc20Decimals?: number;
+}
