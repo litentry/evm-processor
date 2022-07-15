@@ -1,19 +1,40 @@
 import { query, Types, utils } from 'indexer-utils';
-import { SwapMethod } from './types';
+import { ExtractedData, SwapMethod } from './types';
 
 const V2_SIGS = utils.contract.CONTRACT_SIGNATURES.UNISWAPV2.EXTRINSICS;
 const V3_SIG = utils.contract.CONTRACT_SIGNATURES.UNISWAPV3.EXTRINSICS[0]; // multicall (the rest are internal) -> todo check contracts indexed to see if we get a match on this (as internal methods might not be in op-codes)
 
-export default async function extract(startBlock: number, endBlock: number) {
-  const [v2, v3] = await Promise.all([
-    fetchV2Txs(startBlock, endBlock),
-    fetchV3Txs(startBlock, endBlock),
-  ]);
+export default async function extract(
+  startBlock: number,
+  endBlock: number,
+): Promise<ExtractedData> {
+  try {
+    const [v2, v3] = await Promise.all([
+      fetchV2Txs(startBlock, endBlock),
+      fetchV3Txs(startBlock, endBlock),
+    ]);
 
-  return {
-    v2,
-    v3,
-  };
+    return {
+      v2,
+      v3,
+    };
+  } catch (e) {
+    const data: ExtractedData = { v2: [], v3: [] };
+
+    let block = startBlock;
+    while (block <= endBlock) {
+      const [v2, v3] = await Promise.all([
+        fetchV2Txs(block, block),
+        fetchV3Txs(block, block),
+      ]);
+      data.v2.push(...v2);
+      data.v3.push(...v3);
+
+      block++;
+    }
+
+    return data;
+  }
 }
 
 async function fetchV2Txs(startBlock: number, endBlock: number) {

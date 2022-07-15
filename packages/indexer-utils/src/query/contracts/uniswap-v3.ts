@@ -39,7 +39,7 @@ export default async function uniswapV3Contracts({
     }`;
   }
 
-  if (contractAddress?.length) {
+  if (contractAddress) {
     contractAddressesVar = '$contractAddress: [String!], ';
     contractAddresses = `_id: {
       in: $contractAddress
