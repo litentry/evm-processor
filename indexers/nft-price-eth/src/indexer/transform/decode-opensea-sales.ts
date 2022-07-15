@@ -12,13 +12,13 @@ import {
 import decodeTransfers from './decode-transfers';
 
 export default function decodeOpenseaSales(
-  data: ExtractedNFTPriceData,
+  data: ExtractedNFTPriceData['opensea'],
 ): TransformedNFTPriceData {
   const mismatchedTransfers: MismatchedTransfers[] = [];
   const missingContracts: MissingContracts[] = [];
   const sales: Types.Nft.Sale[] = [];
 
-  data.openseaLogs.forEach((log) => {
+  data.logs.forEach((log) => {
     const decoded = new ethers.utils.Interface(
       OPENSEA_WYVERN.ABI,
     ).decodeEventLog(OPENSEA_WYVERN.SIGNATURE, log.data, [

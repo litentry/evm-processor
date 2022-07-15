@@ -25,8 +25,6 @@ export default async function extract(
   ]);
   const associatedContracts = await getAssociatedContracts(associatedLogs);
 
-  // const [erc721TokenTransfers, erc1155TokenTransfers, erc20TokenTransfers] =
-  //   await getTransfers(transactionIds);
   const erc721LogsByTxId = _.groupBy(associatedLogs.erc721, 'transactionId');
   const erc1155SingleLogsByTxId = _.groupBy(
     associatedLogs.erc1155Single,
@@ -39,17 +37,19 @@ export default async function extract(
   const erc20LogsByTxId = _.groupBy(associatedLogs.erc20, 'transactionId');
 
   return {
-    associatedContracts,
-    openseaLogs: [...openseaV1, ...openseaV2].map((log) => {
-      return {
-        ...log,
-        associatedLogs: {
-          erc20: erc20LogsByTxId[log.transactionId] || [],
-          erc721: erc721LogsByTxId[log.transactionId] || [],
-          erc1155Single: erc1155SingleLogsByTxId[log.transactionId] || [],
-          erc1155Batch: erc1155BatchLogsByTxId[log.transactionId] || [],
-        },
-      };
-    }),
+    opensea: {
+      logs: [...openseaV1, ...openseaV2].map((log) => {
+        return {
+          ...log,
+          associatedLogs: {
+            erc20: erc20LogsByTxId[log.transactionId] || [],
+            erc721: erc721LogsByTxId[log.transactionId] || [],
+            erc1155Single: erc1155SingleLogsByTxId[log.transactionId] || [],
+            erc1155Batch: erc1155BatchLogsByTxId[log.transactionId] || [],
+          },
+        };
+      }),
+      associatedContracts,
+    },
   };
 }

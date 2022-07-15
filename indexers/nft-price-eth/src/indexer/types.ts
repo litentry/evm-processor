@@ -2,14 +2,13 @@ import { Types } from 'indexer-utils';
 
 export interface LogWithTransfers extends Types.Archive.Log {
   associatedLogs: AssociatedLogs;
-  // transfers721: Types.Nft.ERC721TokenTransfer[];
-  // transfers1155: Types.Nft.ERC1155TokenTransfer[];
-  // transfers20: Types.Erc20.Transfer[];
 }
 
 export type ExtractedNFTPriceData = {
-  openseaLogs: LogWithTransfers[];
-  associatedContracts: AssociatedContracts;
+  opensea: {
+    logs: LogWithTransfers[];
+    associatedContracts: AssociatedContracts;
+  };
 };
 
 export type TransformedNFTPriceData = {

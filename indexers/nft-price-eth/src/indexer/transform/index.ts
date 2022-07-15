@@ -3,8 +3,9 @@ import decodeOpenseaSales from './decode-opensea-sales';
 export default function transform(
   data: ExtractedNFTPriceData,
 ): TransformedNFTPriceData {
-  const { sales, missingContracts, mismatchedTransfers } =
-    decodeOpenseaSales(data);
+  const { sales, missingContracts, mismatchedTransfers } = decodeOpenseaSales(
+    data.opensea,
+  );
 
   return { sales, missingContracts, mismatchedTransfers };
 }
