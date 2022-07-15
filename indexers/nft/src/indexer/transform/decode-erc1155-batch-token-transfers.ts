@@ -30,7 +30,6 @@ export default function decodeErc1155BatchTokenTransfers(
     }
 
     const shared = {
-      _id: log._id,
       contract: log.address,
       from: (decoded[1] as string).toLowerCase(),
       to: (decoded[2] as string).toLowerCase(),
@@ -44,6 +43,7 @@ export default function decodeErc1155BatchTokenTransfers(
 
     const transfers = (decoded[3] as BigNumber[]).map((tokenId, i) => {
       const transfer: Types.Nft.ERC1155TokenTransfer = {
+        _id: `${log._id}.${i}`,
         tokenId: tokenId.toString(),
         quantity: (decoded[4][i] as BigNumber).toString(),
         ...shared,
