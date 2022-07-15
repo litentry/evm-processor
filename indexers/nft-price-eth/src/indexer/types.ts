@@ -4,11 +4,13 @@ export interface LogWithTransfers extends Types.Archive.Log {
   associatedLogs: AssociatedLogs;
 }
 
+export type ExtractedMarketplaceData = {
+  logs: LogWithTransfers[];
+  associatedContracts: AssociatedContracts;
+};
+
 export type ExtractedNFTPriceData = {
-  opensea: {
-    logs: LogWithTransfers[];
-    associatedContracts: AssociatedContracts;
-  };
+  opensea: ExtractedMarketplaceData;
 };
 
 export type TransformedNFTPriceData = {
