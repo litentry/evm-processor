@@ -113,7 +113,10 @@ ContractTransactionTC.addFields({
   logs: {
     type: [LogTC],
     resolve: async (transaction) => {
-      if (!transaction.blockNumber || !transaction.transactionIndex) {
+      if (
+        transaction.blockNumber === undefined ||
+        !transaction.transactionIndex === undefined
+      ) {
         throw Error(
           'transaction.blockNumber & transaction.transactionIndex are required to query logs',
         );
