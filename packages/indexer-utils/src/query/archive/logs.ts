@@ -40,6 +40,7 @@ export default async function logs({
   let transactionIdQuery = '';
   let transactionIdQueryVar = '';
   if (transactionIds) {
+    if (!transactionIds.length) return [];
     transactionIdQueryVar = '$transactionIds: [String!],';
     transactionIdQuery = `transactionId: {
       in: $transactionIds
