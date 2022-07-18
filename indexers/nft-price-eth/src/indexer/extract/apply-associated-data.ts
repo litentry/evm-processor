@@ -11,6 +11,17 @@ export default async function applyAssociatedData(
 ): Promise<ExtractedMarketplaceData> {
   const transactionIds = logs.map((log) => log.transactionId);
 
+  if (!transactionIds.length) {
+    return {
+      logs: [],
+      associatedContracts: {
+        erc20: [],
+        erc1155: [],
+        erc721: [],
+      },
+    };
+  }
+
   const associatedLogs = await getAssociatedLogs(startBlock, endBlock, [
     ...new Set(transactionIds),
   ]);
