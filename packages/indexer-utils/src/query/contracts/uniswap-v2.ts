@@ -12,7 +12,7 @@ const defaultProperties: (keyof UniswapV2Contract)[] = [
 
 export default async function uniswapV2Contracts({
   blockRange,
-  contractAddress,
+  addresses,
   erc165,
   creator,
   properties = defaultProperties,
@@ -21,29 +21,29 @@ export default async function uniswapV2Contracts({
     start: number;
     end: number;
   };
-  contractAddress?: string[];
+  addresses?: string[];
   erc165?: boolean;
   creator?: string;
   properties?: (keyof UniswapV2Contract)[];
 }) {
-  let contractAddresses = '';
-  let contractAddressesVar = '';
-  let blockQuery = '';
+  let addressesOperator = '';
+  let addressesQueryVar = '';
+  let blockOperator = '';
   let blockQueryVar = '';
 
   if (blockRange) {
     blockQueryVar = '$startBlock: Float, $endBlock: Float, ';
-    blockQuery = `blockNumber: {
+    blockOperator = `blockNumber: {
       gte: $startBlock,
       lte: $endBlock
     }`;
   }
 
-  if (contractAddress) {
-    if (!contractAddress.length) return [];
-    contractAddressesVar = '$contractAddress: [String!], ';
-    contractAddresses = `_id: {
-      in: $contractAddress
+  if (addresses) {
+    if (!addresses.length) return [];
+    addressesQueryVar = '$addresses: [String!], ';
+    addressesOperator = `_id: {
+      in: $addresses
     }`;
   }
 
@@ -55,17 +55,17 @@ export default async function uniswapV2Contracts({
         variables: {
           startBlock: blockRange?.start,
           endBlock: blockRange?.end,
-          contractAddress,
+          addresses: addresses ? [...new Set(addresses)] : undefined,
           erc165,
           creator,
         },
         query: `
-        query UniswapV2Contracts(${blockQueryVar}${contractAddressesVar}$erc165: Boolean, $creator: String) {
+        query UniswapV2Contracts(${blockQueryVar}${addressesQueryVar}$erc165: Boolean, $creator: String) {
           uniswapV2Contracts(
             filter: {
               _operators: {
-                ${blockQuery}
-                ${contractAddresses}
+                ${blockOperator}
+                ${addressesOperator}
               }
               erc165: $erc165
               creator: $creator

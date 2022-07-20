@@ -15,7 +15,7 @@ const defaultProperties: (keyof ERC1155Contract)[] = [
 
 export default async function erc1155Contracts({
   blockRange,
-  contractAddress,
+  addresses,
   erc165,
   erc1155MetadataURI,
   erc1155TokenReceiver,
@@ -26,31 +26,31 @@ export default async function erc1155Contracts({
     start: number;
     end: number;
   };
-  contractAddress?: string[];
+  addresses?: string[];
   erc165?: boolean;
   erc1155MetadataURI?: boolean;
   erc1155TokenReceiver?: boolean;
   creator?: string;
   properties?: (keyof ERC1155Contract)[];
 }) {
-  let contractAddresses = '';
-  let contractAddressesVar = '';
-  let blockQuery = '';
+  let addressesOperator = '';
+  let addressesQueryVar = '';
+  let blockOperator = '';
   let blockQueryVar = '';
 
   if (blockRange) {
     blockQueryVar = '$startBlock: Float, $endBlock: Float, ';
-    blockQuery = `blockNumber: {
+    blockOperator = `blockNumber: {
       gte: $startBlock,
       lte: $endBlock
     }`;
   }
 
-  if (contractAddress) {
-    if (!contractAddress.length) return [];
-    contractAddressesVar = '$contractAddress: [String!], ';
-    contractAddresses = `_id: {
-      in: $contractAddress
+  if (addresses) {
+    if (!addresses.length) return [];
+    addressesQueryVar = '$addresses: [String!], ';
+    addressesOperator = `_id: {
+      in: $addresses
     }`;
   }
 
@@ -62,19 +62,19 @@ export default async function erc1155Contracts({
         variables: {
           startBlock: blockRange?.start,
           endBlock: blockRange?.end,
-          contractAddress,
+          addresses: addresses ? [...new Set(addresses)] : undefined,
           erc165,
           erc1155TokenReceiver,
           erc1155MetadataURI,
           creator,
         },
         query: `
-        query ERC1155Contracts(${blockQueryVar}${contractAddressesVar}$erc165: Boolean, $erc1155MetadataURI: Boolean, $erc1155TokenReceiver: Boolean, $creator: String) {
+        query ERC1155Contracts(${blockQueryVar}${addressesQueryVar}$erc165: Boolean, $erc1155MetadataURI: Boolean, $erc1155TokenReceiver: Boolean, $creator: String) {
           erc1155Contracts(
             filter: {
               _operators: {
-                ${blockQuery}
-                ${contractAddresses}
+                ${blockOperator}
+                ${addressesOperator}
               }
               erc165: $erc165
               erc1155MetadataURI: $erc1155MetadataURI

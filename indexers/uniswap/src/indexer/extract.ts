@@ -101,7 +101,7 @@ async function filterByContractTypeAndStatus(
 
   const successfulTxs = txs.filter((tx) => tx.receiptStatus);
   const validContracts = await query.contracts[method]({
-    contractAddress: successfulTxs.map((tx) => tx.to),
+    addresses: successfulTxs.map((tx) => tx.to),
     properties: ['_id'],
   });
 
