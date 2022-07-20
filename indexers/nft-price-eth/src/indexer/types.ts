@@ -11,6 +11,7 @@ export type ExtractedMarketplaceData = {
 
 export type ExtractedNFTPriceData = {
   opensea: ExtractedMarketplaceData;
+  x2y2: ExtractedMarketplaceData;
 };
 
 export type TransformedNFTPriceData = {

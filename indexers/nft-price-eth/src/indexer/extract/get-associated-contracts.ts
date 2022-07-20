@@ -17,15 +17,15 @@ export default async function getAssociatedContracts(
 
   const [erc20, erc721, erc1155] = await Promise.all([
     query.contracts.erc20Contracts({
-      addresses: erc20ContractAddresses,
+      contractAddress: erc20ContractAddresses,
       properties: ['_id', 'name', 'symbol', 'decimals'],
     }),
     query.contracts.erc721Contracts({
-      addresses: erc721ContractAddresses,
+      contractAddress: erc721ContractAddresses,
       properties: ['_id', 'name'],
     }),
     query.contracts.erc1155Contracts({
-      addresses: erc1155ContractAddresses,
+      contractAddress: erc1155ContractAddresses,
       properties: ['_id', 'name'],
     }),
   ]);
