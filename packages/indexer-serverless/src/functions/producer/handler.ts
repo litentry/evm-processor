@@ -189,6 +189,8 @@ async function dispatchBatches(
     // otherwise use group 0
     if (blocksInBatch === batchSize) {
       workerGroup = (b.startBlock % (maxWorkers * batchSize)) / batchSize;
+    } else {
+      workerGroup = b.startBlock % maxWorkers;
     }
     return {
       Id: `${b.endBlock}`,
