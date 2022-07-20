@@ -83,7 +83,7 @@ schemaComposer.Query.addFields({
         .call()) as string;
 
       const contractData = await query.contracts.erc20Contracts({
-        contractAddress: [args.contract],
+        addresses: [args.contract],
       });
       const { decimals, symbol, name } = contractData[0] || {};
 

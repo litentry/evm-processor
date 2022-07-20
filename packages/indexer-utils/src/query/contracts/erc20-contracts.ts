@@ -15,7 +15,7 @@ const defaultProperties: (keyof ERC20Contract)[] = [
 
 export default async function erc20Contracts({
   blockRange,
-  contractAddress,
+  addresses,
   erc165,
   creator,
   properties = defaultProperties,
@@ -24,29 +24,29 @@ export default async function erc20Contracts({
     start: number;
     end: number;
   };
-  contractAddress?: string[];
+  addresses?: string[];
   erc165?: boolean;
   creator?: string;
   properties?: (keyof ERC20Contract)[];
 }) {
-  let contractAddresses = '';
-  let contractAddressesVar = '';
-  let blockQuery = '';
+  let addressesOperator = '';
+  let addressesQueryVar = '';
+  let blockOperator = '';
   let blockQueryVar = '';
 
   if (blockRange) {
     blockQueryVar = '$startBlock: Float, $endBlock: Float, ';
-    blockQuery = `blockNumber: {
+    blockOperator = `blockNumber: {
       gte: $startBlock,
       lte: $endBlock
     }`;
   }
 
-  if (contractAddress) {
-    if (!contractAddress.length) return [];
-    contractAddressesVar = '$contractAddress: [String!], ';
-    contractAddresses = `_id: {
-      in: $contractAddress
+  if (addresses) {
+    if (!addresses.length) return [];
+    addressesQueryVar = '$addresses: [String!], ';
+    addressesOperator = `_id: {
+      in: $addresses
     }`;
   }
 
@@ -58,17 +58,17 @@ export default async function erc20Contracts({
         variables: {
           startBlock: blockRange?.start,
           endBlock: blockRange?.end,
-          contractAddress,
+          addresses: addresses ? [...new Set(addresses)] : undefined,
           erc165,
           creator,
         },
         query: `
-        query ERC20Contracts(${blockQueryVar}${contractAddressesVar}$erc165: Boolean, $creator: String) {
+        query ERC20Contracts(${blockQueryVar}${addressesQueryVar}$erc165: Boolean, $creator: String) {
           erc20Contracts(
             filter: {
               _operators: {
-                ${blockQuery}
-                ${contractAddresses}
+                ${blockOperator}
+                ${addressesOperator}
               }
               erc165: $erc165
               creator: $creator

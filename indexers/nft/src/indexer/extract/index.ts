@@ -24,10 +24,10 @@ export default async function extract(
   ];
   const [erc721Contracts, erc1155Contracts] = await Promise.all([
     query.contracts.erc721Contracts({
-      contractAddress: unique721ContractAddresses,
+      addresses: unique721ContractAddresses,
     }),
     query.contracts.erc1155Contracts({
-      contractAddress: unique1155ContractAddresses,
+      addresses: unique1155ContractAddresses,
     }),
   ]);
   const erc721ContractAddresses = erc721Contracts.map((c) => c._id);

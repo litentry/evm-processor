@@ -11,7 +11,7 @@ export default async function extract(
   // get matching erc20 contracts
   const uniqueContractAddresses = [...new Set(logs.map((log) => log.address))];
   const erc20Contracts = await query.contracts.erc20Contracts({
-    contractAddress: uniqueContractAddresses,
+    addresses: uniqueContractAddresses,
     properties: ['_id', 'decimals', 'name', 'symbol'],
   });
   const erc20ContractAddresses = erc20Contracts.map((c) => c._id);
