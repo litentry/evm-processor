@@ -19,7 +19,6 @@ export interface Block {
 
 export interface Log {
   _id: string;
-  transactionId: string;
   blockNumber: number;
   blockTimestamp: number;
   transactionHash: string;

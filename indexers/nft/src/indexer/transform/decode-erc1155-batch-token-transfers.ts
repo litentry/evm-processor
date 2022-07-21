@@ -34,7 +34,6 @@ export default function decodeErc1155BatchTokenTransfers(
       from: (decoded[1] as string).toLowerCase(),
       to: (decoded[2] as string).toLowerCase(),
       transactionHash: log.transactionHash,
-      transactionId: log.transactionId,
       blockNumber: log.blockNumber,
       blockTimestamp: log.blockTimestamp,
       collectionName: contracts.find((contract) => contract._id === log.address)

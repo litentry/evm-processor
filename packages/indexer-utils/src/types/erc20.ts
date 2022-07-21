@@ -6,7 +6,6 @@ export type Transfer = {
   blockNumber: number;
   blockTimestamp: number;
   transactionHash: string;
-  transactionId: string;
   amount: string;
   name?: string;
   symbol?: string;

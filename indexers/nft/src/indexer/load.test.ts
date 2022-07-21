@@ -8,7 +8,6 @@ import {
 import load from './load';
 
 const transactionHash = '0x123';
-const transactionId = '1.1';
 
 describe('load', () => {
   it('Ensures we only get the latest ERC721 owner for tokens, and saves transfers', async () => {
@@ -26,7 +25,6 @@ describe('load', () => {
         contract: contract_721,
         tokenId: tokenId_721,
         transactionHash,
-        transactionId,
       },
       {
         _id: '2',
@@ -37,7 +35,6 @@ describe('load', () => {
         contract: contract_721,
         tokenId: tokenId_721,
         transactionHash,
-        transactionId,
       },
       {
         _id: '3',
@@ -48,7 +45,6 @@ describe('load', () => {
         contract: contract_721,
         tokenId: tokenId_721,
         transactionHash,
-        transactionId,
       },
       {
         _id: '4',
@@ -59,7 +55,6 @@ describe('load', () => {
         contract: contract_721,
         tokenId: tokenId_721,
         transactionHash,
-        transactionId,
       },
       {
         _id: '5',
@@ -70,7 +65,6 @@ describe('load', () => {
         contract: contract_721,
         tokenId: tokenId_721,
         transactionHash,
-        transactionId,
       },
       {
         _id: '6',
@@ -81,7 +75,6 @@ describe('load', () => {
         contract: contract_721,
         tokenId: tokenId_721,
         transactionHash,
-        transactionId,
       },
     ];
 
@@ -164,7 +157,6 @@ describe('load', () => {
         from: doc.from,
         to: doc.to,
         transactionHash: doc.transactionHash,
-        transactionId: doc.transactionId,
         tokenId: doc.tokenId,
       })),
     ).toStrictEqual(erc721TokenTransfers);
@@ -214,7 +206,6 @@ describe('load', () => {
         blockNumber: 4,
         blockTimestamp: 4,
         transactionHash,
-        transactionId,
       },
       {
         _id: '2',
@@ -226,7 +217,6 @@ describe('load', () => {
         blockNumber: 4,
         blockTimestamp: 4,
         transactionHash,
-        transactionId,
       },
     ];
 
@@ -281,7 +271,6 @@ describe('load', () => {
         from: doc.from,
         to: doc.to,
         transactionHash: doc.transactionHash,
-        transactionId: doc.transactionId,
         tokenId: doc.tokenId,
         quantity: doc.quantity,
       })),

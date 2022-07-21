@@ -5,10 +5,10 @@ import { AssociatedLogs } from '../types';
 export default async function getAssociatedLogs(
   startBlock: number,
   endBlock: number,
-  transactionIds: string[],
+  transactionHashes: string[],
 ) {
   try {
-    const logs = await getLogs(startBlock, endBlock, transactionIds);
+    const logs = await getLogs(startBlock, endBlock, transactionHashes);
     return logs;
   } catch (e) {
     const logs: AssociatedLogs = {
@@ -20,7 +20,7 @@ export default async function getAssociatedLogs(
 
     let block = startBlock;
     while (block <= endBlock) {
-      const _logs = await getLogs(block, block, transactionIds);
+      const _logs = await getLogs(block, block, transactionHashes);
 
       logs.erc20.push(..._logs.erc20);
       logs.erc721.push(..._logs.erc721);
@@ -37,18 +37,18 @@ export default async function getAssociatedLogs(
 async function getLogs(
   startBlock: number,
   endBlock: number,
-  transactionIds: string[],
+  transactionHashes: string[],
 ) {
   const [erc20, erc721, erc1155Single, erc1155Batch] = await Promise.all([
     query.archive.logs({
       startBlock,
       endBlock,
-      transactionIds,
+      transactionHashes,
       eventId: TRANSFER.ID,
       hasTopic3: false,
       properties: [
         '_id',
-        'transactionId',
+        'transactionHash',
         'data',
         'topic1',
         'topic2',
@@ -60,14 +60,14 @@ async function getLogs(
     query.archive.logs({
       startBlock,
       endBlock,
-      transactionIds,
+      transactionHashes,
       eventId: TRANSFER.ID,
       hasTopic3: true,
       properties: [
         '_id',
         'blockNumber',
         'blockTimestamp',
-        'transactionId',
+        'transactionHash',
         'data',
         'topic1',
         'topic2',
@@ -79,13 +79,13 @@ async function getLogs(
     query.archive.logs({
       startBlock,
       endBlock,
-      transactionIds,
+      transactionHashes,
       eventId: TRANSFER_SINGLE.ID,
       properties: [
         '_id',
         'blockNumber',
         'blockTimestamp',
-        'transactionId',
+        'transactionHash',
         'data',
         'topic1',
         'topic2',
@@ -97,13 +97,13 @@ async function getLogs(
     query.archive.logs({
       startBlock,
       endBlock,
-      transactionIds,
+      transactionHashes,
       eventId: TRANSFER_BATCH.ID,
       properties: [
         '_id',
         'blockNumber',
         'blockTimestamp',
-        'transactionId',
+        'transactionHash',
         'data',
         'topic1',
         'topic2',

@@ -32,7 +32,6 @@ export default function decodeErc721TokenTransfers(
       to: (decoded[1] as string).toLowerCase(),
       tokenId: (decoded[2] as BigNumber).toString(),
       transactionHash: log.transactionHash,
-      transactionId: log.transactionId,
       blockNumber: log.blockNumber,
       blockTimestamp: log.blockTimestamp,
       collectionName: contracts.find((contract) => contract._id === log.address)

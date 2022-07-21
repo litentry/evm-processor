@@ -4,7 +4,6 @@ import endpoint from './endpoint';
 
 const defaultProperties: (keyof Log)[] = [
   '_id',
-  'transactionId',
   'blockNumber',
   'blockTimestamp',
   'transactionHash',
@@ -23,8 +22,8 @@ export default async function logs({
   endBlock,
   contractAddress,
   eventId,
-  transactionId,
-  transactionIds,
+  transactionHash,
+  transactionHashes,
   hasTopic3,
   properties = defaultProperties,
 }: {
@@ -32,18 +31,18 @@ export default async function logs({
   endBlock: number;
   contractAddress?: string;
   eventId?: string;
-  transactionId?: string;
-  transactionIds?: string[];
+  transactionHash?: string;
+  transactionHashes?: string[];
   hasTopic3?: boolean;
   properties?: (keyof Log)[];
 }) {
-  let transactionIdQuery = '';
-  let transactionIdQueryVar = '';
-  if (transactionIds) {
-    if (!transactionIds.length) return [];
-    transactionIdQueryVar = '$transactionIds: [String!],';
-    transactionIdQuery = `transactionId: {
-      in: $transactionIds
+  let transactionHashQuery = '';
+  let transactionHashQueryVar = '';
+  if (transactionHashes) {
+    if (!transactionHashes.length) return [];
+    transactionHashQueryVar = '$transactionHashes: [String!],';
+    transactionHashQuery = `transactionHash: {
+      in: $transactionHashes
     }`;
   }
 
@@ -71,8 +70,8 @@ export default async function logs({
           endBlock,
           contractAddress,
           eventId,
-          transactionId,
-          transactionIds,
+          transactionHash,
+          transactionHashes,
           hasTopic3,
         },
         query: `
@@ -82,8 +81,8 @@ export default async function logs({
           $contractAddress: String,
           $eventId: String,
           ${topic3QueryVar}
-          ${transactionIdQueryVar}
-          $transactionId: String
+          ${transactionHashQueryVar}
+          $transactionHash: String
         ) {
           logs(
             filter: {
@@ -93,11 +92,11 @@ export default async function logs({
                   lte: $endBlock
                 }
                 ${topic3Query}
-                ${transactionIdQuery}
+                ${transactionHashQuery}
               }
               address: $contractAddress,
               topic0: $eventId,
-              transactionId: $transactionId
+              transactionHash: $transactionHash
             }
           ) {
             ${properties.join(',')}
