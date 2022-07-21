@@ -42,7 +42,6 @@ export const ERC721TokenTransferSchema =
     contract: { type: String, required: true },
     tokenId: { type: String, required: true },
     transactionHash: { type: String, required: true },
-    transactionId: { type: String, required: true },
     blockNumber: { type: Number, required: true },
     blockTimestamp: { type: Number, required: true },
     collectionName: String,
@@ -52,7 +51,7 @@ ERC721TokenTransferSchema.index({ from: 1 });
 ERC721TokenTransferSchema.index({ to: 1 });
 ERC721TokenTransferSchema.index({ contract: 1 });
 ERC721TokenTransferSchema.index({ tokenId: 1 });
-ERC721TokenTransferSchema.index({ transactionId: 1 });
+ERC721TokenTransferSchema.index({ transactionHash: 1 });
 ERC721TokenTransferSchema.index({ blockNumber: 1 });
 
 export const ERC1155TokenSchema = new mongoose.Schema<ERC1155TokenDocument>({
@@ -80,7 +79,6 @@ export const ERC1155TokenTransferSchema =
     tokenId: { type: String, required: true },
     quantity: { type: String, required: true },
     transactionHash: { type: String, required: true },
-    transactionId: { type: String, required: true },
     blockNumber: { type: Number, required: true },
     blockTimestamp: { type: Number, required: true },
     collectionName: String,
@@ -90,7 +88,7 @@ ERC1155TokenTransferSchema.index({ from: 1 });
 ERC1155TokenTransferSchema.index({ to: 1 });
 ERC1155TokenTransferSchema.index({ contract: 1 });
 ERC1155TokenTransferSchema.index({ tokenId: 1 });
-ERC1155TokenTransferSchema.index({ transactionId: 1 });
+ERC1155TokenTransferSchema.index({ transactionHash: 1 });
 ERC1155TokenTransferSchema.index({ blockNumber: 1 });
 
 export const ERC721TokenModel = mongoose.model(

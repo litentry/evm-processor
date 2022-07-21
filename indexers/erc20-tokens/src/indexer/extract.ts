@@ -43,7 +43,6 @@ async function getLogs(startBlock: number, endBlock: number) {
         'blockNumber',
         'blockTimestamp',
         'transactionHash',
-        'transactionId',
       ],
     });
     return logs;
@@ -66,7 +65,6 @@ async function getLogs(startBlock: number, endBlock: number) {
           'blockNumber',
           'blockTimestamp',
           'transactionHash',
-          'transactionId',
         ],
       });
       logs.push(..._logs);

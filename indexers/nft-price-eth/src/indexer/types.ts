@@ -54,7 +54,6 @@ export type NftTransfer = {
   tokenId: string;
   quantity?: string;
   contract: string;
-  transactionId: string;
   blockNumber: number;
   blockTimestamp: number;
   transactionHash: string;

@@ -101,7 +101,6 @@ function transformBlock({ blockWithTransactions, receipts }: ExtractedBlock) {
         const logIndex = BigNumber.from(logIndexHash).toNumber();
         logs.push({
           _id: `${tx.blockNumber}.${tx.transactionIndex}.${logIndex}`,
-          transactionId: `${tx.blockNumber}.${tx.transactionIndex}`,
           transactionHash: tx.hash,
           address: address?.toLowerCase(),
           topic0: topics[0],

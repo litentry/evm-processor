@@ -34,7 +34,6 @@ export default function decodeErc1155SingleTokenTransfers(
       tokenId: (decoded[3] as BigNumber).toString(),
       quantity: (decoded[4] as BigNumber).toString(),
       transactionHash: log.transactionHash,
-      transactionId: log.transactionId,
       blockNumber: log.blockNumber,
       blockTimestamp: log.blockTimestamp,
       collectionName: contracts.find((contract) => contract._id === log.address)

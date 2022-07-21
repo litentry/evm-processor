@@ -9,9 +9,9 @@ export default async function applyAssociatedData(
   startBlock: number,
   endBlock: number,
 ): Promise<ExtractedMarketplaceData> {
-  const transactionIds = logs.map((log) => log.transactionId);
+  const transactionHashes = logs.map((log) => log.transactionHash);
 
-  if (!transactionIds.length) {
+  if (!transactionHashes.length) {
     return {
       logs: [],
       associatedContracts: {
@@ -23,29 +23,29 @@ export default async function applyAssociatedData(
   }
 
   const associatedLogs = await getAssociatedLogs(startBlock, endBlock, [
-    ...new Set(transactionIds),
+    ...new Set(transactionHashes),
   ]);
   const associatedContracts = await getAssociatedContracts(associatedLogs);
 
-  const erc721LogsByTxId = _.groupBy(associatedLogs.erc721, 'transactionId');
+  const erc721LogsByTxId = _.groupBy(associatedLogs.erc721, 'transactionHash');
   const erc1155SingleLogsByTxId = _.groupBy(
     associatedLogs.erc1155Single,
-    'transactionId',
+    'transactionHash',
   );
   const erc1155BatchLogsByTxId = _.groupBy(
     associatedLogs.erc1155Batch,
-    'transactionId',
+    'transactionHash',
   );
-  const erc20LogsByTxId = _.groupBy(associatedLogs.erc20, 'transactionId');
+  const erc20LogsByTxId = _.groupBy(associatedLogs.erc20, 'transactionHash');
 
   return {
     logs: logs.map((log) => ({
       ...log,
       associatedLogs: {
-        erc20: erc20LogsByTxId[log.transactionId] || [],
-        erc721: erc721LogsByTxId[log.transactionId] || [],
-        erc1155Single: erc1155SingleLogsByTxId[log.transactionId] || [],
-        erc1155Batch: erc1155BatchLogsByTxId[log.transactionId] || [],
+        erc20: erc20LogsByTxId[log.transactionHash] || [],
+        erc721: erc721LogsByTxId[log.transactionHash] || [],
+        erc1155Single: erc1155SingleLogsByTxId[log.transactionHash] || [],
+        erc1155Batch: erc1155BatchLogsByTxId[log.transactionHash] || [],
       },
     })),
     associatedContracts,

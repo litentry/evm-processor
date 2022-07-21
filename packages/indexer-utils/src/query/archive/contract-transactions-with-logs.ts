@@ -8,7 +8,6 @@ import endpoint from './endpoint';
 
 const defaultLogProperties: (keyof Log)[] = [
   '_id',
-  'transactionId',
   'blockNumber',
   'blockTimestamp',
   'transactionHash',
@@ -86,8 +85,7 @@ export default async function contractTransactionsWithLogs({
               methodId: $methodId
             }
           ) {
-            transactionIndex
-            blockNumber
+            _id
             ${transactionProperties.join(',')}
             logs {
               ${logProperties.join(',')}

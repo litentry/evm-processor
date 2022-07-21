@@ -29,7 +29,6 @@ export const NFTSaleSchema = new mongoose.Schema<NFTSaleDocument>({
   quantity: Number,
   collectionName: String,
   transactionHash: { type: String, required: true },
-  transactionId: { type: String, required: true },
   blockNumber: { type: Number, required: true },
   blockTimestamp: { type: Number, required: true },
 });
@@ -38,7 +37,7 @@ NFTSaleSchema.index({ from: 1 });
 NFTSaleSchema.index({ to: 1 });
 NFTSaleSchema.index({ contract: 1 });
 NFTSaleSchema.index({ tokenId: 1 });
-NFTSaleSchema.index({ transactionId: 1 });
+NFTSaleSchema.index({ transactionHash: 1 });
 NFTSaleSchema.index({ blockNumber: 1 });
 
 export const MissingContractsSchema =

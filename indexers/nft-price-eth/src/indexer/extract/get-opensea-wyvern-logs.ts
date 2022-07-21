@@ -17,7 +17,6 @@ export default async function getOpenseaWyvernLogs(
       contractAddress: OPENSEA_WYVERN[version].ADDRESS,
       eventId: OPENSEA_WYVERN.EVENT_HASH,
       properties: [
-        'transactionId',
         'data',
         'topic1',
         'topic2',
@@ -38,7 +37,6 @@ export default async function getOpenseaWyvernLogs(
         contractAddress: OPENSEA_WYVERN[version].ADDRESS,
         eventId: OPENSEA_WYVERN.EVENT_HASH,
         properties: [
-          'transactionId',
           'data',
           'topic1',
           'topic2',

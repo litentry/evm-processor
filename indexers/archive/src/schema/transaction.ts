@@ -113,19 +113,12 @@ ContractTransactionTC.addFields({
   logs: {
     type: [LogTC],
     resolve: async (transaction) => {
-      if (
-        transaction.blockNumber === undefined ||
-        !transaction.transactionIndex === undefined
-      ) {
-        throw Error(
-          'transaction.blockNumber & transaction.transactionIndex are required to query logs',
-        );
+      if (transaction._id === undefined) {
+        throw Error('transaction._id is required to query logs');
       }
 
       return LogModel.find({
-        transactionId: `0x${transaction.blockNumber.toString(
-          16,
-        )}.0x${transaction.transactionIndex.toString(16)}`,
+        transactionHash: transaction._id,
       });
     },
   },

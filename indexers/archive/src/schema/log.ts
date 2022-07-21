@@ -14,7 +14,7 @@ interface LogDocument extends Types.Archive.Log, mongoose.Document {}
 const LogSchema = new mongoose.Schema<LogDocument>(
   {
     _id: String,
-    transactionId: { type: String, required: true },
+    transactionHash: { type: String, required: true },
     blockNumber: { type: Number, required: true },
     address: { type: String, required: true },
     topic0: { type: String, required: true },
@@ -24,7 +24,6 @@ const LogSchema = new mongoose.Schema<LogDocument>(
     topic4: String,
     data: { type: String, required: true },
     logIndex: { type: Number, required: true },
-    transactionHash: { type: String, required: true },
     blockTimestamp: { type: Number, required: true },
   },
   {
@@ -33,7 +32,7 @@ const LogSchema = new mongoose.Schema<LogDocument>(
 );
 
 LogSchema.index({ blockNumber: 1 });
-LogSchema.index({ transactionId: 1 });
+LogSchema.index({ transactionHash: 1 });
 LogSchema.index({ address: 1 });
 LogSchema.index({ topic0: 1 });
 LogSchema.index({ topic3: 1 }); // https://github.com/litentry/evm-processor/issues/133

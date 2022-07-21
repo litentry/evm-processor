@@ -68,7 +68,6 @@ async function getErc721TransferLogs(startBlock: number, endBlock: number) {
         'data',
         '_id',
         'transactionHash',
-        'transactionId',
         'blockNumber',
         'blockTimestamp',
         'logIndex',
@@ -91,7 +90,6 @@ async function getErc721TransferLogs(startBlock: number, endBlock: number) {
         properties: [
           '_id',
           'transactionHash',
-          'transactionId',
           'blockNumber',
           'blockTimestamp',
           'logIndex',
@@ -122,7 +120,6 @@ async function getErc1155TransferLogs(
       properties: [
         'address',
         'transactionHash',
-        'transactionId',
         'blockNumber',
         'blockTimestamp',
         'logIndex',
@@ -150,7 +147,6 @@ async function getErc1155TransferLogs(
         properties: [
           'address',
           'transactionHash',
-          'transactionId',
           'blockNumber',
           'blockTimestamp',
           'logIndex',

@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers';
-import transformSwap, { TRANSFER_METHOD_ID } from './transform-swap';
+import { Types } from 'indexer-utils';
 import { SwapMethod } from '../types';
+import transformSwap, { TRANSFER_METHOD_ID } from './transform-swap';
 
 describe('transformSwap()', () => {
   it('Converts transaction data into a Swap model', async () => {
@@ -26,39 +27,21 @@ describe('transformSwap()', () => {
           methodId: '0xSwapETHForExactTokensHash',
           logs: [
             {
-              _id: '1.4.0',
-              transactionId: '1.4',
-              blockNumber: 1,
-              blockTimestamp: 1517234642,
-              transactionHash: 'TX_HASH',
               address: 'WETH_CONTRACT',
               topic0: TRANSFER_METHOD_ID,
               data: '0x000A', // 10
-              logIndex: 0,
             },
             {
-              _id: '1.4.1',
-              transactionId: '1.4',
-              blockNumber: 1,
-              blockTimestamp: 1517234642,
-              transactionHash: 'TX_HASH',
               address: 'WETH_CONTRACT',
               topic0: 'IGNORE',
               data: 'IGNORE',
-              logIndex: 1,
             },
             {
-              _id: '1.4.2',
-              transactionId: '1.4',
-              blockNumber: 1,
-              blockTimestamp: 1517234642,
-              transactionHash: 'TX_HASH',
               address: 'WETH_CONTRACT',
               topic0: TRANSFER_METHOD_ID,
               data: '0x001E', // 30
-              logIndex: 2,
             },
-          ],
+          ] as Types.Archive.Log[],
         },
         BigNumber.from(123),
         ['WETH_CONTRACT', 'INTERMEDIATE_TOKEN', 'TOKEN_CONTRACT'],

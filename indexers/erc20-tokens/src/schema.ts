@@ -22,13 +22,12 @@ export const ERC20TransferSchema = new mongoose.Schema<ERC20TransferDocument>({
   blockNumber: { type: Number, required: true },
   blockTimestamp: { type: Number, required: true },
   transactionHash: { type: String, required: true },
-  transactionId: { type: String, required: true },
 });
 
 ERC20TransferSchema.index({ contract: 1 });
 ERC20TransferSchema.index({ from: 1 });
 ERC20TransferSchema.index({ to: 1 });
-ERC20TransferSchema.index({ transactionId: 1 });
+ERC20TransferSchema.index({ transactionHash: 1 });
 
 export const ERC20TransferModel = mongoose.model(
   'ERC20Transfer',

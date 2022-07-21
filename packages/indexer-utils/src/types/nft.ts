@@ -28,7 +28,6 @@ export interface ERC721TokenTransfer {
   blockNumber: number;
   blockTimestamp: number;
   transactionHash: string;
-  transactionId: string;
 }
 
 export interface ERC1155TokenTransfer {
@@ -42,7 +41,6 @@ export interface ERC1155TokenTransfer {
   blockNumber: number;
   blockTimestamp: number;
   transactionHash: string;
-  transactionId: string;
 }
 
 // one record per token transferred, not per sale event
@@ -58,7 +56,6 @@ export interface Sale {
   blockNumber: number;
   blockTimestamp: number;
   transactionHash: string;
-  transactionId: string;
 
   // present if price not in ETH
   erc20Contract?: string;
